@@ -1,0 +1,92 @@
+﻿namespace WorkFlows
+{
+    partial class HashSimple
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.percentData)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(3, 212);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(581, 212);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(15, 192);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(146, 17);
+            this.checkBox1.TabIndex = 72;
+            this.checkBox1.Text = "use consensus projection";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // HashSimple
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(644, 250);
+            this.Controls.Add(this.checkBox1);
+            this.Name = "HashSimple";
+            this.Text = "HashSimple";
+            this.Controls.SetChildIndex(this.button4, 0);
+            this.Controls.SetChildIndex(this.label1, 0);
+            this.Controls.SetChildIndex(this.textBox1, 0);
+            this.Controls.SetChildIndex(this.button1, 0);
+            this.Controls.SetChildIndex(this.label2, 0);
+            this.Controls.SetChildIndex(this.label3, 0);
+            this.Controls.SetChildIndex(this.label6, 0);
+            this.Controls.SetChildIndex(this.label7, 0);
+            this.Controls.SetChildIndex(this.percentData, 0);
+            this.Controls.SetChildIndex(this.relevantC, 0);
+            this.Controls.SetChildIndex(this.button2, 0);
+            this.Controls.SetChildIndex(this.label4, 0);
+            this.Controls.SetChildIndex(this.label5, 0);
+            this.Controls.SetChildIndex(this.label8, 0);
+            this.Controls.SetChildIndex(this.label9, 0);
+            this.Controls.SetChildIndex(this.checkBox1, 0);
+            ((System.ComponentModel.ISupportInitialize)(this.relevantC)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.percentData)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.CheckBox checkBox1;
+
+    }
+}
