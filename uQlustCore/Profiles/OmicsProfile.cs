@@ -26,6 +26,7 @@ namespace phiClustCore.Profiles
         public int numCol=10;
         public int numRow=18;
         public bool genePosition;
+        public int selectGenes = 0;
         public bool zScore;
         public bool quantile;
         public int numStates = 6;
@@ -99,6 +100,8 @@ namespace phiClustCore.Profiles
             wr.WriteLine("Z-score " + zScore);
             wr.WriteLine("Quantile " + quantile);
             wr.WriteLine("Selected genes " + fileSelectedGenes);
+            if (selectGenes > 0)
+                wr.Write("Select genes " + selectGenes);
             wr.Close();
         }
         public override void AddInternalProfiles()
@@ -188,6 +191,13 @@ namespace phiClustCore.Profiles
                         gR.Close();
 
                     }
+                }
+                if(line.Contains("Select "))
+                {
+                    if (aux[aux.Length - 1].Length > 0)
+                        selectGenes = Convert.ToInt32(aux[aux.Length - 1], CultureInfo.InvariantCulture);
+                    else
+                        selectGenes = 0;
                 }
                 line = r.ReadLine();
             }
@@ -824,7 +834,7 @@ namespace phiClustCore.Profiles
                 dataFinal = TransposeData(dataFinal);
             //Check(dataFinal);
             if (zScore)
-                dataFinal=StandardData(dataFinal);
+                dataFinal=StandardData(dataFinal,false,selectGenes);
             currentProgress += 20;
             if (quantile)
             {

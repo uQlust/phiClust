@@ -21,7 +21,7 @@ namespace phiClustCore
         public List<KeyValuePair<string, double>> juryLike;
         public Dictionary<string, string> hNNRes;
         public List<string> aux1;
-        public List<string> aux2;
+        public List<string> aux2;       
         public List<int> auxInt;
         public HClusterNode hNode;
         public List<HClusterNode> nodes;
@@ -57,7 +57,7 @@ namespace phiClustCore
             }
             if(clusters!=null)
             {
-                Save(clusters,stream,false);
+                Save(clusters,clusterConsisten,stream,false);
             }
             if (hNode != null)
             {
@@ -66,18 +66,17 @@ namespace phiClustCore
             }
             stream.Close();
         }
-        static public void Save(List<List<string>> list,StreamWriter stream,bool reference)
+        static public void Save(List<List<string>> list,List<double> clCons,StreamWriter stream,bool reference)
         {
-            int count = 1;
-            foreach (var item in list)
+            for(int i=0;i<list.Count;i++)
             {
-                string line = "===========CLUSTER " + count + " === Size " + item.Count;
+                string line = "===========CLUSTER " + (i+1) + " === Size " + list[i].Count;
                 if (reference)
-                    line += "====Reference model:" + item[0];
-
+                    line += "====Reference model:" + list[i][0];
+                if (clCons != null && clCons.Count == list.Count)
+                    line += "====Consitsency:" + clCons[i];
                 stream.WriteLine(line); 
-                count++;
-                foreach (var it in item)
+                foreach (var it in list[i])
                     stream.WriteLine(it);
                 stream.WriteLine("=======================================");
             }
@@ -94,7 +93,7 @@ namespace phiClustCore
             
             string newName = Path.GetFileNameWithoutExtension(fileName)+"_leafs.dat";
             StreamWriter stream = new StreamWriter(newName);
-            Save(clusters,stream,true);
+            Save(clusters,null,stream,true);
             stream.Close();
             stream = new StreamWriter(fileName);
             Queue<HClusterNode> ww = new Queue<HClusterNode>();

@@ -348,7 +348,10 @@ namespace phiClustCore
             ClusterOutput aux,output;
             //  opt.hierarchical.distance = DistanceMeasures.PEARSON;
             profOm.LoadOmicsSettings();
+            int numLeftClusters, numUpperClusters;
 
+            numLeftClusters = opt.hash.reqClusters;
+            numUpperClusters = opt.hash.relClusters;
             if (alignmentFile != null)
             {
                 hashUpper = new HashCluster("", alignmentFile, opt.hash);               
@@ -369,6 +372,7 @@ namespace phiClustCore
            
             ClusterOutput outputUpper;
             DateTime cpuPart2 = DateTime.Now;
+            opt.hash.relClusters = numUpperClusters;
             outputUpper = hashUpper.RunHashCluster();
             progressDic.Remove(name);
             hashLeft.StartProgress = 0.25;
@@ -378,7 +382,8 @@ namespace phiClustCore
             ClusterOutput outputLeft;
             profOm.heatmap = true;
             profOm.SaveOmicsSettings();
-            opt.hash.relClusters = opt.hash.reqClusters;
+            opt.hash.relClusters = numLeftClusters;
+           
             
             hashLeft.InitHashCluster();
             outputLeft = hashLeft.RunHashCluster();
@@ -399,9 +404,11 @@ namespace phiClustCore
 
             output = new ClusterOutput();
 
-         
-         //   hashUpper.CuttAlignment(hashLeft.structNames, refStructLeft);
-          //  hashLeft.CuttAlignment(hashUpper.structNames, refStructUpper);
+        
+
+
+            //   hashUpper.CuttAlignment(hashLeft.structNames, refStructLeft);
+            //  hashLeft.CuttAlignment(hashUpper.structNames, refStructUpper);
             hashUpper.CuttAlignment(listLeft, refStructLeft);
             hashLeft.CuttAlignment(listUpper, refStructUpper);
             //output.aux1 = hashLeft.stateAlignKeys;
@@ -419,6 +426,17 @@ namespace phiClustCore
            progressDic.Add(name, upper);
            
            aux=upper.DendrogUsingMicroClusters(refStructUpper);
+           List<HClusterNode> upperLeafs = aux.hNode.GetLeaves();
+
+            Dictionary<string, int> toCheckLeft = new Dictionary<string, int>();
+            foreach(var item in hashUpper.selectedColumnsHash)
+            {
+                toCheckLeft.Add(listLeft[item], 0);
+            }
+
+
+
+
            output.nodes.Add(aux.hNode);
            if (opt.hash.profileName.Contains("omics"))
            {
@@ -439,7 +457,39 @@ namespace phiClustCore
            progressDic.Add(name, left);
 
            aux = left.DendrogUsingMicroClusters(refStructLeft);
-           output.nodes.Add(aux.hNode);
+
+            Dictionary<string, int> toCheckUpper = new Dictionary<string, int>();
+            foreach (var item in hashLeft.selectedColumnsHash)
+            {
+                toCheckUpper.Add(listUpper[item], 0);
+            }
+
+
+            
+            foreach (var item in upperLeafs)
+            {
+                foreach (var it in item.setStruct)
+                    if (toCheckUpper.ContainsKey(it))
+                    {
+                        item.flagSign = true;
+                        break;
+                    }
+            }
+
+            List<HClusterNode> leftLeafs = aux.hNode.GetLeaves();
+            foreach (var item in leftLeafs)
+            {
+                foreach (var it in item.setStruct)
+                    if (toCheckLeft.ContainsKey(it))
+                    {
+                        item.flagSign = true;
+                        break;
+                    }
+            }
+
+
+
+            output.nodes.Add(aux.hNode);
            /*List<string> str = new List<string>();
            foreach (var item in hashLeft.)
                if (refStructLeft.ContainsKey(item))

@@ -31,7 +31,7 @@ namespace phiClustCore
         List<string> allItems = new List<string>();
 
         List<RangeWeight> rangeWeights = null;
-
+        public List<int> selectedColumnsHash = new List<int>();
         Dictionary<string, string> structToKey = null;
 
         public List<string> structNames = null;
@@ -52,7 +52,7 @@ namespace phiClustCore
         string dirName;
        protected Dictionary<byte, int>[] consensusStates;
         Dictionary<byte, int>[] consensusStatesReg;
-        Dictionary<byte, int>[] columns = null;
+        protected Dictionary<byte, int>[] columns = null;
         Dictionary<byte, int>[] columnsReg = null;
 
         Dictionary<string, List<int>> threadingKeys;
@@ -777,10 +777,11 @@ namespace phiClustCore
             Dictionary<string, List<int>> hashClusters = new Dictionary<string, List<int>>();
 
             int n=0;
-            while(entropy[n]<0.05)
-                columnAvoid[indexes[n++]] = true;
+            while(entropy[n]<0.05 && n<(entropy.Length-1))
+                columnAvoid[n++] = true;
 
             int position=0;
+
             int positionLeft = 0;
             int positionRight = indexes.Length;
             
@@ -792,9 +793,11 @@ namespace phiClustCore
                     columnAvoid[indexes[j]] = true;
 
                 hashClusters.Clear();
+              
                 foreach (var item in dic.Keys)
                 {
                     StringBuilder keyB = new StringBuilder();
+                    selectedColumnsHash.Clear();
                     string key = "";
                     for (int i = 0; i < item.Length; i++)
                     {
@@ -802,6 +805,7 @@ namespace phiClustCore
                             continue;
 
                         keyB.Append(item[i]);
+                        selectedColumnsHash.Add(i);
                     }
                     key = keyB.ToString();
                     if (!hashClusters.ContainsKey(key))
@@ -810,12 +814,10 @@ namespace phiClustCore
                     hashClusters[key].AddRange(dic[item]);
                 }
                 for (int j = 0; j < position; j++)
-                    columnAvoid[indexes[j]] = false;
+                    if(entropy[indexes[j]]>0.05)
+                        columnAvoid[indexes[j]] = false;
 
-                /*if (SelectionNMatchHeuristic(k, prec, hashClusters) == 1)
-                    positionLeft = position;
-                else
-                    positionRight = position;*/
+              
 
                 if (SelectionHeuristic(k, prec, hashClusters) == 1)
                     positionLeft = position;
@@ -825,7 +827,8 @@ namespace phiClustCore
                 
                 
             }
-            while (positionRight-positionLeft>1);
+            while (positionRight-positionLeft>1);                        
+
             DebugClass.WriteMessage("End Select");
             return hashClusters;
 
@@ -2027,7 +2030,7 @@ namespace phiClustCore
             return output;
         }
 
-        private void PrepareClustering(List<string> _structNames)
+        protected void PrepareClustering(List<string> _structNames)
         {
             structNames = new List<string>();
             foreach (var item in _structNames)
@@ -2064,7 +2067,7 @@ namespace phiClustCore
             return res;
 
         }
-        private List<double> CalcClustersConsistency(List<List<string>> clusters)
+        protected List<double> CalcClustersConsistency(List<List<string>> clusters)
         {
             List<double> consistency=new List<double>();
             foreach(var item in clusters)
@@ -2109,7 +2112,7 @@ namespace phiClustCore
 
         }
 
-        public ClusterOutput Cluster(List<string> _structNames,bool dendrog=false)
+        public virtual ClusterOutput Cluster(List<string> _structNames,bool dendrog=false)
         {
             
             structNames = new List<string>(_structNames.Count);

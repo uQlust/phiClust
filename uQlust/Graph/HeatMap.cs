@@ -45,6 +45,7 @@ namespace Graph
             leftNode.ClearColors(Color.Black);
             this.outp = outp;
             this.upperNode = auxUpper=upperNode;
+            this.Text = outp.alignFile;
             this.leftNode = auxLeft=leftNode;
             List<KeyValuePair<string, List<byte>>> colOmicsProfiles=new List<KeyValuePair<string,List<byte>>>();
             rowOmicsProfiles = new List<KeyValuePair<string, List<byte>>>();
@@ -343,10 +344,10 @@ namespace Graph
             leftBitMap = new Bitmap(pictureBox3.Width, pictureBox3.Height);
             left.PrepareGraphNodes(leftBitMap);
             upper.PrepareGraphNodes(upperBitMap);
-           /* pictureBox1.Refresh();
+            pictureBox1.Refresh();
             pictureBox2.Refresh();
-            pictureBox3.Refresh();*/
-            this.Invalidate();
+            pictureBox3.Refresh();
+            //this.Invalidate();
         }
 
         private void pictureBox4_Paint(object sender, PaintEventArgs e)
@@ -618,20 +619,28 @@ namespace Graph
                 string fileName = saveFileDialog1.FileName;
                 List<List<string>> clusters = new List<List<string>>();
                 List<HClusterNode> nodes = leftNode.GetLeaves();
-                foreach(var item in nodes)                
+                List<double> cons = new List<double>();
+                foreach (var item in nodes)
+                {
                     clusters.Add(item.setStruct);
+                    cons.Add(item.consistency);
+                }
                 
-                StreamWriter wS = new StreamWriter(fileName + "_Left_microclusters.dat");
-                ClusterOutput.Save(clusters,wS,true);
+                StreamWriter wS = new StreamWriter(fileName + "_gene_microclusters.dat");
+                ClusterOutput.Save(clusters,cons,wS,true);
                 wS.Close();
 
                 clusters.Clear();
+                cons = new List<double>();
                 nodes = upperNode.GetLeaves();
-                foreach (var item in nodes)                
+                foreach (var item in nodes)
+                {
                     clusters.Add(item.setStruct);
+                    cons.Add(item.consistency);
+                }
                 
-                wS = new StreamWriter(fileName + "_Right_microclusters.dat");
-                ClusterOutput.Save(clusters, wS, true);
+                wS = new StreamWriter(fileName + "_sample_microclusters.dat");
+                ClusterOutput.Save(clusters, cons,wS, true);
                 wS.Close();
 
 

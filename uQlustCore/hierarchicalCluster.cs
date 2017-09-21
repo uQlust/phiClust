@@ -24,6 +24,7 @@ namespace phiClustCore
         public string dirName;
         public Dictionary<byte, int>[] stateFreq = null;
 		public bool fNode=false;
+        public bool flagSign = false;
 		public int num;
 		public int iterNum=0;
 		public int levelNum=0;

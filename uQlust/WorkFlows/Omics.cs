@@ -79,8 +79,10 @@ namespace WorkFlows
             w.WriteLine("Gene Position Rows " + radioButton3.Checked);
             w.WriteLine("Z-score " + checkBox2.Checked);
             w.WriteLine("Quantile " + checkBox3.Checked);
-            if (textBox3.Text.Length > 0)
+            if (textBox3.Text.Length > 0 &&!checkBox6.Checked)
                 w.WriteLine("Selected genes " + textBox3.Text);
+            if (checkBox6.Checked)
+                w.WriteLine("Select genes "+numericUpDown4.Value);
             w.Close();
 
         }
@@ -195,6 +197,14 @@ namespace WorkFlows
             if (res == DialogResult.OK)
                 textBox3.Text = openFileDialog1.FileName;
 
+        }
+
+        private void checkBox6_CheckedChanged(object sender, EventArgs e)
+        {
+            label6.Enabled = !checkBox6.Checked;
+            textBox3.Enabled = !checkBox6.Checked;
+            button3.Enabled = !checkBox6.Checked;
+            numericUpDown4.Enabled = checkBox6.Checked;
         }
     }
 }

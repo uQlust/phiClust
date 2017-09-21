@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -74,6 +74,7 @@
     <Compile Include="HashCInput.cs" />
     <Compile Include="HashCluster.cs" />
     <Compile Include="HashClusterDendrog.cs" />
+    <Compile Include="HashKDendrog.cs" />
     <Compile Include="HierarchicalCInput.cs" />
     <Compile Include="hierarchicalCluster.cs" />
     <Compile Include="HNN.cs" />

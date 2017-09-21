@@ -114,6 +114,7 @@ namespace phiClustCore
         {
             PrepareAllFields();
         }
+
         public void GenerateAutomaticProfiles(string fileName)
         {
             Type t = this.GetType();

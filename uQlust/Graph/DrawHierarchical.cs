@@ -401,6 +401,16 @@ namespace Graph
                                     c = Color.DarkBlue;
                         gr.FillEllipse(new SolidBrush(c), rect);
                     }
+                    if (aux.flagSign)
+                    {
+                        Pen pl = new Pen(Color.Black);
+                        GraphNode gn = aux.gNode;
+                        if (horizontalView)
+                            gr.DrawLine(pl, gn.x, gn.y+5, gn.x, gn.y + 10);
+                        else
+                            gr.DrawLine(pl, gn.x+5, gn.y , gn.x + 10, gn.y);
+                    }
+
                     string label = aux.refStructure;
                     if (label.Contains(";"))
                     {
