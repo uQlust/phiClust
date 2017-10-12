@@ -23,7 +23,7 @@ namespace WorkFlows
         protected Settings set;
         public Form parent;
         ProfileTree tree = new ProfileTree();
-        string dataFileName;
+        public string dataFileName;
 
         public RpartSimple()
         {

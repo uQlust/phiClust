@@ -38,6 +38,7 @@
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.percentData)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.refPoints)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
@@ -111,9 +112,9 @@
             this.label11.AutoSize = true;
             this.label11.Location = new System.Drawing.Point(15, 229);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(111, 13);
+            this.label11.Size = new System.Drawing.Size(79, 13);
             this.label11.TabIndex = 73;
-            this.label11.Text = "Choose file with labels";
+            this.label11.Text = "Choose test file";
             // 
             // textBox2
             // 
@@ -147,6 +148,11 @@
             // numericUpDown1
             // 
             this.numericUpDown1.Location = new System.Drawing.Point(134, 39);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            10000000,
+            0,
+            0,
+            0});
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
             this.numericUpDown1.TabIndex = 2;
@@ -204,6 +210,8 @@
             this.Name = "HNN";
             this.Text = "HNN";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HNN_FormClosing);
+            this.Controls.SetChildIndex(this.refPoints, 0);
+            this.Controls.SetChildIndex(this.label10, 0);
             this.Controls.SetChildIndex(this.button4, 0);
             this.Controls.SetChildIndex(this.label1, 0);
             this.Controls.SetChildIndex(this.textBox1, 0);
@@ -226,6 +234,7 @@
             this.Controls.SetChildIndex(this.checkBox1, 0);
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.percentData)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.refPoints)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();

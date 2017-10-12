@@ -18,9 +18,17 @@ namespace WorkFlows
         public HNN(Form parent, Settings set, ResultWindow results, OMICS_CHOOSE alg,string fileName = null,string dataFileName=null): base(parent, set, results, fileName,dataFileName)
         {
             InitializeComponent();
-            this.alg = alg;
+            this.label10.Visible = false;
+            this.refPoints.Visible = false;
+            this.alg = alg;            
             this.button2.Click -= new System.EventHandler(this.button2_Click);
-            if(fileName!=null)
+            if (alg != OMICS_CHOOSE.HNN)
+            {
+                label1.Text = "Choose file with class labels";
+                label11.Text= "Choose file without class labels";
+                this.Text = "GuidedClustering";
+            }
+            if (fileName!=null)
             {
                 opt.ReadOptionFile(fileName);
                 textBox2.Text = opt.hNNLabels;               
@@ -35,13 +43,14 @@ namespace WorkFlows
                 w.WriteLine(labels[i] + " " + classLabels[i]);
             w.Close();
         }
+
         void CombineTrainTest()
         {
             if(opt.hash.profileName.Contains("omics"))
             {
                 OmicsProfile om = new OmicsProfile();
-                List<string> classLabels = om.ReadClassLabels(textBox1.Text,radioButton1.Checked,(int)numericUpDown1.Value);
-                om.ReadOmicsFile(textBox1.Text);
+                List<string> classLabels = om.ReadClassLabels(this.dataFileName,radioButton1.Checked,(int)numericUpDown1.Value);
+                om.ReadOmicsFile(this.dataFileName);
                 if (om.labelGenes[0].Count == classLabels.Count)
                     SaveFile(textBox2.Text + "_labels",om.labelGenes[0],classLabels);
                 else
@@ -50,24 +59,26 @@ namespace WorkFlows
                     else
                         throw new Exception("Incorrect numer of class labels");
 
-                om.CombineTrainigTest(textBox1.Text + "_combine", textBox1.Text, textBox2.Text);
+                om.CombineTrainigTest(ChangeFileName(this.dataFileName,"combine"), this.dataFileName, textBox2.Text);
             }
             else
             {
                 StreamReader w = new StreamReader(textBox1.Text);
-                StreamWriter r=new StreamWriter(textBox1.Text+"_combine");
+                StreamWriter r=new StreamWriter(ChangeFileName(textBox1.Text,"combine_"));
                 StreamWriter rl = new StreamWriter(textBox2.Text + "_labels");
                 string line = "";
                 string remlabel = "";
                 string remName = "";
                 line = w.ReadLine();
+                
                 while(line!=null)
                 {
                     if (!line.Contains(">"))
                     {
                         string[] aux = line.Split(' ');
                        // r.Write("pdb_FragBag sequence");
-                        r.Write("pdb_FragBag profile");
+                       if(!line.Contains(" profile "))
+                            r.Write("pdb_FragBag profile");
                         for (int i = 0; i < aux.Length; i++)
                         {
                             if (i != numericUpDown1.Value - 1)
@@ -93,7 +104,8 @@ namespace WorkFlows
                 while (line != null)
                 {
                     if (!line.Contains(">"))
-                        r.Write("pdb_FragBag profile ");
+                        if(!line.Contains(" profile "))
+                            r.Write("pdb_FragBag profile ");
                     r.WriteLine(line);
                     line = w.ReadLine();
                 }
@@ -103,7 +115,14 @@ namespace WorkFlows
             }
 
         }
+        string ChangeFileName(string fileName,string prefix)
+        {
+            string path = Path.GetDirectoryName(fileName);
+            string fName = Path.GetFileName(fileName);
+            fName = path + Path.DirectorySeparatorChar+"combine_" + fName;
 
+            return fName;
+        }
         private void buttonHNN_Click(object sender, EventArgs e)
         {
             opt.dataDir.Clear();
@@ -117,7 +136,14 @@ namespace WorkFlows
                 opt.clusterAlgorithm.Add(ClusterAlgorithm.GuidedHashCluster);
             opt.profileFiles.Clear();
             opt.hNNLabels = textBox2.Text+"_labels";
-            opt.profileFiles.Add(textBox1.Text+"_combine");
+            if (opt.hash.profileName.Contains("omics"))
+            {
+        
+                opt.profileFiles.Add(ChangeFileName(this.dataFileName,"combine"));
+                OmicsProfile om = new OmicsProfile();
+            }
+            else
+                opt.profileFiles.Add(ChangeFileName(textBox1.Text,"combine"));
             opt.hash.relClusters = (int)relevantC.Value;
             opt.hash.perData = (int)percentData.Value;
             opt.hash.useConsensusStates = checkBox1.Checked;

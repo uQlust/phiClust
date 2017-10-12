@@ -18,7 +18,7 @@ namespace phiClustCore.Profiles
     {
         PERCENTILE,
         Z_SCORE,
-        EQUAL_DIST
+        EQUAL_DIST,     
     };
     public class OmicsProfile : UserDefinedProfile
     {
@@ -202,26 +202,36 @@ namespace phiClustCore.Profiles
                 line = r.ReadLine();
             }
             r.Close();
-
-            labelGenes = new List<string>[labelGeneStart.Count];
-            for (int i = 0; i < labelGenes.Length; i++)
-                labelGenes[i] = new List<string>();
-
-            labelSamples = new List<string>[labelSampleStart.Count];
-            for (int i = 0; i < labelSamples.Length; i++)
-                labelSamples[i] = new List<string>();
-
-            labId = new string[labelSamples.Length];
+            if (labelGeneStart != null && labelGeneStart.Count>0)
+            {
+                labelGenes = new List<string>[labelGeneStart.Count];
+                for (int i = 0; i < labelGenes.Length; i++)
+                    labelGenes[i] = new List<string>();
+            }
+            if (labelSampleStart != null && labelSampleStart.Count > 0)
+            {
+                labelSamples = new List<string>[labelSampleStart.Count];
+                for (int i = 0; i < labelSamples.Length; i++)
+                    labelSamples[i] = new List<string>();
+            }
+            if(labelSamples!=null)
+                labId = new string[labelSamples.Length];
 
         }
         public void CombineTrainigTest(string fileName, string fileNameTrain, string fileNameTest)
         {
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
             StreamWriter wF = new StreamWriter(fileName);
             string line = "";
             string remLine = "";
             List<List<double>> dat = ReadOmicsFile(fileNameTest);
             List<string> auxRowTest = null;
             List<string> auxColTest = null;
+            int i = 0;
             if (genePosition)
             {
                 auxRowTest =new List<string>( labelGenes[0]);
@@ -247,38 +257,44 @@ namespace phiClustCore.Profiles
                 auxRow = labelSamples[0];
                 auxCol = labelGenes[0];
             }
+
+            List<List<double>>  localDat=JoinData(trainDat, dat);
+
             wF.WriteLine();
             wF.Write("EMPTY ");
-            for (int i = 0; i < auxCol.Count; i++)
-                wF.Write(auxCol[i] +" ");
-            for (int i = 0; i < auxColTest.Count - 1; i++)
+            for (i = 0; i < auxCol.Count; i++)
+                wF.Write(auxCol[i] + " ");
+            for (i = 0; i < auxColTest.Count - 1; i++)
                 wF.Write(auxColTest[i] + " ");
             wF.WriteLine(auxColTest[auxColTest.Count - 1]);
 
 
-                for (int i = 0; i < trainDat.Count; i++)
+
+            if (trainDat.Count == localDat.Count)
+                for (i = 0; i < trainDat.Count; i++)
                 {
                     wF.Write(auxRow[i] + " ");
-                    for (int j = 0; j < trainDat[i].Count; j++)
-                        wF.Write(trainDat[i][j] + " ");
-                    if (transpose)
-                    {
-                        for (int j = 0; j < dat[i].Count - 1; j++)
-                            wF.Write(dat[i][j] + " ");
-                        wF.WriteLine(dat[i][dat[i].Count - 1]);
-                    }
-                    else
-                        wF.WriteLine();
-
+                    for (int j = 0; j < localDat[i].Count; j++)
+                        wF.Write(localDat[i][j] + " ");
+                    wF.WriteLine();
                 }
-            if (!transpose)
-                for (int i = 0; i < dat.Count; i++)
+            else
+            {
+                for (i = 0; i < trainDat.Count; i++)
                 {
-                    wF.Write(auxRowTest[i] + " ");
-                    for (int j = 0; j < dat[i].Count - 1; j++)
-                        wF.Write(dat[i][j] + " ");
-                    wF.WriteLine(dat[i][dat[i].Count - 1]);
+                    wF.Write(auxRow[i] + " ");
+                    for (int j = 0; j < localDat[i].Count; j++)
+                        wF.Write(localDat[i][j] + " ");
+                    wF.WriteLine();
                 }
+                for (int k = 0; k < dat.Count; k++)
+                {
+                    wF.Write(auxRowTest[k] + " ");
+                    for (int j = 0; j < dat[k].Count; j++)
+                        wF.Write(dat[k][j] + " ");
+                    wF.WriteLine();
+                }
+            }
             wF.Close();
         }
         public static List<KeyValuePair< string,List<byte>>> ReadOmicsProfile(string fileName)
@@ -681,6 +697,54 @@ namespace phiClustCore.Profiles
             }
 
         }
+        public List<List<double>> JoinData(List<List<double>> data1, List<List<double>> data2)
+        {
+            List<List<double>> localData = new List<List<double>>();
+
+
+            if (data1.Count == data2.Count)
+            {
+
+
+                for (int i = 0; i < data1.Count; i++)
+                {
+                    List<double> rowData = new List<double>();
+                    foreach (var item in data1[i])
+                        rowData.Add(item);
+                    foreach (var item in data2[i])
+                        rowData.Add(item);
+
+                    localData.Add(rowData);
+                }
+            }
+            else
+            {
+                if (data1[0].Count != data2[0].Count)
+                    throw new Exception("nes! Cannot be combined");
+
+                for (int i = 0; i < data1.Count; i++)
+                {
+                    List<double> rowData = new List<double>();
+                    foreach (var item in data1[i])
+                        rowData.Add(item);
+                    localData.Add(rowData);
+                }
+
+                for (int i = 0; i < data2.Count; i++)
+                {
+                    List<double> rowData = new List<double>();
+                    foreach (var item in data2[i])
+                        rowData.Add(item);
+
+                    localData.Add(rowData);
+                }
+
+            }
+
+
+            return localData;
+
+        }
         public List<List<double>> ReadOmicsFile(string fileName)
         {
             List<List<double>> localData = new List<List<double>>();
@@ -788,6 +852,50 @@ namespace phiClustCore.Profiles
 
             return resData;
         }
+        double[,] QuantileCoding(double[,] dataFinal)
+        {
+            if (!genePosition)
+                dataFinal = TransposeData(dataFinal);
+            
+            if (zScore)
+                dataFinal = StandardData(dataFinal, false, selectGenes);
+            currentProgress += 20;
+
+            dataFinal = QuantileNorm(dataFinal);
+
+            double[,] outData = IntervalCoding(dataFinal);
+
+            return outData;
+        }
+        double[,] ZScoreCoding(double[,] dataFinal)
+        {
+            if (!genePosition)
+                dataFinal = TransposeData(dataFinal);
+           
+            dataFinal = StandardData(dataFinal, false, selectGenes);
+
+            double[,] cc = dataFinal;// TransposeData(dataFinal);
+            StreamWriter xx = new StreamWriter("test.vv");
+            for(int i=0;i<cc.GetLength(0);i++)
+            {
+                for(int j=0;j<cc.GetLength(1);j++)
+                {
+                    xx.Write(cc[i, j] + " ");
+                }
+                xx.WriteLine();
+            }
+            xx.Close();
+            currentProgress += 20;
+
+           // double[,] outData = IntervalCoding(dataFinal);
+           double[,] outData = IntervalCodingPerSample(dataFinal);
+
+
+            //outData = TransposeData(outData);
+
+            return outData;
+        }
+
         public override int Run(object processParams)
         {
             string fileName = ((ThreadFiles)(processParams)).fileName;
@@ -829,36 +937,20 @@ namespace phiClustCore.Profiles
                 }
 
             }
-
-            if (!genePosition)
-                dataFinal = TransposeData(dataFinal);
-            //Check(dataFinal);
-            if (zScore)
-                dataFinal=StandardData(dataFinal,false,selectGenes);
-            currentProgress += 20;
+            double[,] outData;
             if (quantile)
-            {
-                // dataFinal = TransposeData(dataFinal);
-                dataFinal = QuantileNorm(dataFinal);
-            //    dataFinal = TransposeData(dataFinal);
-            }
+                outData = QuantileCoding(dataFinal);
+            else
+                if (zScore)
+                outData = ZScoreCoding(dataFinal);
+            else
+                outData = IntervalCoding(dataFinal);
 
-            //if (zScore)
-              //  StandardData(dataFinal);
 
-            
-
-            //if (!transpose)
-           //     dataFinal = TransposeData(dataFinal);
-            
             StreamWriter wr;
             string profFile = GetProfileName(fileName);
 
             wr = new StreamWriter(profFile);
-           // dataFinal = TransposeData(dataFinal);
-            double [,] outData=IntervalCoding(dataFinal);
-            if (!genePosition)
-                outData = TransposeData(outData);
             
             int l=0;
             for (i = 0; i < outData.GetLength(0); i++)
@@ -936,17 +1028,22 @@ namespace phiClustCore.Profiles
             {
                 sumX = 0;
                 sumX2 = 0;
+                int counter = 0;
                 for (int j = 0; j < data.GetLength(1); j++)
                     if (data[i, j] != double.NaN)
                     {
                         sumX += data[i, j];
                         sumX2 += data[i, j] * data[i, j];
+                        counter++;
                     }
 
-                sumX /= data.GetLength(1);
-                sumX2 /= data.GetLength(1);
-                avr[i] = sumX;
-                dev[i] = Math.Sqrt(sumX2 - avr[i] * avr[i]);
+                if (counter > 0)
+                {
+                    sumX /= counter;
+                    sumX2 /= counter;
+                    avr[i] = sumX;
+                    dev[i] = Math.Sqrt(sumX2 - avr[i] * avr[i]);
+                }
             }
 
         }
@@ -962,7 +1059,7 @@ namespace phiClustCore.Profiles
             {
 
                     for (int j = 0; j < data.GetLength(1); j++)
-                        if (data[i, j] != double.NaN && dev[i] > 0)
+                        if (data[i, j] != double.NaN && data[i,j]!=0 && dev[i] > 0 )
                             data[i, j] = (data[i, j] - avr[i]) / dev[i];
             }
 
@@ -1021,13 +1118,52 @@ namespace phiClustCore.Profiles
 
             return intervals;
         }
+        static int[] IntervalCodigPerSample(double[,] data,int num, double[,] intervals)
+        {
+            int[] codedData = new int[data.GetLength(1)];
+            for (int j = 0; j < data.GetLength(1); j++)
+            {
+                int code = intervals.GetLength(0);
+
+                if (data[num,j] < intervals[0, 0])
+                {
+                    codedData[j] = 1;
+                    continue;
+                }
+                if (data[num,j] > intervals[intervals.GetLength(0) - 1, 1])
+                {                   
+                    codedData[j]= intervals.GetLength(0) - 1;
+                    continue;
+                }
+                for (int k = 0; k < intervals.GetLength(0); k++)
+                {
+                    if (data[num,j] == double.NaN)
+                    {
+                        code = 0;
+                        break;
+                    }
+                    if (data[num,j] >= intervals[k, 0] && data[num,j] < intervals[k, 1])
+                    {
+                        code = k + 1;
+                        break;
+                    }
+                }
+                if (code == 11)
+                    Console.Write("kssks");
+                codedData[j] = code;
+            }
+
+            return codedData;
+        }
         static double [,] IntervalCodig(double[,] data,double [,] intervals)
         {
             double[,] newData = new double[data.GetLength(0), data.GetLength(1)];
             int[] codedRow = new int[newData.GetLength(1)];
             for (int i = 0; i < data.GetLength(0); i++)
             {
-                for (int j = 0; j < data.GetLength(1); j++)
+
+                codedRow=IntervalCodigPerSample(data,i, intervals);
+                /*for (int j = 0; j < data.GetLength(1); j++)
                 {
                     int code = intervals.GetLength(0);
 
@@ -1055,7 +1191,7 @@ namespace phiClustCore.Profiles
                         }
                     }
                     codedRow[j] = code;
-                }
+                }*/
                 for (int n = 0; n < newData.GetLength(1); n++)
                     newData[i, n] = codedRow[n];
 
@@ -1065,12 +1201,72 @@ namespace phiClustCore.Profiles
         }
 
         
+        double [,] IntervalCodingPerSample(double [,]data)
+        {
+            double[,] newData = data;
+            Dictionary<double, int> hashValues = new Dictionary<double, int>();
+            double[] colValues = new double[data.GetLength(1)];
+            double[,] intervals=null;
+            double[,] outData = new double[data.GetLength(0), data.GetLength(1)];
+            if (coding == CodingAlg.Z_SCORE)
+                newData = ZscoreCoding(data);
 
+            for (int j = 0; j < newData.GetLength(0); j++)
+            {
+                hashValues.Clear();
+                for (int i = 0; i < newData.GetLength(1); i++)
+                {
+                    colValues[i] = data[j, i];
+
+                    if (!hashValues.Keys.Contains(data[j, i]))
+                        hashValues.Add(data[j, i], 1);
+                    else
+                        hashValues[data[j, i]]++;
+                }
+                int[] coded=null;
+                //Array.Sort(colValues);
+                if (hashValues.Keys.Count < 10)
+                    Console.Write("ksjdksjd");
+                if (j == 129)
+                Console.Write("jsjs");
+                try
+                {
+
+                    intervals = SetupIntervals(hashValues);
+                }
+                catch (Exception ex)
+                {
+                    Console.Write("UPS");
+
+                }
+                coded = IntervalCodigPerSample(data, j, intervals);
+
+
+                for (int i = 0; i < coded.Length; i++)
+                {
+                    if (coded[i] == 11)
+                        Console.Write("jdjdj");
+                    outData[j, i] = coded[i];
+                }
+            }
+            StreamWriter ir;
+            if (processName.Length > 0)
+                ir = new StreamWriter("generatedProfiles/OmicsIntervals_" + processName + ".dat");
+            else
+                ir = new StreamWriter("generatedProfiles/OmicsIntervals_.dat");
+            foreach (var item in labId)
+                ir.WriteLine("Label " + item);
+            for (int i = 0; i < intervals.GetLength(0); i++)
+                ir.WriteLine("Code " + i + " " + intervals[i, 0] + " " + intervals[i, 1]);
+            ir.Close();            
+
+            return outData;
+
+        }
         double [,] IntervalCoding(double [,] data)
         {
             double[,] newData = data;
-            HashSet<double> hashValues = new HashSet<double>();
-            double []colValues = new double [data.GetLength(1)];
+            Dictionary<double, int> hashValues = new Dictionary<double, int>();
             double[,] intervals;
             double[,] outData;
             if (coding == CodingAlg.Z_SCORE)
@@ -1078,23 +1274,23 @@ namespace phiClustCore.Profiles
             
             for (int j = 0; j < newData.GetLength(0); j++)
             {
-                for (int i = 0; i < newData.GetLength(1); i++)
+                for (int i = 0; i < newData.GetLength(1)/10; i++)
                 {
-                    colValues[i] = data[j, i];
-
-                    if (!hashValues.Contains(data[j, i]))
-                        hashValues.Add(data[j,i]);
+                    if (!hashValues.Keys.Contains(data[j, i]))
+                        hashValues.Add(data[j, i], 1);
+                    else
+                        hashValues[data[j, i]]++;
                 }
 
-                Array.Sort(colValues);
+                //Array.Sort(colValues);
             }
 
             int nn=0;
-            colValues = new double[hashValues.Count];
-            foreach (var item in hashValues)
-                colValues[nn++] = item;
-            Array.Sort(colValues);
-            intervals = SetupIntervals(colValues);
+            //colValues = new double[hashValues.Count];
+            //foreach (var item in hashValues.Keys)
+              //  colValues[nn++] = item;
+            //Array.Sort(colValues);
+            intervals = SetupIntervals(hashValues);
 
             
             StreamWriter ir;
@@ -1112,59 +1308,100 @@ namespace phiClustCore.Profiles
 
             return outData;
         }
-        double[, ] SetupIntervals(double []dataValues)
+        double[, ] SetupIntervals(Dictionary <double,int> dataValues)
         {
+            if (numStates < 3)
+                numStates = 3;
             double [,] intervals=new double [numStates,2];
             double max, min;
             max = double.MinValue;
             min = double.MaxValue;
-            for (int i = 0; i < dataValues.Length; i++)
+//            double[] values = new double[dataValues.Keys.Count];
+            int n = 0;
+            double step = 0;
+            int i = 0;
+            List<double> dlist = new List<double>(dataValues.Keys);
+            dlist.Sort();
+            min = dlist[0];
+            max = dlist[dlist.Count - 1];
+            switch (coding)
             {
-                if (max < dataValues[i])
-                    max = dataValues[i];
-                if (min > dataValues[i])
-                    min = dataValues[i];
-            }
-
-            switch(coding)
-            {
-                case CodingAlg.EQUAL_DIST:
                 case CodingAlg.Z_SCORE:
-                    double step = (max - min) / numStates;
-                    for (int i = 0; i < numStates; i++)
+                    int s = 0;                   
+                    double st = 3.0 / numStates;
+                    intervals[s, 0] = -100000;
+                    intervals[s++, 1] = -st *(int)(numStates/2);                  
+                    for(i=(numStates-2)/2;i>=1;i--,s++)
                     {
-                        intervals[i, 0] = dataValues[0] + i * step;
-                        intervals[i, 1] = dataValues[0] + (i + 1) * step;
+                        intervals[s, 0] = -st * (i + 1);
+                        intervals[s, 1] = -st * i;
+                    }
+                    intervals[s, 0] = -st;
+                    intervals[s++, 1] = st;
+
+                    for (i=1;i<=(numStates-2)/2;i++,s++)
+                    {
+                        intervals[s, 0] = st * i;
+                        intervals[s, 1] = st * (i+1);
+                    }
+                    intervals[s, 0] = st*(int)(numStates/2);
+                    intervals[s, 1] = 100000;
+
+                    break;
+                case CodingAlg.EQUAL_DIST:
+                
+                    step = (max - min) / numStates;
+                    for (i = 0; i < numStates; i++)
+                    {
+                        intervals[i, 0] = dlist[0] + i * step;
+                        intervals[i, 1] = dlist[0] + (i + 1) * step;
                     }
                     break;
-                case CodingAlg.PERCENTILE:                
-                    double size = (double)dataValues.Length / numStates;
-                    int num=0;
-                    int rem = 0;
-                    int n = 0;
-                    for(n=0;n<dataValues.Length;n++)
+
+                case CodingAlg.PERCENTILE:
+                    int counter = 0;
+                    double end = 0;
+                    foreach (var item in dataValues.Values)
+                        counter += item;
+                    int amount = counter / numStates;
+                    counter = 0;
+                    int k = 0;
+                    double begin = dlist[0];
+                    if (dlist.Count < 100)
+                        Console.Write("ksjdksd");
+                    foreach(var item in dlist)
                     {
-                        if(n>=size*(num+1))
+                        counter += dataValues[item];
+                        if(counter>=amount)
                         {
-                            while (n + 1 < dataValues.Length && dataValues[n] == dataValues[n+1] || dataValues[n]==double.NaN) n++;
-                            
-                            if (n < dataValues.Length)
-                            {
-                                intervals[num, 1] = dataValues[n];
-                                intervals[num, 0] = dataValues[rem];
-                            }
-                      
-                            rem = n;
-                            num++;
+                            end = item;
+                            counter = 0;
+                            intervals[k, 0] = begin;
+                            if (begin == end)
+                                end = end + 0.01 * end;
+
+                            intervals[k, 1] = end;
+                            begin = intervals[k++, 1];
                         }
                     }
-                    if (num < numStates)
+                    if (counter>0 && counter < amount)
                     {
-                        intervals[num, 0] = dataValues[rem];
-                        intervals[num, 1] = max;
+                        if (k < intervals.GetLength(0))
+                        {
+                            intervals[k, 0] = begin;
+                            end = dlist[dlist.Count - 1];
+                            if (begin == end)
+                                end += 0.01 * end;
+
+                            intervals[k, 1] = end;
+                        }
+                        else
+                            intervals[k-1, 1] = dlist[dlist.Count - 1];
                     }
 
                     break;
+
+
             }
             return intervals;
 

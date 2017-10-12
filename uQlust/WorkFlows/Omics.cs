@@ -27,6 +27,7 @@ namespace WorkFlows
         bool previous = false;
         public string processName = null;
         OMICS_CHOOSE nextWindow;
+        int numValue;
         static int counter = 0;
         List<int> sampleLabelsPos = new List<int>();
         public Omics()
@@ -42,6 +43,7 @@ namespace WorkFlows
             foreach (var item in Enum.GetValues(typeof(CodingAlg)))            
                 comboBox1.Items.Add(item);
             comboBox1.SelectedIndex = 0;
+            numValue = (int)numericUpDown3.Value;
             counter++;
         }
 
@@ -205,6 +207,32 @@ namespace WorkFlows
             textBox3.Enabled = !checkBox6.Checked;
             button3.Enabled = !checkBox6.Checked;
             numericUpDown4.Enabled = checkBox6.Checked;
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if ((CodingAlg)comboBox1.SelectedItem == CodingAlg.Z_SCORE)
+                if (numericUpDown3.Value < 3)
+                    numericUpDown3.Value = 3;
+                else
+                    if (((int)numericUpDown3.Value) % 2 == 0)
+                        numericUpDown3.Value = numericUpDown3.Value + 1;
+        }
+
+        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
+        {
+            if ((CodingAlg)comboBox1.SelectedItem == CodingAlg.Z_SCORE)
+                if (numericUpDown3.Value < 3)
+                    numericUpDown3.Value = 3;
+                else                    
+                    if (((int)numericUpDown3.Value) % 2 == 0)
+                        if(numValue<numericUpDown3.Value)
+                            numericUpDown3.Value = numericUpDown3.Value + 1;
+                        else
+                            numericUpDown3.Value = numericUpDown3.Value - 1;
+
+            numValue = (int)numericUpDown3.Value;
+
         }
     }
 }

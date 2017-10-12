@@ -10,6 +10,10 @@ namespace phiClustCore
         public List<string> validateList = new List<string>();
         public List<string> testList = new List<string>();
         HashCluster hk=null;     
+        public HNN(HashCluster hk)
+        {
+            this.hk = hk;
+        }
         public HNN(HashCluster hk,Dictionary<string,string> classLabels)        
         {
             this.hk=hk;
@@ -68,6 +72,12 @@ namespace phiClustCore
             }
             acc = (double)good / all;
             return acc;
+        }
+        public Dictionary<string, string> HNNTest(string fileName)
+        {
+            Dictionary<string, string> aux = new Dictionary<string, string>();
+
+            return aux;
         }
         public Dictionary<string, string> HNNTest(List<string> testList)
         {

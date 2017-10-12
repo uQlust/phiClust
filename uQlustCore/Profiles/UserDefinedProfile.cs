@@ -58,17 +58,28 @@ namespace phiClustCore.Profiles
                         info.sequence = null;
                         info.profile = newProfile;
                         if (dic.ContainsKey(name))
+                        {
+                            wr.Close();
                             throw new Exception("The nameof profile must be unique, name: " + name + " already exists in " + fileName);
+                        }
                         dic.Add(name, info);
                     }
 
                     name = line.Replace(">", "");
                     line = wr.ReadLine();
                 }
-                if (line.Contains(node.profName+" "))
+                if (line.Contains(" profile "))
                 {
 
-                    string cLine=line.Remove(0, (node.profName+" profile ").Length);
+                    int index = line.IndexOf(" profile ");
+                    if (index == -1)
+                    {
+                        wr.Close();
+                        throw new Exception("Incorrect file format you have to have 'profile' word!");
+                    }
+
+                    string cLine=line.Remove(0, " profile ".Length+index);
+
                     cLine = Regex.Replace(cLine, @"\s+", " ");
                     cLine = cLine.Trim();
                     string[] aux;

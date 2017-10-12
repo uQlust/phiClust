@@ -83,13 +83,7 @@ namespace phiClustCore
             r.LoadProfiles(profName);
             r.listFile = profilesFile;
             DebugClass.WriteMessage("profiles gen started "+profName);
-            try
-            {
-                r.MakeProfiles();
-            }
-            catch (Exception cdcdd)
-            {
-            }
+            r.MakeProfiles();
             DebugClass.WriteMessage("Prfofiles end");
         }
         private void StartAlignment(Settings dirSettings, string profName, string dirName, List<string> fileNames )

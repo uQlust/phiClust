@@ -301,6 +301,14 @@ namespace phiClustCore
             DateTime cpuPart1 = DateTime.Now;
             HashCluster hCluster = null;
             OmicsProfile profOm = new OmicsProfile();
+            profOm.LoadOmicsSettings();
+            profOm.numRow = 3;
+            profOm.numCol = 2;
+            profOm.labelGeneStart = new List<int>();
+            profOm.labelGeneStart.Add(1);
+            profOm.labelSampleStart = new List<int>();
+            profOm.labelSampleStart.Add(2);
+            profOm.SaveOmicsSettings();
             if (alignmentFile != null)
                 hCluster = new HashCluster(null, alignmentFile, opt.hash);
             else

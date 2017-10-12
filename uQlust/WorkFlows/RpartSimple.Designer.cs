@@ -303,7 +303,7 @@
         public System.Windows.Forms.Label label8;
         public System.Windows.Forms.Label label9;
         private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.NumericUpDown refPoints;
-        private System.Windows.Forms.Label label10;
+        public System.Windows.Forms.NumericUpDown refPoints;
+        public  System.Windows.Forms.Label label10;
     }
 }

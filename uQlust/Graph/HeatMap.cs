@@ -361,19 +361,19 @@ namespace Graph
 
             List<int> ordered = distV.Keys.ToList();
             ordered.Sort();
-                foreach(var item in ordered)
-                {
-                    b.Color=colorMap[item-1];
-                    e.Graphics.FillRectangle(b,xPos,yPos,15,10);
+            foreach (var item in ordered)
+            {
+                b.Color = colorMap[item - 1];
+                e.Graphics.FillRectangle(b, xPos, yPos, 15, 10);
                 //e.Graphics.DrawString(item.ToString(), drawFont, drawBrush, xPos+25,yPos-3);
-                e.Graphics.DrawString(indexLabels[item-1].ToString(), drawFont, drawBrush, xPos + 25, yPos - 3);
+                e.Graphics.DrawString(indexLabels[item - 1].ToString(), drawFont, drawBrush, xPos + 25, yPos - 3);
                 yPos += 25;
-                    if(yPos>pictureBox4.Height)
-                    {
-                        yPos = 5;
-                        xPos += 40;
-                    }
+                if (yPos > pictureBox4.Height)
+                {
+                    yPos = 5;
+                    xPos += 40;
                 }
+            }
              
         }
 
