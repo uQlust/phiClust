@@ -42,8 +42,8 @@ namespace phiClustCore
            public bool reference1DjuryKmeans;
            [Description("Use 1DJury to find reference vectors in Aglomerative")]
            public bool reference1DjuryAglom;
-           [Description("Use 1DJury to find reference vectors in Fast")]
-           public bool reference1DjuryFast;
+           [Description("Use HTree for dendrogram")]
+           public bool uHTree;
            [Description("Path to the profile for 1djury hash")]
            public string jury1DProfileH="profiles/SS-SA.profiles";
            [Description("Path to the profile for 1djury Kmeans")]

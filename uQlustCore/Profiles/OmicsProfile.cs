@@ -875,16 +875,6 @@ namespace phiClustCore.Profiles
             dataFinal = StandardData(dataFinal, false, selectGenes);
 
             double[,] cc = dataFinal;// TransposeData(dataFinal);
-            StreamWriter xx = new StreamWriter("test.vv");
-            for(int i=0;i<cc.GetLength(0);i++)
-            {
-                for(int j=0;j<cc.GetLength(1);j++)
-                {
-                    xx.Write(cc[i, j] + " ");
-                }
-                xx.WriteLine();
-            }
-            xx.Close();
             currentProgress += 20;
 
            // double[,] outData = IntervalCoding(dataFinal);

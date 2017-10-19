@@ -104,9 +104,9 @@ namespace phiClustCore
         public override string ToString()
         {
             if(input!=null && !input.combine)
-                return "uQlust:Hash";
+                return "phiClust:Hash";
 
-            return "uQlust:Rpart";
+            return "phiClust:Rpart";
         }
         public virtual void InitHashCluster()
         {         
@@ -379,6 +379,14 @@ namespace phiClustCore
             return 1;
 
 
+        }
+
+        private int SelectionHeuristic(int k, Dictionary<string, List<int>> dic)
+        {
+            if (dic.Keys.Count < k)
+                return 1;
+            else
+                return 0;
         }
         private int SelectionHeuristic(int k, double percent, Dictionary<string, List<int>> dic)
         {
@@ -754,15 +762,15 @@ namespace phiClustCore
             }*/
             return finalList;
         }
-        private Dictionary<string, List<int>> SelectColumnsByEntropy(Dictionary<string, List<int>> dic, int k, double prec)
+        private Dictionary<string, List<int>> SelectColumnsByEntropyTest(Dictionary<string, List<int>> dic, int k, double prec)
         {
             if (columns == null)
                 return null;
             DebugClass.WriteMessage("Select");
-            bool [] columnAvoid=new bool [columns.Length];
+            bool[] columnAvoid = new bool[columns.Length];
             for (int i = 0; i < columns.Length; i++)
                 columnAvoid[i] = false;
-            
+
             int[] indexes = new int[columnAvoid.Length];
 
             for (int j = 0; j < indexes.Length; j++)
@@ -771,20 +779,19 @@ namespace phiClustCore
             double[] entropy = CalcEntropy(columns);
 
             Array.Sort(entropy, indexes);
-           // Array.Reverse(entropy);
+            // Array.Reverse(entropy);
             //Array.Reverse(indexes);
 
             Dictionary<string, List<int>> hashClusters = new Dictionary<string, List<int>>();
 
-            int n=0;
-            while(entropy[n]<0.05 && n<(entropy.Length-1))
-                columnAvoid[n++] = true;
+            int n = 0;
+            while (entropy[n] < 0.05)
+                columnAvoid[indexes[n++]] = true;
 
-            int position=0;
-
+            int position = 0;
             int positionLeft = 0;
             int positionRight = indexes.Length;
-            
+            Dictionary<int, double> xx = new Dictionary<int, double>();
             do
             {
                 position = (positionRight + positionLeft) / 2;
@@ -793,11 +800,16 @@ namespace phiClustCore
                     columnAvoid[indexes[j]] = true;
 
                 hashClusters.Clear();
-              
+                xx.Clear();
+                for (int i = 0; i < columnAvoid.Length; i++)
+                {
+                    if (columnAvoid[i])
+                        continue;
+                    xx.Add(i, entropy[i]);
+                }
                 foreach (var item in dic.Keys)
                 {
                     StringBuilder keyB = new StringBuilder();
-                    selectedColumnsHash.Clear();
                     string key = "";
                     for (int i = 0; i < item.Length; i++)
                     {
@@ -805,7 +817,6 @@ namespace phiClustCore
                             continue;
 
                         keyB.Append(item[i]);
-                        selectedColumnsHash.Add(i);
                     }
                     key = keyB.ToString();
                     if (!hashClusters.ContainsKey(key))
@@ -814,21 +825,109 @@ namespace phiClustCore
                     hashClusters[key].AddRange(dic[item]);
                 }
                 for (int j = 0; j < position; j++)
-                    if(entropy[indexes[j]]>0.05)
-                        columnAvoid[indexes[j]] = false;
+                    columnAvoid[indexes[j]] = false;
 
-              
+                /*if (SelectionNMatchHeuristic(k, prec, hashClusters) == 1)
+                    positionLeft = position;
+                else
+                    positionRight = position;*/
 
                 if (SelectionHeuristic(k, prec, hashClusters) == 1)
                     positionLeft = position;
                 else
                     positionRight = position;
 
+
+
+            }
+            while (positionRight - positionLeft > 1);
+
+            StreamWriter vv = new StreamWriter("test.ttt");
+            foreach(var item in xx)
+            {
+                vv.WriteLine("num=" + item.Key + " entropy=" + item.Value);
+            }
+            vv.Close();
+            DebugClass.WriteMessage("End Select");
+            return hashClusters;
+
+        }
+        private Dictionary<string, List<int>> SelectColumnsByEntropy(Dictionary<string, List<int>> dic, int k, double prec)
+        {
+            if (columns == null)
+                return null;
+            DebugClass.WriteMessage("Select");
+            bool [] columnAvoid=new bool [columns.Length];
+            for (int i = 0; i < columns.Length; i++)
+                columnAvoid[i] = false;
+
+
+           // if (dic.Keys.Count < k)
+             //   k = dic.Keys.Count -1;
+
+            int[] indexes = new int[columnAvoid.Length];
+
+            for (int j = 0; j < indexes.Length; j++)
+                indexes[j] = j;
+
+            double[] entropy = CalcEntropy(columns);
+
+            Array.Sort(entropy, indexes);
+            Array.Reverse(entropy);
+            Array.Reverse(indexes);
+
+            Dictionary<string, List<int>> hashClusters = new Dictionary<string, List<int>>();
+
+            int position=0;
+
+            int positionLeft = 0;
+            int positionRight = indexes.Length;
+            do
+            {
+                position =(positionRight + positionLeft) / 2;
+
+                hashClusters.Clear();
+
+                selectedColumnsHash.Clear();
+                for (int i = 0; i < position; i++)
+                    selectedColumnsHash.Add(indexes[i]);
+                StringBuilder keyB = new StringBuilder();
+                foreach (var item in dic.Keys)
+                {
+                    keyB.Clear();
+                    string key = "";
+                    for (int i = 0; i < position; i++)
+                        keyB.Append(item[indexes[i]]);
+                       
+                    key = keyB.ToString();
+                    if (!hashClusters.ContainsKey(key))
+                        hashClusters.Add(key, new List<int>());
+
+                    hashClusters[key].AddRange(dic[item]);
+                }
+
+                if (dic.Count < k)
+                {
+                    if (SelectionHeuristic(dic.Count, hashClusters) != 1)
+                        positionRight = position;
+                    else
+                        positionLeft = position;
+                }
+                else
+                    if (hashClusters.Count == dic.Count)
+                        positionRight = position;
+                    else
+                        if (SelectionHeuristic(k, prec, hashClusters) != 1)
+                            positionLeft = position;
+                        else
+                            positionRight = position;
+
+
                 
                 
             }
-            while (positionRight-positionLeft>1);                        
-
+            while (positionRight-positionLeft>1);
+        
             DebugClass.WriteMessage("End Select");
             return hashClusters;
 
@@ -2050,7 +2149,7 @@ namespace phiClustCore
 
 
         }
-        protected double CalcClusterConsistency(List<string> cluster)
+        public double CalcClusterConsistency(List<string> cluster)
         {
             double res=0;
             if (cluster.Count == 1)
@@ -2058,11 +2157,13 @@ namespace phiClustCore
 
            
             List<byte> refStr = al.r.protCombineStates[cluster[0]];
-                
+
             for (int j = 0; j < refStr.Count; j++)
                 for (int i = 1; i < cluster.Count; i++)
+                {
                     if (refStr[j] == al.r.protCombineStates[cluster[i]][j])
                         res++;
+                }
             res/=refStr.Count*(cluster.Count-1);
             return res;
 

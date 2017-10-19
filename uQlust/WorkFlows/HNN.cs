@@ -49,6 +49,10 @@ namespace WorkFlows
             if(opt.hash.profileName.Contains("omics"))
             {
                 OmicsProfile om = new OmicsProfile();
+                om.LoadOmicsSettings();
+                if (radioButton2.Checked)
+                    om.transpose = true;
+                om.SaveOmicsSettings();
                 List<string> classLabels = om.ReadClassLabels(this.dataFileName,radioButton1.Checked,(int)numericUpDown1.Value);
                 om.ReadOmicsFile(this.dataFileName);
                 if (om.labelGenes[0].Count == classLabels.Count)

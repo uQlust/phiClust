@@ -318,7 +318,7 @@ namespace phiClustCore
             resetEvents[threadNum].Set();
             
         }
-        public ClusterOutput JuryOptWeights(List<string> structNames)
+        public ClusterOutput JuryOptWeights(List<string> structNames,Dictionary<byte,int>[]locColumns=null)
         {
             res1Djury = new List<KeyValuePair<string, double>>(structNames.Count);
             Dictionary<byte, int>[] columns = null;
@@ -329,8 +329,11 @@ namespace phiClustCore
                 if (!stateAlign.ContainsKey(item) || stateAlign[item].Count == 0)
                     aux.Remove(item);
             }
-           // if(columns==null)
+            if (locColumns == null)
                 columns = MakeColumns(aux);
+            else
+                columns = locColumns;
+
             
             currentV++;
             if (columns == null)

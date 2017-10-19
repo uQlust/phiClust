@@ -659,15 +659,17 @@ namespace phiClustCore
                             }*/
                           //  jury1D jury=new jury1D(node.stateFreq,((HammingBase)dMeasure).al)
                         }
-                       List<KeyValuePair<string,double>> orderList= dMeasure.GetReferenceList(node.setStruct);
-                        
-                       node.refStructure = orderList[0].Key;
+                        List<KeyValuePair<string, double>> orderList = dMeasure.GetReferenceList(node.setStruct);
+
+                        node.refStructure = orderList[0].Key;
+                        //node.refStructure = node.setStruct[0];
 
                        Dictionary<string, byte> refList = new Dictionary<string, byte>();
                         foreach (var itemJoined in node.joined)
-                            refList.Add(itemJoined.refStructure,0);
+                            if(refList.ContainsKey(itemJoined.refStructure))
+                                refList.Add(itemJoined.refStructure,0);
 
-                        node.refStructure = null;
+                       // node.refStructure = null;
                         if (mustRefStructure != null)
                             if (refList.ContainsKey(mustRefStructure))
                                 node.refStructure = mustRefStructure;

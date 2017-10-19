@@ -124,16 +124,11 @@ namespace WorkFlows
             opt.hash.reqClusters = (int)numericUpDown4.Value;
             opt.hash.useConsensusStates = consensus.Checked;
             opt.hash.perData = 90;
-            if (radioButton1.Checked)
-            {
-                opt.hash.combine = true;
-                opt.hash.fcolumns = false;
-            }
-            else
-            {
-                opt.hash.combine = false;
-                opt.hash.fcolumns = true;
-            }
+
+            opt.hash.combine = radioButton1.Checked;
+            opt.hash.fcolumns = !radioButton1.Checked;
+
+            opt.hierarchical.uHTree = radioHTree.Checked;
             opt.hierarchical.distance = distanceControl1.distDef;
             opt.hierarchical.reference1DjuryH = true;
             opt.profiles1DJuryFile = "profiles/omics.profiles";
@@ -181,5 +176,22 @@ namespace WorkFlows
             }
         }
 
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            distanceControl1.Visible = !radioHTree.Checked;
+            radioButton1.Visible = !radioHTree.Checked;
+            if (radioHTree.Checked)
+                Hash.Checked = true;
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

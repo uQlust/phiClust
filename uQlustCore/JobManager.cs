@@ -295,7 +295,32 @@ namespace phiClustCore
             lFile.Close();
             return classLabels;
         }
+        void RunHTree(string name, string dirName, string alignmentFile = null)
+        {
+            DateTime cpuPart1 = DateTime.Now;
+            HashCluster hCluster;
 
+            
+
+            if (alignmentFile != null)
+                hCluster = new HashCluster(null, alignmentFile,opt.hash);
+            else
+                hCluster = new HashCluster(dirName, null, opt.hash);
+
+            HTree h = new HTree(dirName, alignmentFile, hCluster);
+            beginJob(currentProcessName, h.ToString(), dirName, "HAMMING");
+            progressDic.Add(name, h);
+            hCluster.InitHashCluster();
+   
+            DateTime cpuPart2 = DateTime.Now;            
+          
+
+            ClusterOutput output = new ClusterOutput();
+            output = h.RunHTree();
+            UpdateOutput(name, dirName, alignmentFile, output, "NONE", cpuPart1, cpuPart2, h);
+
+
+        }
         private void RunHNN(string name, string dirName, string alignmentFile = null)
         {
             DateTime cpuPart1 = DateTime.Now;
@@ -433,7 +458,14 @@ namespace phiClustCore
            upper.EndProgress = 0.75;
            progressDic.Add(name, upper);
            
-           aux=upper.DendrogUsingMicroClusters(refStructUpper);
+            if(opt.hierarchical.uHTree)
+            {
+                HTree ct = new HTree(hashUpper.al, hashUpper);
+                aux = ct.RunHTree();
+            }
+            else
+                aux=upper.DendrogUsingMicroClusters(refStructUpper);
+
            List<HClusterNode> upperLeafs = aux.hNode.GetLeaves();
 
             Dictionary<string, int> toCheckLeft = new Dictionary<string, int>();
@@ -464,7 +496,13 @@ namespace phiClustCore
            left.EndProgress = 1.0;
            progressDic.Add(name, left);
 
-           aux = left.DendrogUsingMicroClusters(refStructLeft);
+            if (opt.hierarchical.uHTree)
+            {
+                HTree ct = new HTree(hashLeft.al, hashLeft);
+                aux = ct.RunHTree();
+            }
+            else
+                aux = left.DendrogUsingMicroClusters(refStructLeft);
 
             Dictionary<string, int> toCheckUpper = new Dictionary<string, int>();
             foreach (var item in hashLeft.selectedColumnsHash)
@@ -578,26 +616,6 @@ namespace phiClustCore
 
         }
 
-        private void RunHashDendrog(string name, string dirName, string alignmentFile = null)
-        {
-            DateTime cpuPart1 = DateTime.Now;
-            HashCluster hk = null;
-
-                if (alignmentFile != null)
-                    hk = new HashCluster("", alignmentFile, opt.hash);
-                else
-                    hk = new HashCluster(dirName, null, opt.hash);
-
-            progressDic.Add(name, hk);
-            hk.InitHashCluster();
-
-            DateTime cpuPart2 = DateTime.Now;
-
-            ClusterOutput output;
-            output = hk.RunHashDendrog();
-            UpdateOutput(name, dirName,alignmentFile, output, "NONE", cpuPart1, cpuPart2, hk);
-
-        }
 
         private void RunHierarchicalCluster(string name, string dirName,string alignFile=null)
         {
@@ -649,78 +667,7 @@ namespace phiClustCore
             clustOut = km.HierarchicalKMeans();
             UpdateOutput(name, dirName,alignFile,clustOut, distance.ToString(), cpuPart1, cpuPart2, km);
         }
-        private void RunFastHCluster(string name, string dirName, string alignFile=null)
-        {
-            DateTime cpuPart1 = DateTime.Now;
-            ClusterOutput clustOut = null;
-            DistanceMeasure distance = null;
-
-                distance = CreateMeasure(name,dirName,opt.hierarchical.distance, opt.hierarchical.reference1DjuryFast,
-                    alignFile, opt.hierarchical.hammingProfile, opt.hierarchical.jury1DProfileFast);
-
-            FastDendrog km;
-            km = new FastDendrog(distance, opt.hierarchical,dirName);
-            if (beginJob != null)
-                beginJob(currentProcessName, km.ToString(), dirName, distance.ToString());
-
-            progressDic.Add(name, km);
-            distance.InitMeasure();
-            DateTime cpuPart2 = DateTime.Now;
-            clType = km.ToString();
-            clustOut = km.Run(new List<string>(distance.structNames.Keys));
-            UpdateOutput(name, dirName,alignFile, clustOut, distance.ToString(), cpuPart1, cpuPart2, km);
-
-        }
-
-        private void RunKMeans(string name, string dirName, string alignFile=null)
-        {
-            DateTime cpuPart1 = DateTime.Now;
-            ClusterOutput clustOut;
-            DistanceMeasure distance = null;
-
-                distance = CreateMeasure(name,dirName,opt.kmeans.kDistance, opt.kmeans.reference1Djury,
-                    alignFile, opt.kmeans.hammingProfile, opt.kmeans.jury1DProfile);
-
-            kMeans km;            
-            km = new kMeans(distance, opt.kmeans.kMeans_init);
-            if (beginJob != null)
-                beginJob(currentProcessName, km.ToString(), dirName, distance.ToString());
-
-            progressDic.Add(name, km);
-            distance.InitMeasure();
-            DateTime cpuPart2 = DateTime.Now;
-            clType = km.ToString();
-            if ((int)opt.kmeans.maxK <= 1)
-                throw new Exception("k in k-Means must be bigger then 1, right now is: " + (int)opt.kmeans.maxK);
-            if (distance.structNames.Count < 10)
-                throw new Exception("Number of structures to cluster must be bigger then 10 right now is: " + distance.structNames.Count);
-
-            clustOut = km.kMeansLevel((int)opt.kmeans.maxK, opt.kmeans.maxIter,new List <string>(distance.structNames.Keys));
-            UpdateOutput(name, dirName,alignFile, clustOut, distance.ToString(), cpuPart1, cpuPart2,km);
-            GC.SuppressFinalize(distance);                        
-        }
-
-        
-        private void RunBakerCluster(string name, string dirName, string alignFile=null)
-        {
-            DateTime cpuPart1 = DateTime.Now;
-            ClusterOutput output = null;
-            DistanceMeasure distance = null;
-                distance = CreateMeasure(name,dirName,opt.threshold.hDistance, opt.threshold.reference1Djury,
-                alignFile, opt.threshold.hammingProfile, null);
-
-            ThresholdCluster bk = new ThresholdCluster(distance, opt.threshold.distThresh, opt.threshold.bakerNumberofStruct);
-            if (beginJob != null)
-                beginJob(currentProcessName, bk.ToString(), dirName, distance.ToString());
-
-
-            progressDic.Add(name, bk);
-            distance.InitMeasure();
-            DateTime cpuPart2 = DateTime.Now;
-            clType = bk.ToString();
-            output = bk.OrgClustering();
-            UpdateOutput(name, dirName,alignFile, output, distance.ToString(), cpuPart1, cpuPart2,bk);
-        }
+       
      
         private void Run1DJury(string name, string dirName, string alignFile=null)
         {
@@ -760,30 +707,7 @@ namespace phiClustCore
             }
             UpdateOutput(name, dirName,alignFile, output,ju.ToString(), cpuPart1,cpuPart2, ju);
         }
-        private void Run3DJury(string name, string dirName, string alignFile=null)
-        {
-            DateTime cpuStart = DateTime.Now;
-            ClusterOutput output;
-            DistanceMeasure distance = null;
-
-            if(alignFile!=null)
-                distance = CreateMeasure(name,null,opt.other.oDistance, opt.other.reference1Djury,
-                alignFile, opt.other.hammingProfile, opt.other.referenceProfile);
-            else
-                if(dirName!=null)
-                    distance = CreateMeasure(name,dirName,opt.other.oDistance, opt.other.reference1Djury,
-                    alignFile, opt.other.hammingProfile, opt.other.referenceProfile);
-            Jury3D ju = new Jury3D(distance);
-            if (beginJob != null)
-                beginJob(currentProcessName, ju.ToString(), dirName, distance.ToString());
-
-            progressDic.Add(name, ju);
-            distance.InitMeasure();            
-            clType = ju.ToString();
-            output = ju.Run3DJury();
-            UpdateOutput(name, dirName,alignFile,output, distance.ToString(), cpuStart, DateTime.Now,ju);
-            progressDic.Remove(name);
-        }
+      
         private void UpdateOutput(string name, string dirName, string alignFile, ClusterOutput output, string distStr, DateTime cpuPart1, DateTime cpuPart2, object obj)
         {           
             output.clusterType = obj.ToString();
@@ -916,21 +840,12 @@ namespace phiClustCore
                                 case ClusterAlgorithm.HKmeans:
                                     RunHKMeans(currentProcessName, item);
                                     break;
-                                case ClusterAlgorithm.FastHCluster:
-                                    RunFastHCluster(currentProcessName, item);
-                                    break;
-                                case ClusterAlgorithm.Kmeans:
-                                    RunKMeans(currentProcessName, item);
-                                    break;
-                                case ClusterAlgorithm.BakerCluster:
-                                    RunBakerCluster(currentProcessName, item);
-                                    break;
                                 case ClusterAlgorithm.Jury1D:
                                     Run1DJury(currentProcessName, item);
                                     break;
-                                case ClusterAlgorithm.Jury3D:
-                                    Run3DJury(currentProcessName, item);
-                                    break;                               
+                                case ClusterAlgorithm.HTree:
+                                    RunHTree(currentProcessName, item);
+                                    break;
                             }
 
                             counter++;
@@ -946,50 +861,42 @@ namespace phiClustCore
 //                        if (tTimer != null)
 //                            tTimer.Start();
                         currentProcessName = MakeName(processParams, alg, counter);
-                       // if (beginJob != null)
-                         //   beginJob(currentProcessName, opt.clusterAlgorithm.ToString(), item, opt.GetDistanceMeasure(alg));
+                            // if (beginJob != null)
+                            //   beginJob(currentProcessName, opt.clusterAlgorithm.ToString(), item, opt.GetDistanceMeasure(alg));
 
-                        switch (alg)
-                        {
-                            case ClusterAlgorithm.uQlustTree:
-                                RunHashDendrogCombine(currentProcessName, item,item);
-                                //RunHashDendrog(currentProcessName, null, item);
-                                break;
-                            case ClusterAlgorithm.OmicsHeatMap:
-                                RunOmicsHeatmap(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.HashCluster:
-                                RunHashCluster(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.GuidedHashCluster:
-                                RunGuidedHashCluster(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.HierarchicalCluster:
-                                RunHierarchicalCluster(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.HKmeans:
-                                RunHKMeans(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.FastHCluster:
-                                RunFastHCluster(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.Kmeans:
-                                RunKMeans(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.BakerCluster:
-                                RunBakerCluster(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.Jury1D:
-                                Run1DJury(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.Jury3D:
-                                Run3DJury(currentProcessName, item, item);
-                                break;
-                            case ClusterAlgorithm.HNN:
-                                RunHNN(currentProcessName, item, item);
-                                break;
-                        }
-                        counter++;
+                            switch (alg)
+                            {
+                                case ClusterAlgorithm.uQlustTree:
+                                    RunHashDendrogCombine(currentProcessName, item, item);
+                                    //RunHashDendrog(currentProcessName, null, item);
+                                    break;
+                                case ClusterAlgorithm.OmicsHeatMap:
+                                    RunOmicsHeatmap(currentProcessName, item, item);
+                                    break;
+                                case ClusterAlgorithm.HashCluster:
+                                    RunHashCluster(currentProcessName, item, item);
+                                    break;
+                                case ClusterAlgorithm.GuidedHashCluster:
+                                    RunGuidedHashCluster(currentProcessName, item, item);
+                                    break;
+                                case ClusterAlgorithm.HierarchicalCluster:
+                                    RunHierarchicalCluster(currentProcessName, item, item);
+                                    break;
+                                case ClusterAlgorithm.HKmeans:
+                                    RunHKMeans(currentProcessName, item, item);
+                                    break;
+                                case ClusterAlgorithm.Jury1D:
+                                    Run1DJury(currentProcessName, item, item);
+                                    break;
+                                case ClusterAlgorithm.HNN:
+                                    RunHNN(currentProcessName, item, item);
+                                    break;
+                                case ClusterAlgorithm.HTree:
+                                    RunHTree(currentProcessName, item,item);
+                                    break;
+
+                            }
+                            counter++;
                     }
 
                 }

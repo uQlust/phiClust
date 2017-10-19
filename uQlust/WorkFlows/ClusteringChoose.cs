@@ -128,5 +128,17 @@ namespace WorkFlows
 
         }
 
+        private void button6_Click(object sender, EventArgs e)
+        {
+            HTreeFlow ht;
+            if (set.mode == INPUTMODE.OMICS)
+                ht = new HTreeFlow(this, set, results, genomePath + profiles["Hash"], dataFileName);
+            else
+                ht = new HTreeFlow(this, set, results, userDefinedPath + profiles["Hash"]);
+            ht.processName = GetProcessName(ht);
+            ht.Show();
+            this.Hide();
+
+        }
     }
 }

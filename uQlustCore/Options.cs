@@ -17,16 +17,13 @@ namespace phiClustCore
         HKmeans,
         HNN,
         HierarchicalCluster,
-        FastHCluster,
-        Kmeans,
-        BakerCluster,
         Jury1D,
-        Jury3D,
         HashCluster,
         GuidedHashCluster,
         uQlustTree,
         OmicsHeatMap,
-        Sift
+        HTree,
+     
     }
     public enum DistanceMeasures
     {
@@ -95,16 +92,9 @@ namespace phiClustCore
         {
             switch (clAlgorithm)
             {
-                case ClusterAlgorithm.FastHCluster:
                 case ClusterAlgorithm.HierarchicalCluster:
                 case ClusterAlgorithm.HKmeans:
                             return hierarchical.distance;
-                case ClusterAlgorithm.Kmeans:
-                            return kmeans.kDistance;
-                case ClusterAlgorithm.Jury3D:
-                            return other.oDistance;
-                case ClusterAlgorithm.BakerCluster:
-                            return threshold.hDistance;
                 default:
                             return DistanceMeasures.NONE;
 

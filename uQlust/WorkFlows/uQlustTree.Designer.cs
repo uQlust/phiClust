@@ -48,8 +48,14 @@
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioHTree = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -81,7 +87,7 @@
             // 
             // relevantC
             // 
-            this.relevantC.Location = new System.Drawing.Point(207, 104);
+            this.relevantC.Location = new System.Drawing.Point(444, 99);
             this.relevantC.Maximum = new decimal(new int[] {
             100000000,
             0,
@@ -99,7 +105,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(12, 106);
+            this.label6.Location = new System.Drawing.Point(255, 101);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(183, 13);
             this.label6.TabIndex = 65;
@@ -107,7 +113,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(585, 282);
+            this.button2.Location = new System.Drawing.Point(585, 319);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(53, 36);
             this.button2.TabIndex = 69;
@@ -118,7 +124,7 @@
             // button4
             // 
             this.button4.Image = ((System.Drawing.Image)(resources.GetObject("button4.Image")));
-            this.button4.Location = new System.Drawing.Point(3, 282);
+            this.button4.Location = new System.Drawing.Point(3, 319);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(53, 36);
             this.button4.TabIndex = 68;
@@ -151,7 +157,7 @@
             // 
             this.Hash.AutoSize = true;
             this.Hash.Checked = true;
-            this.Hash.Location = new System.Drawing.Point(15, 127);
+            this.Hash.Location = new System.Drawing.Point(6, 18);
             this.Hash.Name = "Hash";
             this.Hash.Size = new System.Drawing.Size(50, 17);
             this.Hash.TabIndex = 72;
@@ -162,7 +168,7 @@
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(97, 127);
+            this.radioButton1.Location = new System.Drawing.Point(127, 18);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(51, 17);
             this.radioButton1.TabIndex = 73;
@@ -195,13 +201,13 @@
             this.distanceControl1.HideHamming = false;
             this.distanceControl1.hideReference = true;
             this.distanceControl1.hideSetup = true;
-            this.distanceControl1.Location = new System.Drawing.Point(12, 150);
+            this.distanceControl1.Location = new System.Drawing.Point(3, 217);
             this.distanceControl1.Name = "distanceControl1";
             this.distanceControl1.profileInfo = false;
             this.distanceControl1.profileName = null;
             this.distanceControl1.reference = false;
             this.distanceControl1.referenceProfile = null;
-            this.distanceControl1.Size = new System.Drawing.Size(573, 130);
+            this.distanceControl1.Size = new System.Drawing.Size(573, 70);
             this.distanceControl1.TabIndex = 77;
             this.distanceControl1.Load += new System.EventHandler(this.distanceControl1_Load);
             // 
@@ -218,7 +224,7 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(357, 132);
+            this.numericUpDown1.Location = new System.Drawing.Point(444, 134);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
             this.numericUpDown1.TabIndex = 79;
@@ -232,26 +238,71 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(203, 134);
+            this.label4.Location = new System.Drawing.Point(255, 136);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(135, 13);
             this.label4.TabIndex = 80;
             this.label4.Text = "Number of reference points";
             this.label4.Visible = false;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.Hash);
+            this.groupBox1.Controls.Add(this.radioButton1);
+            this.groupBox1.Location = new System.Drawing.Point(12, 108);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(200, 41);
+            this.groupBox1.TabIndex = 81;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Micro clusters algorithm";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.radioHTree);
+            this.groupBox2.Controls.Add(this.radioButton2);
+            this.groupBox2.Location = new System.Drawing.Point(12, 164);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 47);
+            this.groupBox2.TabIndex = 82;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Tree algortihm";
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Checked = true;
+            this.radioButton2.Location = new System.Drawing.Point(7, 20);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(62, 17);
+            this.radioButton2.TabIndex = 0;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "Regular";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            // 
+            // radioHTree
+            // 
+            this.radioHTree.AutoSize = true;
+            this.radioHTree.Location = new System.Drawing.Point(104, 19);
+            this.radioHTree.Name = "radioHTree";
+            this.radioHTree.Size = new System.Drawing.Size(55, 17);
+            this.radioHTree.TabIndex = 83;
+            this.radioHTree.Text = "HTree";
+            this.radioHTree.UseVisualStyleBackColor = true;
+            this.radioHTree.CheckedChanged += new System.EventHandler(this.radioHTree_CheckedChanged);
+            // 
             // uQlustTreeSimple
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(637, 321);
+            this.ClientSize = new System.Drawing.Size(637, 363);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.distanceControl1);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.radioButton1);
-            this.Controls.Add(this.Hash);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.button2);
@@ -270,6 +321,10 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.uQlustTree_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -296,5 +351,9 @@
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton radioHTree;
+        private System.Windows.Forms.RadioButton radioButton2;
     }
 }

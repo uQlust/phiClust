@@ -135,6 +135,7 @@ namespace Graph
             if(output.nodes!=null)
             {
                 HeatMap heatRes = new HeatMap(output.nodes[1], output.nodes[0], null,output);
+                heatRes.PrepareDataForHeatMap();
                 active = heatRes;
                 heatRes.Show();
 

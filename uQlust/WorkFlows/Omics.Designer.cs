@@ -471,6 +471,11 @@
             // 
             this.numericUpDown4.Enabled = false;
             this.numericUpDown4.Location = new System.Drawing.Point(119, 54);
+            this.numericUpDown4.Maximum = new decimal(new int[] {
+            1410065408,
+            2,
+            0,
+            0});
             this.numericUpDown4.Minimum = new decimal(new int[] {
             10,
             0,

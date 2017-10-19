@@ -31,6 +31,7 @@
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.percentData)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.refPoints)).BeginInit();
             this.SuspendLayout();
             // 
             // button4
@@ -61,6 +62,8 @@
             this.Controls.Add(this.checkBox1);
             this.Name = "HashSimple";
             this.Text = "HashSimple";
+            this.Controls.SetChildIndex(this.refPoints, 0);
+            this.Controls.SetChildIndex(this.label10, 0);
             this.Controls.SetChildIndex(this.button4, 0);
             this.Controls.SetChildIndex(this.label1, 0);
             this.Controls.SetChildIndex(this.textBox1, 0);
@@ -79,6 +82,7 @@
             this.Controls.SetChildIndex(this.checkBox1, 0);
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.percentData)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.refPoints)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

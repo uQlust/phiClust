@@ -50,9 +50,13 @@
             this.consensus = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioHTree = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label5
@@ -139,6 +143,7 @@
             this.label7.Size = new System.Drawing.Size(35, 13);
             this.label7.TabIndex = 81;
             this.label7.Text = "label7";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
             // 
             // label10
             // 
@@ -204,7 +209,7 @@
             // button4
             // 
             this.button4.Image = ((System.Drawing.Image)(resources.GetObject("button4.Image")));
-            this.button4.Location = new System.Drawing.Point(6, 238);
+            this.button4.Location = new System.Drawing.Point(6, 260);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(53, 36);
             this.button4.TabIndex = 88;
@@ -213,7 +218,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(613, 238);
+            this.button1.Location = new System.Drawing.Point(613, 260);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(53, 36);
             this.button1.TabIndex = 89;
@@ -232,7 +237,7 @@
             this.distanceControl1.HideHamming = false;
             this.distanceControl1.hideReference = true;
             this.distanceControl1.hideSetup = true;
-            this.distanceControl1.Location = new System.Drawing.Point(7, 142);
+            this.distanceControl1.Location = new System.Drawing.Point(7, 182);
             this.distanceControl1.Name = "distanceControl1";
             this.distanceControl1.profileInfo = true;
             this.distanceControl1.profileName = null;
@@ -276,11 +281,48 @@
             0});
             this.numericUpDown1.Visible = false;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.radioHTree);
+            this.groupBox1.Controls.Add(this.radioButton2);
+            this.groupBox1.Location = new System.Drawing.Point(10, 142);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(207, 44);
+            this.groupBox1.TabIndex = 94;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Dendrogram clustering";
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Checked = true;
+            this.radioButton2.Location = new System.Drawing.Point(6, 17);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(62, 17);
+            this.radioButton2.TabIndex = 95;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "Regular";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            // 
+            // radioHTree
+            // 
+            this.radioHTree.AutoSize = true;
+            this.radioHTree.Location = new System.Drawing.Point(102, 17);
+            this.radioHTree.Name = "radioHTree";
+            this.radioHTree.Size = new System.Drawing.Size(55, 17);
+            this.radioHTree.TabIndex = 95;
+            this.radioHTree.TabStop = true;
+            this.radioHTree.Text = "HTree";
+            this.radioHTree.UseVisualStyleBackColor = true;
+            this.radioHTree.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            // 
             // OmicsHeatMap
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(670, 279);
+            this.ClientSize = new System.Drawing.Size(670, 301);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.consensus);
@@ -307,6 +349,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -335,6 +379,8 @@
         private System.Windows.Forms.CheckBox consensus;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
-        
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton radioHTree;
+        private System.Windows.Forms.RadioButton radioButton2;
     }
 }

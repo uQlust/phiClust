@@ -48,11 +48,13 @@ namespace phiClustCore.Distance
             }
             for (int j = 0; j < refPos.Length; j++)
                 refPos[j] /= structures.Count;
-            double avr = 0; ;
-            for (int j = 0; j < refPos.Length; j++)
-                avr += refPos[j];
-            avr /=refPos.Length;
-            for (int i = 0; i < structures.Count; i++)
+
+            double refMod = 0;
+            for (int j = 0; j < refPos.Length; j++)            
+                refMod += refPos[j];
+            refMod /= refPos.Length;
+
+                for (int i = 0; i < structures.Count; i++)
             {
                 double dist = 0;
                 List<byte> mod1 = stateAlign[structures[i]];
@@ -61,9 +63,11 @@ namespace phiClustCore.Distance
                 double Syy = 0;
 
                 double avrMod = 0;
+              
 
-                for (int j = 0; j < refPos.Length; j++)
+                for (int j = 0; j < refPos.Length; j++)                
                     avrMod += mod1[j];
+
                 avrMod /= mod1.Count;
 
                 for (int j = 0; j < mod1.Count; j++)
@@ -75,7 +79,8 @@ namespace phiClustCore.Distance
              //   Sxx -= mod1.Count * avrMod * avrMod;
                 //Syy-= mod1.Count * avr * avr;
                 //Sxy-=mod1.Count*avr*avrMod;
-                dist =(1- Sxy*Sxy/(Sxx*Syy))*100;
+                dist = (Sxy - refPos.Length* refMod *avrMod) / (Math.Sqrt((Sxx - mod1.Count * avrMod * avrMod) * (Syy - refPos.Length * refMod * refMod)));
+                dist = 1 - dist;
 
                 KeyValuePair<string, double> aux = new KeyValuePair<string, double>(structures[i], dist);
                 refList.Add(aux);
@@ -128,8 +133,7 @@ namespace phiClustCore.Distance
             /*Sxx -= mod1.Count * avrMod1 * avrMod1;
             Syy -= mod2.Count * avrMod2 * avrMod2;
             Sxy -= mod1.Count * avrMod2 * avrMod1;*/
-            double vv = Sxy * Sxy / (Sxx * Syy);
-            vv = Math.Sqrt(vv);
+            double vv = (Sxy -mod1.Count*avrMod1*avrMod2) /(Math.Sqrt((Sxx-mod1.Count*avrMod1*avrMod1) * (Syy-mod2.Count*avrMod2*avrMod2)));
             dist = (1.0-vv)*100;
 
 

@@ -34,6 +34,7 @@ namespace Graph
         Dictionary<string, Dictionary<string,int>> omicsProfiles;
         Dictionary<int, int> distV = new Dictionary<int, int>();
         ClusterOutput outp;
+        Dictionary<string, string> labels;
         public void ToFront()
         {
             this.BringToFront();
@@ -49,16 +50,15 @@ namespace Graph
             this.leftNode = auxLeft=leftNode;
             List<KeyValuePair<string, List<byte>>> colOmicsProfiles=new List<KeyValuePair<string,List<byte>>>();
             rowOmicsProfiles = new List<KeyValuePair<string, List<byte>>>();
-            string[] aux = outp.name.Split(';');
+            this.labels = labels;
+            
+        }
+        public void PrepareDataForHeatMap()
+        {
             List<HClusterNode> leaves = leftNode.GetLeaves();
             Dictionary<string, List<byte>> dic1 = new Dictionary<string, List<byte>>();
             Dictionary<string, List<byte>> dic2 = new Dictionary<string, List<byte>>();
-            /*foreach(var item in leaves)
-            {
-                for (int i = 0; i < item.setProfiles.Count; i++)
-                    //dic1.Add(item.setStruct[i], item.setProfiles[i]);
-                    rowOmicsProfiles.Add(new KeyValuePair<string,List<byte>>(item.setStruct[i],item.setProfiles[i]));
-            }*/
+            string[] aux = outp.name.Split(';');
 
             rowOmicsProfiles = OmicsProfile.ReadOmicsProfile(/*"omics_Omics_profile"+"_"+*/aux[0]);
             //colOmicsProfiles = OmicsProfile.ReadOmicsProfile(/*"omics_Omics_profile"+"_"+*/aux[0]+"_transpose");
@@ -67,7 +67,7 @@ namespace Graph
             {
                 if (!omicsProfiles.ContainsKey(rowOmicsProfiles[i].Key))
                     omicsProfiles.Add(rowOmicsProfiles[i].Key, new Dictionary<string, int>());
-                
+
                 for (int j = 0; j < outp.aux1.Count; j++)
                 {
                     if (!omicsProfiles[rowOmicsProfiles[i].Key].ContainsKey(outp.aux1[j]))
@@ -79,7 +79,7 @@ namespace Graph
             indexLabels = outp.auxInt;
             InitializeComponent();
             this.Name = "HeatMap " + outp.dirName;
-            for (int i = 1; i < outp.aux2.Count;i++ )
+            for (int i = 1; i < outp.aux2.Count; i++)
                 comboBox1.Items.Add(outp.aux2[i]);
             upperBitMap = new Bitmap(pictureBox2.Width, pictureBox2.Height);
             leftBitMap = new Bitmap(pictureBox3.Width, pictureBox3.Height);
@@ -90,20 +90,12 @@ namespace Graph
             foreach (var item in rowOmicsProfiles)
                 foreach (var v in item.Value)
                     if (!distV.ContainsKey(v))
-                        distV.Add(v,0);
+                        distV.Add(v, 0);
             BarColors();
             pictureBox2.Refresh();
         }
         void BarColors()
         {
-/*            int[] tab = new int[4];
-
-            tab[0] = 0; tab[1] = 85; tab[2] = 170; tab[3] = 255;
-            barMap = new List<Color>();
-            for (int i = 0; i < tab.Length; i++)
-                for (int j = 0; j < tab.Length; j++)
-                    for (int n = 0; n < tab.Length; n++)
-                        barMap.Add(Color.FromArgb(tab[i], tab[j], tab[n]));            */
             barMap = new List<Color>();
             barMap.Add(Color.Black);
             barMap.Add(Color.Red);
@@ -121,10 +113,22 @@ namespace Graph
 
 
         }
-        double CalculateProfilesAccuracy(List<string> profiles, List<string> leaves)
+        double CalculateProfilesAccuracy(List<string> profiles, List<string> leaves,bool reverse)
         {
             double res = 0;
 
+
+            if(reverse)
+                for (int j = 0; j < leaves.Count; j++)
+                { 
+                    for (int i = 0; i < profiles.Count; i++)                                    
+                    {
+                        int ind = omicsProfiles[profiles[i]][leaves[j]];
+                        if (ind == omicsProfiles[profiles[0]][leaves[j]])
+                            res++;
+                    }
+                }
+            else
             for (int i = 0; i < profiles.Count; i++)
             {
                 for (int j = 0; j < leaves.Count; j++)
@@ -138,7 +142,7 @@ namespace Graph
             return res;
 
         }
-        double DrawHeatMapNode(Bitmap bmp,List<string> profiles,List<string> leaves)
+        void DrawHeatMapNode(Bitmap bmp,List<string> profiles,List<string> leaves)
         {
             Graphics g = Graphics.FromImage(bmp);
             int width = bmp.Width;
@@ -175,7 +179,7 @@ namespace Graph
                 
             }
 
-            return CalculateProfilesAccuracy(profiles, leaves);
+          
         }
         void DrawHeatMap(Graphics g)
         {
@@ -458,7 +462,7 @@ namespace Graph
                         List<string> refList = new List<string>();
                         foreach (var item in leftLeaves)
                             refList.Add(item.refStructure);
-                        pn.drawPic = delegate { double res = DrawHeatMapNode(pn.bmp, refList, nodeC.setStruct); pn.Text = res.ToString(); };
+                        pn.drawPic = delegate { DrawHeatMapNode(pn.bmp, refList, nodeC.setStruct); pn.Text = nodeC.consistency.ToString(); };
                         pn.Show();
                     }
                     else
@@ -536,7 +540,7 @@ namespace Graph
                          List<string> refList = new List<string>();
                         foreach(var item in upperLeaves)
                             refList.Add(item.refStructure);
-                        pn.drawPic = delegate { double res = DrawHeatMapNode(pn.bmp, nodeC.setStruct, refList); pn.Text = res.ToString(); };
+                        pn.drawPic = delegate {DrawHeatMapNode(pn.bmp, nodeC.setStruct, refList); pn.Text = nodeC.consistency.ToString(); };
                          pn.Show();
                          pn.pictureBox1.Invalidate();
                     }

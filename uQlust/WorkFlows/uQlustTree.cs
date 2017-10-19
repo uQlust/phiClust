@@ -83,8 +83,7 @@ namespace WorkFlows
                 if (opt.dataDir.Count > 0)
                     textBox1.Text = opt.dataDir[0];
 
-            opt.clusterAlgorithm.Clear();
-            opt.clusterAlgorithm.Add(ClusterAlgorithm.uQlustTree);
+           
             label3.Text = opt.hash.profileName;
             relevantC.Value = opt.hash.relClusters;
             distanceControl1.distDef = opt.hierarchical.distance;
@@ -132,8 +131,15 @@ namespace WorkFlows
                 opt.hash.combine = true;
             else
                 opt.hash.combine = false;
+            opt.clusterAlgorithm.Clear();
+            if (!radioHTree.Checked)
+                opt.clusterAlgorithm.Add(ClusterAlgorithm.uQlustTree);
+            else
+                opt.clusterAlgorithm.Add(ClusterAlgorithm.HTree);
             opt.hierarchical.distance = distanceControl1.distDef;
+            opt.hierarchical.uHTree = radioHTree.Checked;
             opt.hash.refPoints = (int)numericUpDown1.Value;
+
             if (opt.hierarchical.distance == DistanceMeasures.HAMMING || opt.hierarchical.distance==DistanceMeasures.COSINE)
                 opt.hierarchical.reference1DjuryH = true;
             else
@@ -144,7 +150,11 @@ namespace WorkFlows
                 opt.hash.profileNameReg = ProfileAutomatic.similarityProfileName;
                 opt.hierarchical.GenerateAutomaticProfiles(textBox1.Text);
             }
-
+            if (Hash.Checked)
+            {
+                opt.hash.fcolumns = true;
+                opt.hash.selectionMethod = COL_SELECTION.ENTROPY;
+            }
             results.Show();
             results.Focus();
             results.BringToFront();
@@ -213,6 +223,12 @@ namespace WorkFlows
                 label4.Visible = false;
                 numericUpDown1.Visible = false;
             }
+        }
+
+        private void radioHTree_CheckedChanged(object sender, EventArgs e)
+        {
+            distanceControl1.Visible = !radioHTree.Checked;
+
         }
     }
 }
