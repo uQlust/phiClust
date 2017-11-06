@@ -13,7 +13,7 @@ namespace phiClustCore.Distance
         public Dictionary<string, List<byte>> stateAlign;
         protected Dictionary<byte, Dictionary<byte, double>> weights;
         Settings dirSettings = new Settings();
-        protected Alignment al;
+        public Alignment al;
 
         protected Dictionary<string, int> states = new Dictionary<string, int>();
         protected List<Dictionary<string, int>> lStates = new List<Dictionary<string, int>>();

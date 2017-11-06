@@ -217,9 +217,13 @@ namespace phiClustCore
                     foreach (var name in allStructures)
                     {
                         locState = stateAlign[name][i];
-                        if (locState == 0 || !columns[i].ContainsKey(locState))
+                        if (locState == 0)
                             continue;
-
+                        if (!columns[i].ContainsKey(locState))
+                        {
+                            columns[i].Add(locState, 1);
+                            continue;
+                        }
                         
                         //columns[i].AddOrUpdate(locState,0, (key, value) => value + 1);
                         columns[i][locState]++;//, 0, (key, value) => value + 1);
@@ -245,9 +249,9 @@ namespace phiClustCore
 
             for (int i = 0; i < columns.Length; i++)
             {
-                columns[i] = new Dictionary<byte, int>(weights.Keys.Count);
-                foreach (var item in weights.Keys)
-                    columns[i].Add(item,0);
+                columns[i] = new Dictionary<byte, int>();
+           //     foreach (var item in weights.Keys)
+             //       columns[i].Add(item,0);
             }
             for (int n = 0; n < threadNumbers; n++)
             {

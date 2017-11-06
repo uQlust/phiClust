@@ -1123,7 +1123,175 @@ namespace phiClustCore
 
 
         }
+        int FindNextRefPoint(int n,List<KeyValuePair<int,int>> sortedDist,Dictionary <int,int>[] refPoints)
+        {            
+            if (n == 0)
+                return sortedDist[sortedDist.Count-1].Key;
+
+            int[] newDist = new int[sortedDist.Count];
+
+            for (int i = 0; i < sortedDist.Count; i++)
+                newDist[sortedDist[i].Value] = sortedDist[i].Key;
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < sortedDist.Count; j++)
+                    newDist[j] += refPoints[i][j];
+
+            var sorted = newDist.Select((x, i) => new KeyValuePair<int, int>(x, i)).OrderBy(x => x.Key).ToList();
+
+            return sorted[1].Value;
+
+        }
         protected Dictionary<string, List<int>> FastCombineKeysNew(Dictionary<string, List<int>> dic, List<string> structures, bool flagDecision)
+        {
+            Dictionary<string, List<int>> outDic = null;
+            string []hashKeys = new string [structures.Count];
+
+
+            foreach( var item in dic)
+            {                
+                for(int i=0;i<item.Value.Count;i++)
+                    hashKeys[item.Value[i]] = item.Key;
+            }
+
+
+            bool[] avoid = new bool[hashKeys.Length];
+            double sum = 0;
+            bool end = false;
+            List<List<string>> clusters = new List<List<string>>();
+
+            int[] tabDist = new int[hashKeys.Length];
+
+            for (int i = 0; i < hashKeys.Length; i++)
+            {
+                tabDist[i] = 0;
+                for (int n = 0; n < hashKeys[i].Length; n++)
+                    if ((int)hashKeys[i][n] != '0')
+                        tabDist[i]++;
+            }
+            var sorted = tabDist.Select((x, i) => new KeyValuePair<int, int>(x, i)).OrderBy(x => x.Key).ToList();
+
+            Dictionary<int, int>[] referenceDist = null;
+            consensusStates = new Dictionary<byte, int>[columns.Length];
+            for (int i = 0; i < columns.Length; i++)
+                consensusStates[i] = new Dictionary<byte, int>();
+
+            int stepRef = 0;
+
+            if (refPoints > 0)
+            {
+                stepRef = sorted.Count / refPoints;
+                referenceDist = new Dictionary<int, int>[refPoints];
+            }
+            for (int n = 0; n < refPoints; n++)
+            {
+
+                //   string profileKey = hashKeys[sorted[stepRef * (n + 1) - 1].Value];
+                string profileKey= hashKeys[FindNextRefPoint(n,sorted,referenceDist)];
+                List<byte> auxXX = auxDic[allStructures[dic[profileKey][0]]];
+                for (int i = 0; i < auxXX.Count; i++)
+                {
+                    consensusStates[i].Clear();
+                    consensusStates[i].Add(auxXX[i], 0);
+                }
+
+
+                Dictionary<string, List<int>> dic2 = PrepareKeys(allStructures, true, false);
+                referenceDist[n] = new Dictionary<int, int>(hashKeys.Length);
+
+                foreach (var item in dic2)
+                {
+                    int sumX = 0;
+                    for (int k = 0; k < item.Key.Length; k++)
+                        if ((int)item.Key[k] != '0')
+                            sumX++;
+
+                    foreach (var num in item.Value)
+                        referenceDist[n].Add(num, sumX);
+
+
+                }
+
+            }
+            Debug.Flush();
+            int thresholdA = 0;
+            int thresholdB = sorted[sorted.Count - 1].Key;
+            DebugClass.WriteMessage("mPointOK");
+
+            int iter = (int)Math.Ceiling(Math.Log(thresholdB, 2) / Math.Log(2, 2));
+            int remCurrent = currentV;
+            double step = 40 / iter;
+            //int mPoint = (thresholdB+thresholdA)/2;
+            int mPoint = sorted[sorted.Count / 2].Key;
+            DebugClass.WriteMessage("rel Clusters" + input.relClusters);
+            int xx = tabDist.Length / input.relClusters;
+            DebugClass.WriteMessage("xx=" + xx);
+            /* for(int i=xx;i<sorted.Count;i++)
+                 if(sorted[i].Key!=sorted[xx].Key)
+                 {
+                     mPoint=sorted[i].Key;
+                     break;
+                 }*/
+            //mPoint=input.relClusters
+            bool decision = false;
+            int iterNumber = 0;
+            double prevStep = 0;
+            do
+            {
+                //Check clusters size
+                DebugClass.WriteMessage("mPoint=" + mPoint);
+                outDic = null;
+                GC.Collect();
+                outDic = ClustDistNew(dic, referenceDist, sorted, mPoint, 1);
+                //outDic = ClustDist(dic,sorted, mPoint, 1);
+                DebugClass.WriteMessage("dicSize=" + outDic.Count);
+                //List<KeyValuePair<string, List<int>>> toSort = outDic.AsParallel().WithDegreeOfParallelism(s.numberOfCores).ToList();
+                List<KeyValuePair<string, List<int>>> toSort = outDic.ToList();
+                if (input.relClusters > toSort.Count)
+                {
+                    thresholdB = mPoint;
+                    mPoint = (thresholdB + thresholdA) / 2;
+                    iterNumber++;
+                    currentV += (int)(iterNumber * step - prevStep);
+                    prevStep = iterNumber * step;
+                    continue;
+                }
+
+                if (flagDecision)
+                {
+                    toSort.Sort((nextPair, firstPair) => { return firstPair.Value.Count.CompareTo(nextPair.Value.Count); });
+                    sum = 0;
+                    for (int i = 0; i < input.relClusters; i++)
+                        sum += toSort[i].Value.Count;
+
+                    sum /= structures.Count;
+
+                    decision = sum >= input.perData / 100.0;
+                    if (decision)
+                        thresholdB = mPoint;
+                    else
+                        thresholdA = mPoint;
+                }
+                else
+                {
+                    decision = outDic.Keys.Count <= input.relClusters;
+                    if (decision)
+                        thresholdB = mPoint;
+                    else
+                        thresholdA = mPoint;
+
+                }
+                mPoint = (thresholdB + thresholdA) / 2;
+                iterNumber++;
+                currentV += (int)(iterNumber * step - prevStep);
+                prevStep = iterNumber * step;
+            }
+            while ((thresholdB - thresholdA) > 1);
+
+            currentV += 40 - (currentV - remCurrent);
+
+            return outDic;
+        }
+        protected Dictionary<string, List<int>> FastCombineKeysOLD(Dictionary<string, List<int>> dic, List<string> structures, bool flagDecision)
         {            
             Dictionary<string, List<int>> outDic = null;
             List<string> hashKeys = new List<string>(dic.Keys);
@@ -1212,7 +1380,8 @@ namespace phiClustCore
                 DebugClass.WriteMessage("mPoint=" + mPoint);
                 outDic = null;
                 GC.Collect();
-                outDic = ClustDistNew(dic,referenceDist, sorted, mPoint, 1);
+               // outDic = ClustDistNew(dic,referenceDist, sorted, mPoint, 1);
+                outDic = ClustDist(dic,sorted, mPoint, 1);
                 DebugClass.WriteMessage("dicSize=" + outDic.Count);
                 //List<KeyValuePair<string, List<int>>> toSort = outDic.AsParallel().WithDegreeOfParallelism(s.numberOfCores).ToList();
                 List<KeyValuePair<string, List<int>>> toSort = outDic.ToList();
@@ -1255,7 +1424,7 @@ namespace phiClustCore
                 currentV += (int)(iterNumber * step - prevStep);
                 prevStep = iterNumber * step;
             }
-            while ((thresholdB - thresholdA) > 2);
+            while ((thresholdB - thresholdA) > 1);
 
             currentV += 40 - (currentV - remCurrent);
 
@@ -1287,9 +1456,18 @@ namespace phiClustCore
         private Dictionary<string, List<int>> ClustDistNew(Dictionary<string, List<int>> dic, Dictionary<int, int>[] referenceDist, List<KeyValuePair<int, int>> sorted, int thresholdH, int vT)
         {
             Dictionary<string, List<int>> outDic = new Dictionary<string, List<int>>(dic.Keys.Count);
-            List<string> hashKeys = new List<string>(dic.Keys);
-            bool[] avoid = new bool[hashKeys.Count];
-            distTab = new int[hashKeys.Count];
+            string[] hashKeys = new string[sorted.Count];
+
+            foreach (var item in dic)
+            {
+                for (int i = 0; i < item.Value.Count; i++)
+                    hashKeys[item.Value[i]] = item.Key;
+            }
+
+
+
+            bool[] avoid = new bool[hashKeys.Length];
+            distTab = new int[hashKeys.Length];
 
             for (int i = 0; i < avoid.Length; i++)
                 avoid[i] = false;
@@ -1297,12 +1475,13 @@ namespace phiClustCore
      
 
 
-            for (int i = 0, k = 0; i < hashKeys.Count; i++)
+            for (int i = 0, k = 0; i < hashKeys.Length; i++)
             {
                 if (avoid[sorted[i].Value])
                     continue;
-
                 k = i + 1;
+                while (k < sorted.Count && avoid[sorted[k].Value])
+                    k++;
                 string keyProfile = hashKeys[sorted[i].Value];
                 int val = sorted[i].Key;
                 while (k < sorted.Count && Math.Abs(val - sorted[k].Key) <= thresholdH)
@@ -1323,8 +1502,10 @@ namespace phiClustCore
 
                     if (test)
                     {
-                        List<int> inx = new List<int>(dic[hashKeys[sorted[k].Value]].Count);
+                        List<int> inx = new List<int>();// (dic[hashKeys[sorted[k].Value]].Count);
                         inx.AddRange(dic[hashKeys[sorted[k].Value]]);
+                        foreach (var item in dic[hashKeys[sorted[k].Value]])
+                            avoid[item] = true;
                         if (!outDic.ContainsKey(keyProfile))
                         {
                             List<int> auxList = new List<int>();

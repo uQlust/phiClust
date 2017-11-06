@@ -603,8 +603,9 @@ namespace phiClustCore
             progressRead = 1;
             dMeasure.CalcDistMatrix(structures);
 
-            
-			for(int i=0;i<structures.Count;i++)
+            jury1D jury = new jury1D();
+            jury.PrepareJury(((HammingBase)dMeasure).al);
+            for (int i=0;i<structures.Count;i++)
 			{
 				node=new HClusterNode();
 				node.refStructure=structures[i];
@@ -615,7 +616,10 @@ namespace phiClustCore
                     node.stateFreq = freq[i];
                 else
                 {
-                    //node.stateFreq=new Dictionary<byte,int>[]
+                    //node.stateFreq = new Dictionary<byte, int>[];
+                    jury.JuryOptWeights(node.setStruct);
+                    node.stateFreq = jury.columns;
+
                 }
                 node.levelDist = dMeasure.maxSimilarity;
                 node.realDist = dMeasure.GetRealValue(node.levelDist);
@@ -645,9 +649,12 @@ namespace phiClustCore
 
 							
 						}
+                      
+                        List<KeyValuePair<string, double>> orderList = null;
+                        
                         if (item[0].stateFreq != null)
                         {
-                            /*node.stateFreq = item[0].stateFreq;
+                            node.stateFreq = item[0].stateFreq;
                             for (int m = 1; m < item.Count; m++)
                             {
                                 for (int n = 0; n < item[m].stateFreq.Length; n++)
@@ -656,10 +663,14 @@ namespace phiClustCore
                                             node.stateFreq[n][state.Key] += state.Value;
                                         else
                                             node.stateFreq[n].Add(state.Key, state.Value);
-                            }*/
-                          //  jury1D jury=new jury1D(node.stateFreq,((HammingBase)dMeasure).al)
+                            }
+                           ClusterOutput outJury=jury.JuryOptWeights(node.setStruct,node.stateFreq);
+                            orderList = outJury.juryLike;
+                           
+                            //jury1D jury=new jury1D(node.stateFreq,((HammingBase)dMeasure).al)
                         }
-                        List<KeyValuePair<string, double>> orderList = dMeasure.GetReferenceList(node.setStruct);
+                        else
+                            orderList = dMeasure.GetReferenceList(node.setStruct);
 
                         node.refStructure = orderList[0].Key;
                         //node.refStructure = node.setStruct[0];
