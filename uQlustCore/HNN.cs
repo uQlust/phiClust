@@ -39,17 +39,24 @@ namespace phiClustCore
                         }
                     }
                     foreach (var index in item.Value)
-                        labelToBaseKey.Add(hk.structNames[index], item.Key);
+                        if(labelToBaseKey.ContainsKey(hk.structNames[index]))
+                            //throw new Exception("Key " + hk.structNames[index] + " already exists");
+                            Console.Write("Key " + hk.structNames[index] + " already exists");
+                        else
+                            labelToBaseKey.Add(hk.structNames[index], item.Key);
                     if (classDic.Count == 0)
                         continue;
                     List<string> classLab = new List<string>(classDic.Keys);
 
                     classLab.Sort((x, y) => classDic[x].CompareTo(classDic[y]));
                     caseBase.Add(item.Key, classLab[0]);
-                   
+
                 }
                 else
-                    labelToBaseKey.Add(hk.structNames[item.Value[0]], item.Key);
+                    if (labelToBaseKey.ContainsKey(hk.structNames[item.Value[0]]))
+                        throw new Exception("Key " + hk.structNames[item.Value[0]] + " already exists");
+                    else
+                        labelToBaseKey.Add(hk.structNames[item.Value[0]], item.Key);
             }
 
 

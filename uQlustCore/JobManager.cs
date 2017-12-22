@@ -325,6 +325,8 @@ namespace phiClustCore
         {
             DateTime cpuPart1 = DateTime.Now;
             HashCluster hCluster = null;
+            OmicsProfile remOm = new OmicsProfile();
+            remOm.LoadOmicsSettings();
             OmicsProfile profOm = new OmicsProfile();
             profOm.LoadOmicsSettings();
             profOm.numRow = 3;
@@ -364,6 +366,7 @@ namespace phiClustCore
 
 
             Dictionary<string, string> resT = knn.HNNTest(testList);
+            remOm.SaveOmicsSettings();
             //double res = knn.HNNValidate(knn.validateList);
             ClusterOutput output = new ClusterOutput();
             output.hNNRes = resT;
@@ -432,6 +435,14 @@ namespace phiClustCore
             fileName += "_transpose";
             List<string> listLeft = OmicsProfile.GetOrderedProfiles(fileName);
 
+            List<string> refUpper= HashClusterDendrog.ClustersReferences(outputUpper.clusters, hashUpper.al);
+            List<string> refLeft = HashClusterDendrog.ClustersReferences(outputLeft.clusters, hashLeft.al);
+
+
+            hashUpper.CuttAlignment(listLeft, refLeft);
+            hashLeft.CuttAlignment(listUpper, refUpper);
+
+
             Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> refStructUpper = HashClusterDendrog.StructuresToDenrogram(outputUpper.clusters, hashUpper.al);
             Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> refStructLeft = HashClusterDendrog.StructuresToDenrogram(outputLeft.clusters, hashLeft.al);
 
@@ -442,11 +453,13 @@ namespace phiClustCore
 
             //   hashUpper.CuttAlignment(hashLeft.structNames, refStructLeft);
             //  hashLeft.CuttAlignment(hashUpper.structNames, refStructUpper);
-            hashUpper.CuttAlignment(listLeft, refStructLeft);
-            hashLeft.CuttAlignment(listUpper, refStructUpper);
             //output.aux1 = hashLeft.stateAlignKeys;
 
-           left = new HashClusterDendrog(dirName, opt.hash, opt.hierarchical,hashLeft.al);
+
+         //   refStructUpper=HashCluster.CuttFreq(listLeft, new List<string>(refStructLeft.Keys), refStructUpper);
+         //   refStructLeft=HashCluster.CuttFreq(listUpper, new List<string>(refStructUpper.Keys), refStructLeft);
+
+            left = new HashClusterDendrog(dirName, opt.hash, opt.hierarchical,hashLeft.al);
            upper = new HashClusterDendrog(dirName, opt.hash, opt.hierarchical, hashUpper.al);
 
 

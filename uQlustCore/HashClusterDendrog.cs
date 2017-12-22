@@ -93,21 +93,39 @@ namespace phiClustCore
              ClusterOutput output = DendrogUsingMeasures(stateAlignKeys);
              return output;
          }
+        static public List<string> ClustersReferences(List<List<string>> structures, Alignment al)
+        {
+            List<string> refCluster = new List<string>();
+            jury1D juryLocal = new jury1D();
+            juryLocal.PrepareJury(al);
 
+
+
+            foreach (var item in structures)
+            {
+                ClusterOutput output = juryLocal.JuryOptWeights(item);
+                if (item.Count > 2)
+                    refCluster.Add(output.juryLike[0].Key);
+                else
+                    refCluster.Add(item[0]);
+            }
+
+            return refCluster;
+        }
         static public Dictionary<string,KeyValuePair<List<string>,Dictionary<byte,int>[]>> StructuresToDenrogram(List<List<string>> structures,Alignment al)
          {
              Dictionary<string, KeyValuePair<List<string>,Dictionary<byte,int>[]>> translateToCluster = new Dictionary<string,KeyValuePair<List<string>,Dictionary<byte,int>[]>>(structures.Count);
-
              jury1D juryLocal = new jury1D();
              juryLocal.PrepareJury(al);
 
-             foreach(var item in structures)
+            
+
+            foreach (var item in structures)
              {
-                 if (item.Count > 2)
-                 {
-                     ClusterOutput output = juryLocal.JuryOptWeights(item);
-                     translateToCluster.Add(output.juryLike[0].Key, new KeyValuePair<List<string>,Dictionary<byte,int>[]>(new List<string>(item.Count),juryLocal.columns));
-                     
+                ClusterOutput output = juryLocal.JuryOptWeights(item);
+                if (item.Count > 2)
+                 {                     
+                     translateToCluster.Add(output.juryLike[0].Key, new KeyValuePair<List<string>,Dictionary<byte,int>[]>(new List<string>(item.Count),juryLocal.columns));                     
                      translateToCluster[output.juryLike[0].Key].Key.Add(output.juryLike[0].Key);
                      foreach (var i in item)
                          if (!i.Equals(output.juryLike[0].Key))

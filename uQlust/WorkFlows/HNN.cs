@@ -55,6 +55,19 @@ namespace WorkFlows
                 om.SaveOmicsSettings();
                 List<string> classLabels = om.ReadClassLabels(this.dataFileName,radioButton1.Checked,(int)numericUpDown1.Value);
                 om.ReadOmicsFile(this.dataFileName);
+                Console.WriteLine("labL=" + om.labelGenes[0][om.labelGenes[0].Count - 1]+" "+classLabels[classLabels.Count-1]);
+
+                StreamWriter fileF = new StreamWriter("log");
+                for(int i=0;i< om.labelGenes[0].Count;i++)
+                {
+                    fileF.WriteLine(om.labelGenes[0][i]);
+                }
+                fileF.WriteLine("Next");
+                for (int i = 0; i < classLabels.Count; i++)
+                {
+                    fileF.WriteLine(classLabels[i]);
+                }
+                fileF.Close();
                 if (om.labelGenes[0].Count == classLabels.Count)
                     SaveFile(textBox2.Text + "_labels",om.labelGenes[0],classLabels);
                 else

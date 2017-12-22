@@ -105,13 +105,15 @@ namespace WorkFlows
             switch(nextWindow)
             {
                 case OMICS_CHOOSE.NONE:
-                    c = new ClusteringChoose(set, this,textBox1.Text);
+                    c = new ClusteringChoose(set, this,textBox1.Text);                    
                     break;
                 case OMICS_CHOOSE.HNN:  
                     c = new HNN(this, set, Rna_Protein_UserDef.results,nextWindow, "workFlows" + Path.DirectorySeparatorChar + "omics" + Path.DirectorySeparatorChar + "uQlust_config_file_Rpart.txt",textBox1.Text);
+                    ((HNN)c).processName = GetProcessName();
                     break;
                 case OMICS_CHOOSE.GUIDED_HASH:
                     c = new HNN(this, set, Rna_Protein_UserDef.results,nextWindow, "workFlows" + Path.DirectorySeparatorChar + "omics" + Path.DirectorySeparatorChar + "uQlust_config_file_GuidedHash.txt",textBox1.Text);
+                    ((HNN)c).processName = GetProcessName();
                     break;
                 case OMICS_CHOOSE.HEATMAP:
                     c = new OmicsHeatMap(this, Rna_Protein_UserDef.results,textBox1.Text);

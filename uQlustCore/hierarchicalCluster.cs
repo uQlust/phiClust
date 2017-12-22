@@ -612,7 +612,7 @@ namespace phiClustCore
 				node.joined=null;
 				node.setStruct.Add(structures[i]);
                 node.levelNum = levelCount;
-                if (freq != null)
+                if (freq != null && freq[i]!=null)
                     node.stateFreq = freq[i];
                 else
                 {
@@ -634,43 +634,47 @@ namespace phiClustCore
                 List<List<HClusterNode>> rowList = LevelMinimalDist(level[level.Count - 1]);
                 if (rowList.Count > 0)
                 {
-                    foreach (var item in rowList)
+                    for(int s=0;s<rowList.Count;s++)
+                    //foreach (var item in rowList)
                     {
 						node=new HClusterNode();
-						node.joined=item;
+						node.joined=rowList[s];
                         node.levelDist = min;
                         node.realDist = dMeasure.GetRealValue(min);
                         node.levelNum = level.Count;
                         
-						for(int m=0;m<item.Count;m++)
+						for(int m=0;m<rowList[s].Count;m++)
 						{
-							node.setStruct.AddRange(item[m].setStruct);
-                            item[m].fNode = true;
+							node.setStruct.AddRange(rowList[s][m].setStruct);
+                            rowList[s][m].fNode = true;
 
 							
 						}
-                      
+                  
                         List<KeyValuePair<string, double>> orderList = null;
-                        
-                        if (item[0].stateFreq != null)
+                        if (rowList[s][0].stateFreq != null)
                         {
-                            node.stateFreq = item[0].stateFreq;
-                            for (int m = 1; m < item.Count; m++)
+                            node.stateFreq = new Dictionary<byte, int>[rowList[s][0].stateFreq.Length];
+                            for (int m = 0; m < node.stateFreq.Length; m++)
+                                node.stateFreq[m] = new Dictionary<byte, int>();
+                            //node.stateFreq=rowList[s][0].stateFreq;
+                            for (int m = 0; m < rowList[s].Count; m++)
                             {
-                                for (int n = 0; n < item[m].stateFreq.Length; n++)
-                                    foreach (var state in item[m].stateFreq[n])
+                                for (int n = 0; n < rowList[s][m].stateFreq.Length; n++)
+                                    foreach (var state in rowList[s][m].stateFreq[n])
                                         if (node.stateFreq[n].ContainsKey(state.Key))
                                             node.stateFreq[n][state.Key] += state.Value;
                                         else
                                             node.stateFreq[n].Add(state.Key, state.Value);
                             }
-                           ClusterOutput outJury=jury.JuryOptWeights(node.setStruct,node.stateFreq);
+                            ClusterOutput outJury = jury.JuryOptWeights(node.setStruct, node.stateFreq);
                             orderList = outJury.juryLike;
-                           
+
                             //jury1D jury=new jury1D(node.stateFreq,((HammingBase)dMeasure).al)
                         }
                         else
                             orderList = dMeasure.GetReferenceList(node.setStruct);
+                        
 
                         node.refStructure = orderList[0].Key;
                         //node.refStructure = node.setStruct[0];
@@ -680,7 +684,7 @@ namespace phiClustCore
                             if(refList.ContainsKey(itemJoined.refStructure))
                                 refList.Add(itemJoined.refStructure,0);
 
-                       // node.refStructure = null;
+                        node.refStructure = null;
                         if (mustRefStructure != null)
                             if (refList.ContainsKey(mustRefStructure))
                                 node.refStructure = mustRefStructure;
@@ -700,7 +704,7 @@ namespace phiClustCore
                                     }
                                 }
                             }
-                            //node.refStructure = dMeasure.GetReferenceStructure(node.setStruct, refList);                           
+      //                      node.refStructure = dMeasure.GetReferenceStructure(node.setStruct, refList);                           
                         }
 
 

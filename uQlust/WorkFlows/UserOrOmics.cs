@@ -30,26 +30,33 @@ namespace WorkFlows
             g.Show();
             this.Hide();
         }
-
+        string GetProcessName(object o,INPUTMODE mode)
+        {
+            return "WorkFlow_" + mode.ToString() + "_" + o.ToString();
+        }
         private void button3_Click(object sender, EventArgs e)
         {
             Settings set;
             set=new Settings();
+            set.Load();
             Form c=null;
             set.mode = INPUTMODE.USER_DEFINED;
             switch(prevWindow)
             { 
                 case OMICS_CHOOSE.HNN:
                     c = new HNN(this, set, Rna_Protein_UserDef.results, OMICS_CHOOSE.HNN,"workFlows" + Path.DirectorySeparatorChar + "userDefined" + Path.DirectorySeparatorChar + "uQlust_config_file_Rpart.txt");
+                    ((HNN)c).processName = GetProcessName(c,set.mode);
                     break;
                 case OMICS_CHOOSE.GUIDED_HASH:
                     c = new HNN(this, set, Rna_Protein_UserDef.results, OMICS_CHOOSE.GUIDED_HASH,"workFlows" + Path.DirectorySeparatorChar + "userDefined" + Path.DirectorySeparatorChar + "uQlust_config_file_GuidedHash.txt");
+                    ((HNN)c).processName = GetProcessName(c, set.mode);
                     break;
                 case OMICS_CHOOSE.NONE:
                     c = new ClusteringChoose(set, this);
                     break;
                 case OMICS_CHOOSE.HEATMAP:
                     c = new OmicsHeatMap(this, Rna_Protein_UserDef.results);
+                    ((OmicsHeatMap)c).processName = GetProcessName(c, set.mode);
                     break;              
             }
             c.Show();

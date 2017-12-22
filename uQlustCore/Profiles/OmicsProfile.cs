@@ -295,6 +295,7 @@ namespace phiClustCore.Profiles
                     wF.WriteLine();
                 }
             }
+
             wF.Close();
         }
         public static List<KeyValuePair< string,List<byte>>> ReadOmicsProfile(string fileName)
@@ -448,6 +449,7 @@ namespace phiClustCore.Profiles
             string line="";
             char tab = '\t';
             StreamReader r = new StreamReader(fileName);
+            string[] aux;
 
             if (r == null)
                 throw new Exception("Cannot open file: " + fileName);
@@ -457,20 +459,20 @@ namespace phiClustCore.Profiles
                 for (int i=0; i < pos; i++)
                     line = r.ReadLine();
                 line = line.Replace(tab.ToString(), " ");
-                string[] aux = line.Split(' ');
+                aux = line.Split(' ');
                 for (int i = numCol; i < aux.Length; i++)
                     labels.Add(aux[i]);
 
             }
             else
             {
-                for (int i=0; i < numRow; i++)
+                for (int i=0; i <=numRow; i++)
                     line = r.ReadLine();
-
+              
                 while (line != null)
                 {
                     line = line.Replace(tab.ToString(), " ");
-                    string[] aux = line.Split(' ');
+                    aux = line.Split(' ');
                     labels.Add(aux[pos - 1]);
                     line = r.ReadLine();
                 }
@@ -745,6 +747,27 @@ namespace phiClustCore.Profiles
             return localData;
 
         }
+        string ProcessCSVLine(string line,char delimiter)
+        {
+            StringBuilder newLine = new StringBuilder();
+            Boolean q = false;
+            for(int i=0;i<line.Length;i++)
+            {
+                if (line[i] == '"')
+                {
+                    q = !q;
+                    continue;
+
+                }
+                if (q && line[i] == delimiter)
+                    newLine.Append('-');
+                else
+                    newLine.Append(line[i]);                
+
+            }
+
+            return newLine.ToString();
+        }
         public List<List<double>> ReadOmicsFile(string fileName)
         {
             List<List<double>> localData = new List<List<double>>();
@@ -774,15 +797,23 @@ namespace phiClustCore.Profiles
                 line = r.ReadLine();
 
             currentProgress += 5;
+            string remLine = line;
             while (line != null)
             {
-                if(line.Contains("\""))
-                    line = Regex.Replace(line, "\"", "");
-                ProcessRow(line, localData,delimiter);
+                if (line.Length > 5)
+                {
+
+                    if (line.Contains("\""))
+                        line = ProcessCSVLine(line, delimiter);
+                        //line = Regex.Replace(line, "\"", "");
+                    ProcessRow(line, localData, delimiter);
+                }
+                remLine = line;
                 line = r.ReadLine();
             }
             r.Close();
             currentProgress += 15;
+            remLine += "ll";
             GenerateDefaultLabels(localData.Count, localData[0].Count);
             
             return localData;

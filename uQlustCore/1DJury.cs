@@ -336,7 +336,10 @@ namespace phiClustCore
             if (locColumns == null)
                 columns = MakeColumns(aux);
             else
+            {
                 columns = locColumns;
+                this.columns = locColumns;
+            }
 
             
             currentV++;

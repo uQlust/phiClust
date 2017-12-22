@@ -20,6 +20,9 @@ namespace phiClustCore
         {
             public int threadNum;
             public double threshold;
+            public Dictionary<int, int>[] referenceDist;
+            public List<int> candidates;
+            public int referenceIndex;
         };
         public List<string> stateAlignKeys { get { return new List<string>(stateAlign.Keys); } }
 
@@ -81,6 +84,8 @@ namespace phiClustCore
             dirSettings.Load();
             consensusProjection = input.useConsensusStates;
             threadNumbers = dirSettings.numberOfCores;
+            threadNumbers = 3;
+            maxV += refPoints * 20;
         }
         public HashCluster(Alignment _al, HashCInput input)
         {
@@ -90,6 +95,7 @@ namespace phiClustCore
             consensusProjection = input.useConsensusStates;
             threadNumbers = dirSettings.numberOfCores;
             stateAlign = al.GetStateAlign();
+            maxV += refPoints * 20;
         }
         public HashCluster(Dictionary<string, List<byte>> profiles, Alignment _al, HashCInput input)
         {
@@ -100,6 +106,7 @@ namespace phiClustCore
             dirSettings.Load();
             consensusProjection = input.useConsensusStates;
             threadNumbers = dirSettings.numberOfCores;
+            maxV += refPoints * 20;
         }
         public override string ToString()
         {
@@ -1126,7 +1133,7 @@ namespace phiClustCore
         int FindNextRefPoint(int n,List<KeyValuePair<int,int>> sortedDist,Dictionary <int,int>[] refPoints)
         {            
             if (n == 0)
-                return sortedDist[sortedDist.Count-1].Key;
+                return sortedDist[sortedDist.Count-1].Value;
 
             int[] newDist = new int[sortedDist.Count];
 
@@ -1138,7 +1145,7 @@ namespace phiClustCore
 
             var sorted = newDist.Select((x, i) => new KeyValuePair<int, int>(x, i)).OrderBy(x => x.Key).ToList();
 
-            return sorted[1].Value;
+            return sorted[sorted.Count/2].Value;
 
         }
         protected Dictionary<string, List<int>> FastCombineKeysNew(Dictionary<string, List<int>> dic, List<string> structures, bool flagDecision)
@@ -1152,8 +1159,7 @@ namespace phiClustCore
                 for(int i=0;i<item.Value.Count;i++)
                     hashKeys[item.Value[i]] = item.Key;
             }
-
-
+            
             bool[] avoid = new bool[hashKeys.Length];
             double sum = 0;
             bool end = false;
@@ -1195,7 +1201,7 @@ namespace phiClustCore
                 }
 
 
-                Dictionary<string, List<int>> dic2 = PrepareKeys(allStructures, true, false);
+                Dictionary<string, List<int>> dic2 = PrepareKeys(allStructures, false, false);
                 referenceDist[n] = new Dictionary<int, int>(hashKeys.Length);
 
                 foreach (var item in dic2)
@@ -1210,8 +1216,11 @@ namespace phiClustCore
 
 
                 }
+                dic2.Clear();
+                dic2 = null;
 
             }
+            hashKeys = null;
             Debug.Flush();
             int thresholdA = 0;
             int thresholdB = sorted[sorted.Count - 1].Key;
@@ -1453,7 +1462,7 @@ namespace phiClustCore
             }
             resetEvents[num].Set();
         }
-        private Dictionary<string, List<int>> ClustDistNew(Dictionary<string, List<int>> dic, Dictionary<int, int>[] referenceDist, List<KeyValuePair<int, int>> sorted, int thresholdH, int vT)
+        private Dictionary<string, List<int>> ClustDistNew2(Dictionary<string, List<int>> dic, Dictionary<int, int>[] referenceDist, List<KeyValuePair<int, int>> sorted, int thresholdH, int vT)
         {
             Dictionary<string, List<int>> outDic = new Dictionary<string, List<int>>(dic.Keys.Count);
             string[] hashKeys = new string[sorted.Count];
@@ -1472,7 +1481,7 @@ namespace phiClustCore
             for (int i = 0; i < avoid.Length; i++)
                 avoid[i] = false;
 
-     
+
 
 
             for (int i = 0, k = 0; i < hashKeys.Length; i++)
@@ -1492,13 +1501,13 @@ namespace phiClustCore
                         continue;
                     }
                     bool test = true;
-                    if(referenceDist!=null)
-                    for (int n = 0; n < referenceDist.Length; n++)
-                        if (Math.Abs(referenceDist[n][sorted[k].Value] - referenceDist[n][sorted[i].Value]) > thresholdH)
-                        {
-                            test = false;
-                            break;
-                        }
+                    if (referenceDist != null)
+                        for (int n = 0; n < referenceDist.Length; n++)
+                            if (Math.Abs(referenceDist[n][sorted[k].Value] - referenceDist[n][sorted[i].Value]) > thresholdH)
+                            {
+                                test = false;
+                                break;
+                            }
 
                     if (test)
                     {
@@ -1532,6 +1541,141 @@ namespace phiClustCore
             return outDic;
         }
 
+        private Dictionary<string, List<int>> ClustDistNew(Dictionary<string, List<int>> dic, Dictionary<int, int>[] referenceDist, List<KeyValuePair<int, int>> sorted, int thresholdH, int vT)
+        {
+            Dictionary<string, List<int>> outDic = new Dictionary<string, List<int>>(dic.Keys.Count);
+            string[] hashKeys = new string[sorted.Count];
+
+            foreach (var item in dic)
+            {
+                for (int i = 0; i < item.Value.Count; i++)
+                    hashKeys[item.Value[i]] = item.Key;
+            }
+
+
+
+            bool[] avoid = new bool[hashKeys.Length];
+            distTab = new int[hashKeys.Length];
+
+            for (int i = 0; i < avoid.Length; i++)
+                avoid[i] = false;
+
+
+            List<int> candidates = new List<int>();
+
+            for (int i = 0, k = 0; i < hashKeys.Length; i++)
+            {
+                if (avoid[sorted[i].Value])
+                    continue;
+                k = i + 1;
+                while (k < sorted.Count && avoid[sorted[k].Value])
+                    k++;
+                string keyProfile = hashKeys[sorted[i].Value];
+                int val = sorted[i].Key;
+                candidates.Clear();
+                candidates.Add(sorted[i].Value);
+                while (k < sorted.Count && Math.Abs(val - sorted[k].Key) <= thresholdH)
+                {
+                    candidates.Add(sorted[k].Value);
+                    k++;
+                    if (k<sorted.Count && avoid[sorted[k].Value])
+                    {
+                        k++;
+                        continue;
+                    }
+                    
+                }
+                if(candidates.Count>0)
+                {
+                    int remThreadNumbers = threadNumbers;
+                    if (referenceDist != null)
+                    {
+                        if (candidates.Count < 2 * remThreadNumbers)
+                            threadNumbers = remThreadNumbers / 2;
+                        if (threadNumbers < 1)
+                            threadNumbers = 1;
+                        for (int n = 0; n < threadNumbers; n++)
+                        {
+                            threadParam w;
+                            w.threshold = thresholdH;
+                            w.threadNum = n;
+                            w.candidates = candidates;
+                            w.referenceDist = referenceDist;
+                            w.referenceIndex = sorted[i].Value;                            
+                            resetEvents[n] = new ManualResetEvent(false);
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(CheckCandidates), (object)w);
+                        }
+
+                        for (int n = 0; n < threadNumbers; n++)
+                            resetEvents[n].WaitOne();
+
+                        foreach (var cand in candidates)
+                        {
+                            if (cand>=0)
+                            {
+                                List<int> inx = new List<int>();// (dic[hashKeys[sorted[k].Value]].Count);
+                                if (avoid[cand])
+                                    continue;
+                                    //Console.Write("Ups");
+                                inx.AddRange(dic[hashKeys[cand]]);
+                                foreach (var item in dic[hashKeys[cand]])
+                                    avoid[item] = true;
+                                if (!outDic.ContainsKey(keyProfile))
+                                {
+                                    List<int> auxList = new List<int>();
+                                    auxList.AddRange(dic[keyProfile]);
+                                    auxList.AddRange(inx);
+                                    outDic.Add(keyProfile, auxList);
+                                }
+                                else
+                                    outDic[keyProfile].AddRange(inx);
+                                avoid[cand] = true;
+                            }
+                        }
+                    }
+                    threadNumbers = remThreadNumbers;
+                }
+
+            }
+            for (int i = 0; i < sorted.Count; i++)
+                if (avoid[sorted[i].Value] == false)
+                    if (!outDic.ContainsKey(hashKeys[sorted[i].Value]))
+                    {
+                        outDic.Add(hashKeys[sorted[i].Value], dic[hashKeys[sorted[i].Value]]);
+                    }
+
+
+            return outDic;
+        }
+        void CheckCandidates(object o)//Dictionary<int, int>[] referenceDist, List<int> candidates, int referanceIndex,int threshold,int threadNum)
+        {
+            threadParam p = (threadParam)o;
+            Dictionary<int, int>[] referenceDist = p.referenceDist;
+            List<int> candidates = p.candidates;
+            int referanceIndex = p.referenceIndex;
+            int threadNum = p.threadNum;
+            int threshold = (int)p.threshold;
+
+            double step = ((double)candidates.Count) / threadNumbers;
+            int start =(int)( step*threadNum);
+            int end = (int)(step * (threadNum + 1));
+            if (end > candidates.Count)
+                end = candidates.Count;
+            for(int x=start;x<end;x++)
+            {
+                bool test = true;
+                for (int n = 0; n < referenceDist.Length; n++)
+                    if (Math.Abs(referenceDist[n][candidates[x]] - referenceDist[n][referanceIndex]) > threshold)
+                    {
+                        test = false;
+                        break;
+                    }
+                if (!test)
+                    lock(candidates)
+                        candidates[x] = -1;
+            }
+            resetEvents[threadNum].Set();
+        }
         private Dictionary<string, List<int>> ClustDist(Dictionary<string, List<int>> dic, List<KeyValuePair<int, int>> sorted, int thresholdH, int vT)
         {
             Dictionary<string, List<int>> outDic = new Dictionary<string, List<int>>(dic.Keys.Count);
@@ -1584,7 +1728,7 @@ namespace phiClustCore
                     allStructures.Add(hashKeys[sorted[i].Value]);
                     for (int n = 0; n <threadNumbers; n++)
                     {
-                        threadParam w;
+                        threadParam w=new threadParam();
                         w.threshold = thresholdH;
                         w.threadNum = n;
                         resetEvents[n].Reset();
@@ -2361,12 +2505,36 @@ namespace phiClustCore
 
             return consistency;
         }
-        public void CuttAlignment(List<string> columnNames, Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> dic)
+        public static Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> CuttFreq(List<string> allNames, List<string> cuttedNames,Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> dicToCutt)
+        {
+            Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> newDic = new Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>>();
+            bool[] index = new bool[allNames.Count];
+
+            for (int i = 0; i < allNames.Count; i++)
+                if (cuttedNames.Contains(allNames[i]))
+                    index[i] = true;
+                else
+                    index[i] = false;
+
+
+            foreach (var item in dicToCutt)
+            {
+                Dictionary<byte, int>[] freq = new Dictionary<byte, int>[cuttedNames.Count];
+                for (int i = 0, j = 0; i < item.Value.Value.Length; i++)
+                    if (index[i])
+                        freq[j++] = item.Value.Value[i];
+
+                newDic.Add(item.Key, new KeyValuePair<List<string>, Dictionary<byte, int>[]>(item.Value.Key, freq));
+            }
+            return newDic;
+
+        }
+        public void CuttAlignment(List<string> columnNames, List<string> clusterNames)
         {
             bool[] index = new bool[columnNames.Count];
-
+            
             Dictionary<string, int> dicStruct = new Dictionary<string, int>();
-            foreach (var item in dic.Keys)
+            foreach (var item in clusterNames)
                 dicStruct.Add(item, 0);
 
 
@@ -2390,7 +2558,7 @@ namespace phiClustCore
 
                 d.Remove(item);
                 d.Add(item, states);
-            }
+            }                    
 
         }
 

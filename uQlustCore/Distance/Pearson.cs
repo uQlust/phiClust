@@ -133,7 +133,11 @@ namespace phiClustCore.Distance
             /*Sxx -= mod1.Count * avrMod1 * avrMod1;
             Syy -= mod2.Count * avrMod2 * avrMod2;
             Sxy -= mod1.Count * avrMod2 * avrMod1;*/
-            double vv = (Sxy -mod1.Count*avrMod1*avrMod2) /(Math.Sqrt((Sxx-mod1.Count*avrMod1*avrMod1) * (Syy-mod2.Count*avrMod2*avrMod2)));
+            double res1 = Sxx - mod1.Count * avrMod1 * avrMod1;
+            double res2 = Syy - mod2.Count * avrMod2 * avrMod2;
+            double vv = 0;
+            if (res1>0 && res2>0)                
+                vv = (Sxy -mod1.Count*avrMod1*avrMod2) /(Math.Sqrt((Sxx-mod1.Count*avrMod1*avrMod1) * (Syy-mod2.Count*avrMod2*avrMod2)));
             dist = (1.0-vv)*100;
 
 
