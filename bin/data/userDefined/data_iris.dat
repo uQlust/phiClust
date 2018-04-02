@@ -1,0 +1,236 @@
+>setosa_0
+13 9 4 1 setosa
+>setosa_1
+13 8 4 1 setosa
+>setosa_2
+12 8 4 1 setosa
+>setosa_3
+12 8 4 1 setosa
+>setosa_4
+13 9 4 1 setosa
+>setosa_5
+14 10 5 1 setosa
+>setosa_6
+12 9 4 1 setosa
+>setosa_7
+13 9 4 1 setosa
+>setosa_8
+12 8 4 1 setosa
+>setosa_9
+13 8 4 1 setosa
+>setosa_10
+14 10 4 1 setosa
+>setosa_11
+13 9 4 1 setosa
+>setosa_12
+13 8 4 1 setosa
+>setosa_13
+11 8 3 1 setosa
+>setosa_14
+15 11 3 1 setosa
+>setosa_15
+15 12 4 1 setosa
+>setosa_16
+14 10 4 1 setosa
+>setosa_17
+13 9 4 1 setosa
+>setosa_18
+15 10 5 1 setosa
+>setosa_19
+13 10 4 1 setosa
+>setosa_20
+14 9 5 1 setosa
+>setosa_21
+13 10 4 1 setosa
+>setosa_22
+12 9 3 1 setosa
+>setosa_23
+13 9 5 2 setosa
+>setosa_24
+13 9 5 1 setosa
+>setosa_25
+13 8 4 1 setosa
+>setosa_26
+13 9 4 1 setosa
+>setosa_27
+14 9 4 1 setosa
+>setosa_28
+14 9 4 1 setosa
+>setosa_29
+12 8 4 1 setosa
+>setosa_42
+12 8 4 1 setosa
+>setosa_43
+13 9 4 2 setosa
+>setosa_44
+13 10 5 1 setosa
+>setosa_45
+13 8 4 1 setosa
+>setosa_46
+13 10 4 1 setosa
+>setosa_47
+12 8 4 1 setosa
+>setosa_48
+14 10 4 1 setosa
+>setosa_49
+13 9 4 1 setosa
+>versicolor_50
+18 8 12 4 versicolor
+>versicolor_51
+17 8 12 4 versicolor
+>versicolor_52
+18 8 13 4 versicolor
+>versicolor_53
+14 6 11 4 versicolor
+>versicolor_54
+17 7 12 4 versicolor
+>versicolor_55
+15 7 12 4 versicolor
+>versicolor_56
+16 9 12 4 versicolor
+>versicolor_57
+13 6 9 3 versicolor
+>versicolor_58
+17 8 12 4 versicolor
+>versicolor_59
+14 7 10 4 versicolor
+>versicolor_60
+13 5 9 3 versicolor
+>versicolor_61
+15 8 11 4 versicolor
+>versicolor_62
+16 6 11 3 versicolor
+>versicolor_63
+16 8 12 4 versicolor
+>versicolor_64
+15 8 9 4 versicolor
+>versicolor_65
+17 8 12 4 versicolor
+>versicolor_66
+15 8 12 4 versicolor
+>versicolor_76
+18 7 13 4 versicolor
+>versicolor_77
+17 8 13 5 versicolor
+>versicolor_78
+16 8 12 4 versicolor
+>versicolor_79
+15 7 9 3 versicolor
+>versicolor_80
+14 6 10 3 versicolor
+>versicolor_81
+14 6 10 3 versicolor
+>versicolor_82
+15 7 10 3 versicolor
+>versicolor_83
+16 7 13 4 versicolor
+>versicolor_84
+14 8 12 4 versicolor
+>versicolor_85
+16 9 12 4 versicolor
+>versicolor_86
+17 8 12 4 versicolor
+>versicolor_87
+16 6 12 4 versicolor
+>versicolor_88
+15 8 11 4 versicolor
+>versicolor_89
+14 7 11 4 versicolor
+>versicolor_90
+14 7 12 3 versicolor
+>versicolor_91
+16 8 12 4 versicolor
+>versicolor_92
+15 7 11 3 versicolor
+>versicolor_93
+13 6 9 3 versicolor
+>versicolor_94
+15 7 11 4 versicolor
+>versicolor_95
+15 8 11 3 versicolor
+>versicolor_96
+15 8 11 4 versicolor
+>versicolor_97
+16 8 11 4 versicolor
+>versicolor_98
+13 7 8 3 versicolor
+>versicolor_99
+15 7 11 4 versicolor
+>virginica_100
+16 9 16 7 virginica
+>virginica_101
+15 7 13 5 virginica
+>virginica_102
+18 8 15 6 virginica
+>virginica_103
+16 8 15 5 virginica
+>virginica_104
+17 8 15 6 virginica
+>virginica_105
+19 8 17 6 virginica
+>virginica_106
+13 7 12 5 virginica
+>virginica_107
+19 8 16 5 virginica
+>virginica_108
+17 7 15 5 virginica
+>virginica_109
+19 9 16 7 virginica
+>virginica_110
+17 8 13 5 virginica
+>virginica_111
+17 7 14 5 virginica
+>virginica_112
+18 8 14 6 virginica
+>virginica_113
+15 7 13 5 virginica
+>virginica_114
+15 7 13 6 virginica
+>virginica_115
+17 8 14 6 virginica
+>virginica_116
+17 8 14 5 virginica
+>virginica_117
+19 10 17 6 virginica
+>virginica_118
+19 7 18 6 virginica
+>virginica_119
+16 6 13 4 virginica
+>virginica_120
+18 8 15 6 virginica
+>virginica_121
+15 7 13 5 virginica
+>virginica_122
+19 7 17 5 virginica
+>virginica_123
+16 7 13 5 virginica
+>virginica_124
+17 9 15 6 virginica
+>virginica_125
+19 8 16 5 virginica
+>virginica_137
+17 8 14 5 virginica
+>virginica_138
+16 8 13 5 virginica
+>virginica_139
+18 8 14 6 virginica
+>virginica_140
+17 8 15 6 virginica
+>virginica_141
+18 8 13 6 virginica
+>virginica_142
+15 7 13 5 virginica
+>virginica_143
+18 8 15 6 virginica
+>virginica_144
+17 9 15 7 virginica
+>virginica_145
+17 8 14 6 virginica
+>virginica_146
+16 7 13 5 virginica
+>virginica_147
+17 8 14 5 virginica
+>virginica_148
+16 9 14 6 virginica
+>virginica_149
+15 8 13 5 virginica

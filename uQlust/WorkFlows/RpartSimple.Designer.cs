@@ -231,7 +231,7 @@
             this.refPoints.Size = new System.Drawing.Size(120, 20);
             this.refPoints.TabIndex = 73;
             this.refPoints.Value = new decimal(new int[] {
-            5,
+            20,
             0,
             0,
             0});

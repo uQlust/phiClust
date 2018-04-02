@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dir>C:\Projects\phiClust\bin</dir>
+  <numberOfCores>4</numberOfCores>
+  <extension>*</extension>
+  <profilesDir>C:\Projects\phiClust\uQlust\bin\Release\generatedProfiles</profilesDir>
+  <mode>USER_DEFINED</mode>
+  <iOTroubles>false</iOTroubles>
+</Settings>

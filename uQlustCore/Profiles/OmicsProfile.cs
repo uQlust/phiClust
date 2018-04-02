@@ -418,17 +418,16 @@ namespace phiClustCore.Profiles
             int countPos=0;
             List<int> rowPositions;
             List<string> tmpAux;
-           // line = r.ReadLine();
-
+            char locDelimiter = ' ';
             rowPositions = GetLabelPosition();
             for (i=1;i<rowPositions[rowPositions.Count-1]; i++)
             {
                 line = r.ReadLine();
+                if (!line.Contains(delimiter))
+                    delimiter = locDelimiter;
+                line = ProcessCSVLine(line, delimiter);
                 if (i== rowPositions[countPos]-1)
                 {
-                    line = line.Replace('\t', ' ');
-                    if (line.Contains("\""))
-                        line = Regex.Replace(line, "\"", "");
                     tmpAux = new List<string>();
                     string[] aux = line.Split(delimiter);
                     labId[countPos]=aux[0];
@@ -651,7 +650,8 @@ namespace phiClustCore.Profiles
         private void ProcessRow(string line,List<List<double>> data,char delimiter=' ')
         {
             List<double> row = new List<double>();
-            line = Regex.Replace(line, @"\s+", " ");
+            if(delimiter==' ')
+                line = Regex.Replace(line, @"\s+", " ");
             line = line.TrimEnd();
             string[] aux = line.Split(delimiter);
             if (aux.Length == 0)
@@ -776,7 +776,7 @@ namespace phiClustCore.Profiles
                 return ReadOmicsExcelFile(fileName);
 
             StreamReader r = new StreamReader(fileName);
-            char delimiter=' ';
+            char delimiter = '\t';
             if (Path.GetExtension(fileName).Contains("csv"))
                 delimiter = ',';
 
@@ -790,19 +790,23 @@ namespace phiClustCore.Profiles
                labelGenes[v].Clear();
             for (int v = 0; v < labelSamples.Length; v++)
                 labelSamples[v].Clear();
+
             if(genePosition && uLabelSample || !genePosition && uLabelGene)
                 i = ReadLabels(r,line,delimiter);
 
             for (; i < numRow-1; i++)
                 line = r.ReadLine();
 
+
+           // if(line.Contains())
             currentProgress += 5;
             string remLine = line;
             while (line != null)
             {
                 if (line.Length > 5)
                 {
-
+                    if (!line.Contains(delimiter))
+                        delimiter = ' ';
                     if (line.Contains("\""))
                         line = ProcessCSVLine(line, delimiter);
                         //line = Regex.Replace(line, "\"", "");

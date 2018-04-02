@@ -1,0 +1,16 @@
+Column 4
+Rows 31
+Use gene labels True
+Use sample labels True
+Label Genes 1
+Label Samples 3
+Label Number of rows 1
+States 6
+transposition False
+Coding Algorithm PERCENTILE
+Heatmap True
+OutputName TCGA_BRCA_RNASeqV2_Wed_Jun_21_09_37_21_2017_3348803-1.genprof
+Gene Position Rows True
+Z-score True
+Quantile False
+Selected genes 

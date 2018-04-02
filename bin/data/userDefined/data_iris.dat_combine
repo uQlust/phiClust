@@ -1,0 +1,300 @@
+>setosa_0
+pdb_FragBag profile 13 9 4 1
+>setosa_1
+pdb_FragBag profile 13 8 4 1
+>setosa_2
+pdb_FragBag profile 12 8 4 1
+>setosa_3
+pdb_FragBag profile 12 8 4 1
+>setosa_4
+pdb_FragBag profile 13 9 4 1
+>setosa_5
+pdb_FragBag profile 14 10 5 1
+>setosa_6
+pdb_FragBag profile 12 9 4 1
+>setosa_7
+pdb_FragBag profile 13 9 4 1
+>setosa_8
+pdb_FragBag profile 12 8 4 1
+>setosa_9
+pdb_FragBag profile 13 8 4 1
+>setosa_10
+pdb_FragBag profile 14 10 4 1
+>setosa_11
+pdb_FragBag profile 13 9 4 1
+>setosa_12
+pdb_FragBag profile 13 8 4 1
+>setosa_13
+pdb_FragBag profile 11 8 3 1
+>setosa_14
+pdb_FragBag profile 15 11 3 1
+>setosa_15
+pdb_FragBag profile 15 12 4 1
+>setosa_16
+pdb_FragBag profile 14 10 4 1
+>setosa_17
+pdb_FragBag profile 13 9 4 1
+>setosa_18
+pdb_FragBag profile 15 10 5 1
+>setosa_19
+pdb_FragBag profile 13 10 4 1
+>setosa_20
+pdb_FragBag profile 14 9 5 1
+>setosa_21
+pdb_FragBag profile 13 10 4 1
+>setosa_22
+pdb_FragBag profile 12 9 3 1
+>setosa_23
+pdb_FragBag profile 13 9 5 2
+>setosa_24
+pdb_FragBag profile 13 9 5 1
+>setosa_25
+pdb_FragBag profile 13 8 4 1
+>setosa_26
+pdb_FragBag profile 13 9 4 1
+>setosa_27
+pdb_FragBag profile 14 9 4 1
+>setosa_28
+pdb_FragBag profile 14 9 4 1
+>setosa_29
+pdb_FragBag profile 12 8 4 1
+>setosa_42
+pdb_FragBag profile 12 8 4 1
+>setosa_43
+pdb_FragBag profile 13 9 4 2
+>setosa_44
+pdb_FragBag profile 13 10 5 1
+>setosa_45
+pdb_FragBag profile 13 8 4 1
+>setosa_46
+pdb_FragBag profile 13 10 4 1
+>setosa_47
+pdb_FragBag profile 12 8 4 1
+>setosa_48
+pdb_FragBag profile 14 10 4 1
+>setosa_49
+pdb_FragBag profile 13 9 4 1
+>versicolor_50
+pdb_FragBag profile 18 8 12 4
+>versicolor_51
+pdb_FragBag profile 17 8 12 4
+>versicolor_52
+pdb_FragBag profile 18 8 13 4
+>versicolor_53
+pdb_FragBag profile 14 6 11 4
+>versicolor_54
+pdb_FragBag profile 17 7 12 4
+>versicolor_55
+pdb_FragBag profile 15 7 12 4
+>versicolor_56
+pdb_FragBag profile 16 9 12 4
+>versicolor_57
+pdb_FragBag profile 13 6 9 3
+>versicolor_58
+pdb_FragBag profile 17 8 12 4
+>versicolor_59
+pdb_FragBag profile 14 7 10 4
+>versicolor_60
+pdb_FragBag profile 13 5 9 3
+>versicolor_61
+pdb_FragBag profile 15 8 11 4
+>versicolor_62
+pdb_FragBag profile 16 6 11 3
+>versicolor_63
+pdb_FragBag profile 16 8 12 4
+>versicolor_64
+pdb_FragBag profile 15 8 9 4
+>versicolor_65
+pdb_FragBag profile 17 8 12 4
+>versicolor_66
+pdb_FragBag profile 15 8 12 4
+>versicolor_76
+pdb_FragBag profile 18 7 13 4
+>versicolor_77
+pdb_FragBag profile 17 8 13 5
+>versicolor_78
+pdb_FragBag profile 16 8 12 4
+>versicolor_79
+pdb_FragBag profile 15 7 9 3
+>versicolor_80
+pdb_FragBag profile 14 6 10 3
+>versicolor_81
+pdb_FragBag profile 14 6 10 3
+>versicolor_82
+pdb_FragBag profile 15 7 10 3
+>versicolor_83
+pdb_FragBag profile 16 7 13 4
+>versicolor_84
+pdb_FragBag profile 14 8 12 4
+>versicolor_85
+pdb_FragBag profile 16 9 12 4
+>versicolor_86
+pdb_FragBag profile 17 8 12 4
+>versicolor_87
+pdb_FragBag profile 16 6 12 4
+>versicolor_88
+pdb_FragBag profile 15 8 11 4
+>versicolor_89
+pdb_FragBag profile 14 7 11 4
+>versicolor_90
+pdb_FragBag profile 14 7 12 3
+>versicolor_91
+pdb_FragBag profile 16 8 12 4
+>versicolor_92
+pdb_FragBag profile 15 7 11 3
+>versicolor_93
+pdb_FragBag profile 13 6 9 3
+>versicolor_94
+pdb_FragBag profile 15 7 11 4
+>versicolor_95
+pdb_FragBag profile 15 8 11 3
+>versicolor_96
+pdb_FragBag profile 15 8 11 4
+>versicolor_97
+pdb_FragBag profile 16 8 11 4
+>versicolor_98
+pdb_FragBag profile 13 7 8 3
+>versicolor_99
+pdb_FragBag profile 15 7 11 4
+>virginica_100
+pdb_FragBag profile 16 9 16 7
+>virginica_101
+pdb_FragBag profile 15 7 13 5
+>virginica_102
+pdb_FragBag profile 18 8 15 6
+>virginica_103
+pdb_FragBag profile 16 8 15 5
+>virginica_104
+pdb_FragBag profile 17 8 15 6
+>virginica_105
+pdb_FragBag profile 19 8 17 6
+>virginica_106
+pdb_FragBag profile 13 7 12 5
+>virginica_107
+pdb_FragBag profile 19 8 16 5
+>virginica_108
+pdb_FragBag profile 17 7 15 5
+>virginica_109
+pdb_FragBag profile 19 9 16 7
+>virginica_110
+pdb_FragBag profile 17 8 13 5
+>virginica_111
+pdb_FragBag profile 17 7 14 5
+>virginica_112
+pdb_FragBag profile 18 8 14 6
+>virginica_113
+pdb_FragBag profile 15 7 13 5
+>virginica_114
+pdb_FragBag profile 15 7 13 6
+>virginica_115
+pdb_FragBag profile 17 8 14 6
+>virginica_116
+pdb_FragBag profile 17 8 14 5
+>virginica_117
+pdb_FragBag profile 19 10 17 6
+>virginica_118
+pdb_FragBag profile 19 7 18 6
+>virginica_119
+pdb_FragBag profile 16 6 13 4
+>virginica_120
+pdb_FragBag profile 18 8 15 6
+>virginica_121
+pdb_FragBag profile 15 7 13 5
+>virginica_122
+pdb_FragBag profile 19 7 17 5
+>virginica_123
+pdb_FragBag profile 16 7 13 5
+>virginica_124
+pdb_FragBag profile 17 9 15 6
+>virginica_125
+pdb_FragBag profile 19 8 16 5
+>virginica_137
+pdb_FragBag profile 17 8 14 5
+>virginica_138
+pdb_FragBag profile 16 8 13 5
+>virginica_139
+pdb_FragBag profile 18 8 14 6
+>virginica_140
+pdb_FragBag profile 17 8 15 6
+>virginica_141
+pdb_FragBag profile 18 8 13 6
+>virginica_142
+pdb_FragBag profile 15 7 13 5
+>virginica_143
+pdb_FragBag profile 18 8 15 6
+>virginica_144
+pdb_FragBag profile 17 9 15 7
+>virginica_145
+pdb_FragBag profile 17 8 14 6
+>virginica_146
+pdb_FragBag profile 16 7 13 5
+>virginica_147
+pdb_FragBag profile 17 8 14 5
+>virginica_148
+pdb_FragBag profile 16 9 14 6
+>virginica_149
+pdb_FragBag profile 15 8 13 5
+>setosa_30
+pdb_FragBag profile 13 8 4 1
+>setosa_31
+pdb_FragBag profile 14 9 4 1
+>setosa_32
+pdb_FragBag profile 14 11 4 1
+>setosa_33
+pdb_FragBag profile 14 11 4 1
+>setosa_34
+pdb_FragBag profile 13 8 4 1
+>setosa_35
+pdb_FragBag profile 13 8 3 1
+>setosa_36
+pdb_FragBag profile 14 9 4 1
+>setosa_37
+pdb_FragBag profile 13 9 4 1
+>setosa_38
+pdb_FragBag profile 12 8 4 1
+>setosa_39
+pdb_FragBag profile 13 9 4 1
+>setosa_40
+pdb_FragBag profile 13 9 4 1
+>setosa_41
+pdb_FragBag profile 12 6 4 1
+>versicolor_67
+pdb_FragBag profile 15 7 11 3
+>versicolor_68
+pdb_FragBag profile 16 6 12 4
+>versicolor_69
+pdb_FragBag profile 15 7 10 3
+>versicolor_70
+pdb_FragBag profile 15 8 13 5
+>versicolor_71
+pdb_FragBag profile 16 7 11 4
+>versicolor_72
+pdb_FragBag profile 16 7 13 4
+>versicolor_73
+pdb_FragBag profile 16 7 12 3
+>versicolor_74
+pdb_FragBag profile 17 8 11 4
+>versicolor_75
+pdb_FragBag profile 17 8 12 4
+>virginica_126
+pdb_FragBag profile 16 7 13 5
+>virginica_127
+pdb_FragBag profile 16 8 13 5
+>virginica_128
+pdb_FragBag profile 17 7 15 6
+>virginica_129
+pdb_FragBag profile 19 8 15 4
+>virginica_130
+pdb_FragBag profile 19 7 16 5
+>virginica_131
+pdb_FragBag profile 19 10 17 5
+>virginica_132
+pdb_FragBag profile 17 7 15 6
+>virginica_133
+pdb_FragBag profile 16 7 13 4
+>virginica_134
+pdb_FragBag profile 16 7 15 4
+>virginica_135
+pdb_FragBag profile 19 8 16 6
+>virginica_136
+pdb_FragBag profile 16 9 15 6

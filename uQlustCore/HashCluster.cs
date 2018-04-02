@@ -1573,17 +1573,12 @@ namespace phiClustCore
                 string keyProfile = hashKeys[sorted[i].Value];
                 int val = sorted[i].Key;
                 candidates.Clear();
-                candidates.Add(sorted[i].Value);
+                //candidates.Add(sorted[i].Value);
                 while (k < sorted.Count && Math.Abs(val - sorted[k].Key) <= thresholdH)
                 {
-                    candidates.Add(sorted[k].Value);
-                    k++;
-                    if (k<sorted.Count && avoid[sorted[k].Value])
-                    {
-                        k++;
-                        continue;
-                    }
-                    
+                    if(!avoid[sorted[k].Value])
+                        candidates.Add(sorted[k].Value);
+                    k++;                    
                 }
                 if(candidates.Count>0)
                 {
