@@ -1,0 +1,11 @@
+C:\Projects\phiClust\phiClustTerminal\bin\Debug\phiClustTerminal.exe.config
+C:\Projects\phiClust\phiClustTerminal\bin\Debug\phiClustTerminal.exe
+C:\Projects\phiClust\phiClustTerminal\bin\Debug\phiClustTerminal.pdb
+C:\Projects\phiClust\phiClustTerminal\bin\Debug\phiClustCore.dll
+C:\Projects\phiClust\phiClustTerminal\bin\Debug\DocumentFormat.OpenXml.dll
+C:\Projects\phiClust\phiClustTerminal\bin\Debug\phiClustCore.pdb
+C:\Projects\phiClust\phiClustTerminal\bin\Debug\phiClustCore.dll.config
+C:\Projects\phiClust\phiClustTerminal\bin\Debug\DocumentFormat.OpenXml.xml
+C:\Projects\phiClust\phiClustTerminal\obj\Debug\phiClustTerminal.csprojResolveAssemblyReference.cache
+C:\Projects\phiClust\phiClustTerminal\obj\Debug\phiClustTerminal.exe
+C:\Projects\phiClust\phiClustTerminal\obj\Debug\phiClustTerminal.pdb

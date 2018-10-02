@@ -6,8 +6,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 using phiClustCore;
 using phiClustCore.Interface;
+
 
 namespace Graph
 {
@@ -148,6 +150,65 @@ namespace Graph
             {
                 output.SaveTxt(saveFileDialog1.FileName);
             }
+        }
+        void DrawClusterData(Dictionary<string, string[]> data,int classNum)
+        {
+            double[] accCluster = new double[clusters.Count];
+            for (int i = 0; i < clusters.Count; i++)
+            {
+                Dictionary<string, double> res = new Dictionary<string, double>();
+                for (int j = 0; j < clusters[i].Count; j++)
+                {
+                    if (data.ContainsKey(clusters[i][j]))
+                        if (res.ContainsKey(data[clusters[i][j]][classNum]))
+                            res[data[clusters[i][j]][classNum]]++;
+                        else
+                            res.Add(data[clusters[i][j]][classNum], 1.0);
+                }
+
+                List<KeyValuePair<string, double>> xx = new List<KeyValuePair<string, double>>();
+                xx = res.OrderBy(key => key.Value).ToList();
+                double w= 0;
+                foreach (var item in xx)
+                {
+                    w += item.Value;
+                    // do something with item.Key and item.Value
+                }
+                accCluster[i] = xx[0].Value / w;
+            }
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            DialogResult res = openFileDialog1.ShowDialog();
+
+            if (res == DialogResult.OK)
+            {
+                StreamReader r = new StreamReader(openFileDialog1.FileName);
+                Dictionary<string, string[]> data = new Dictionary<string, string[]>();
+                string line = r.ReadLine();
+                while(line!=null)
+                {
+                    string[] aux = line.Split(' ');
+                    string[] classLabes = new string[aux.Length - 1];
+                    for (int i = 1; i < aux.Length; i++)
+                        classLabes[i - 1] = aux[i];
+                    data.Add(aux[0], classLabes);
+                    line = r.ReadLine();
+                }
+                r.Close();
+                DrawClusterData(data, 0);
+                DrawPanel pn = new DrawPanel("Leave  " );
+                pn.Height = 500;
+                pn.Width = 400;                
+
+                pn.CreateBMP();
+                //pn.drawPic = delegate { double res = DrawNodeProfiles(pn.bmp, clickNode.setProfiles, clickNode.consistency); pn.Text = res.ToString(); };
+                pn.Show();
+                pn.pictureBox1.Invalidate();
+
+            }
+
+
         }
     }
 }

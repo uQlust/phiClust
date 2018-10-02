@@ -21,7 +21,7 @@ namespace Graph
             InitializeComponent();
 
             numericUpDown1.Value = set.numberOfCores;
-            extensionFile.Text = set.extension;
+            
             textBox1.Text = set.profilesDir;
         }
         public FormSettings(bool flag)
@@ -30,16 +30,14 @@ namespace Graph
            
             try
             {
-                set.Load();
-                extensionFile.Text = set.extension;
+                set.Load();                
                 textBox1.Text = set.profilesDir;
                 numericUpDown1.Value = set.numberOfCores;
 
             }
             catch
             {
-                cancelBtn.Enabled = false;               
-                extensionFile.Text = "*";
+                cancelBtn.Enabled = false;                           
                 numericUpDown1.Value = 1;
             }
 
@@ -51,8 +49,7 @@ namespace Graph
         }
 
         private void saveBtn_Click(object sender, EventArgs e)
-        {        
-            set.extension = extensionFile.Text;
+        {                    
             set.profilesDir = textBox1.Text;
             set.numberOfCores = (int)numericUpDown1.Value;
             set.iOTroubles = io.Checked;

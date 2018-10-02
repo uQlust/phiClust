@@ -46,6 +46,7 @@ namespace Graph
             leftNode.ClearColors(Color.Black);
             this.outp = outp;
             this.upperNode = auxUpper=upperNode;
+            InitializeComponent();
             this.Text = outp.alignFile;
             this.leftNode = auxLeft=leftNode;
             List<KeyValuePair<string, List<byte>>> colOmicsProfiles=new List<KeyValuePair<string,List<byte>>>();
@@ -77,7 +78,7 @@ namespace Graph
             }
             colorMap = outp.profilesColor;
             indexLabels = outp.auxInt;
-            InitializeComponent();
+            
             this.Name = "HeatMap " + outp.dirName;
             for (int i = 1; i < outp.aux2.Count; i++)
                 comboBox1.Items.Add(outp.aux2[i]);
@@ -649,6 +650,11 @@ namespace Graph
 
 
             }
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void pictureBox3_MouseLeave(object sender, EventArgs e)
