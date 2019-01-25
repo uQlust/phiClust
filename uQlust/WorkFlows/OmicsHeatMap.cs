@@ -16,7 +16,7 @@ namespace WorkFlows
     {
         Form parent;
         bool previous = false;
-        Options opt = new Options();
+        public Options opt = new Options();
         public string processName = null;
         static int counter=0;
         ResultWindow results;
@@ -24,10 +24,10 @@ namespace WorkFlows
         string dataFileName = "";
         ProfileTree tree = new ProfileTree();
 
-        public OmicsHeatMap(Form parent,ResultWindow results,string dataFileName=null)
+        public OmicsHeatMap(Form parent, ResultWindow results, string dataFileName = null)
         {
             this.parent = parent;
-            this.dataFileName = dataFileName;           
+            this.dataFileName = dataFileName;
             this.results = results;
             InitializeComponent();
             if (dataFileName != null)
@@ -37,7 +37,13 @@ namespace WorkFlows
                 button2.Visible = false;
             }
             opt.ReadOptionFile("workFlows/omicsHeatMap/uQlust_config_file_Tree.txt");
-            SetProfileOptions();
+            SetProfileOptions();            
+        }
+
+
+        public OmicsHeatMap(OmicsInput om,Form parent,ResultWindow results,string dataFileName=null):this(parent,results,dataFileName )
+        {
+            opt.omics = om;
         }
         void SetProfileOptions()
         {
@@ -111,6 +117,16 @@ namespace WorkFlows
             //processName = "OmicsHeatMap" + "_" + counter++;
             //((Omics)parent).processName = processName;
             //((Omics)parent).SaveOptions();
+            if (checkBox1.Checked)
+            {
+                if (textBox2.Text.Length == 0)
+                {
+                    MessageBox.Show("Name of distance file is not provided!");
+                    return;
+                }
+                opt.distanceFile = textBox2.Text;
+            }
+
             Settings set = new Settings();
             set.Load();
             set.mode = INPUTMODE.OMICS;
@@ -140,18 +156,17 @@ namespace WorkFlows
             results.BringToFront();
             set.Save();
             counter++;
-            OmicsProfile aux = new OmicsProfile();
-            aux.processName = processName + "-" + counter + ".genprof";
-            aux.heatmap = false;
-            aux.SaveOmicsSettings();
-            results.Run(aux.processName, opt);
+            opt.omics.processName = processName + "-" + counter + ".genprof";
+            opt.omics.heatmap = false;            
+            results.Run(opt.omics.processName, opt);
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
             previous = true;
             parent.Show();
-            this.Close();
+            this.Hide();
+            //this.Close();
         }
 
         private void OmicsHeatMap_FormClosed(object sender, FormClosedEventArgs e)
@@ -192,6 +207,20 @@ namespace WorkFlows
         private void label7_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            textBox2.Enabled = checkBox1.Checked;
+            button3.Enabled = checkBox1.Checked;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            DialogResult res = openFileDialog1.ShowDialog();
+
+            if (res == DialogResult.OK)
+                textBox2.Text = openFileDialog1.FileName;
         }
     }
 }

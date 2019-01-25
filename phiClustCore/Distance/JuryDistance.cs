@@ -12,18 +12,18 @@ namespace phiClustCore.Distance
     public class JuryDistance: HammingBase//,IDistance
     {
 
-        public JuryDistance(List<string> fileNames, string alignFile, bool flag, string profileName, string refJuryProfile = null) 
-            :base(fileNames, alignFile, flag,  profileName,refJuryProfile)
+        public JuryDistance(List<string> fileNames, string alignFile, bool flag, string profileName, Options opt,string refJuryProfile = null) 
+            :base(fileNames, alignFile, flag,  profileName,opt,refJuryProfile)
         {
 
         }
-        public JuryDistance(string dirName,string alignFile,bool flag,string profileName,string refJuryProfile=null) 
-            :base(dirName,alignFile,flag,profileName,refJuryProfile) 
+        public JuryDistance(string dirName,string alignFile,bool flag,string profileName,Options opt,string refJuryProfile=null) 
+            :base(dirName,alignFile,flag,profileName,opt,refJuryProfile) 
         {
           
         }
-        public JuryDistance(string profilesFile, bool flag , string profileName, string refJuryProfile)
-            :base(profilesFile,flag,profileName,refJuryProfile)
+        public JuryDistance(string profilesFile, bool flag , string profileName, Options opt,string refJuryProfile)
+            :base(profilesFile,flag,profileName,opt,refJuryProfile)
         {
         }
         public JuryDistance(Alignment al, bool flag)

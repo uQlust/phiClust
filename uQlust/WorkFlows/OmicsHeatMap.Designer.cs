@@ -51,8 +51,11 @@
             this.label4 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioHTree = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -115,22 +118,22 @@
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
+            this.radioButton1.Checked = true;
             this.radioButton1.Location = new System.Drawing.Point(92, 118);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(51, 17);
             this.radioButton1.TabIndex = 83;
+            this.radioButton1.TabStop = true;
             this.radioButton1.Text = "Rpart";
             this.radioButton1.UseVisualStyleBackColor = true;
             // 
             // Hash
             // 
             this.Hash.AutoSize = true;
-            this.Hash.Checked = true;
             this.Hash.Location = new System.Drawing.Point(10, 118);
             this.Hash.Name = "Hash";
             this.Hash.Size = new System.Drawing.Size(50, 17);
             this.Hash.TabIndex = 82;
-            this.Hash.TabStop = true;
             this.Hash.Text = "Hash";
             this.Hash.UseVisualStyleBackColor = true;
             this.Hash.CheckedChanged += new System.EventHandler(this.Hash_CheckedChanged);
@@ -209,7 +212,7 @@
             // button4
             // 
             this.button4.Image = ((System.Drawing.Image)(resources.GetObject("button4.Image")));
-            this.button4.Location = new System.Drawing.Point(6, 260);
+            this.button4.Location = new System.Drawing.Point(6, 292);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(53, 36);
             this.button4.TabIndex = 88;
@@ -218,7 +221,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(613, 260);
+            this.button1.Location = new System.Drawing.Point(613, 292);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(53, 36);
             this.button1.TabIndex = 89;
@@ -275,7 +278,7 @@
             this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
             this.numericUpDown1.TabIndex = 92;
             this.numericUpDown1.Value = new decimal(new int[] {
-            5,
+            20,
             0,
             0,
             0});
@@ -292,6 +295,18 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Dendrogram clustering";
             // 
+            // radioHTree
+            // 
+            this.radioHTree.AutoSize = true;
+            this.radioHTree.Location = new System.Drawing.Point(102, 17);
+            this.radioHTree.Name = "radioHTree";
+            this.radioHTree.Size = new System.Drawing.Size(55, 17);
+            this.radioHTree.TabIndex = 95;
+            this.radioHTree.TabStop = true;
+            this.radioHTree.Text = "HTree";
+            this.radioHTree.UseVisualStyleBackColor = true;
+            this.radioHTree.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            // 
             // radioButton2
             // 
             this.radioButton2.AutoSize = true;
@@ -305,23 +320,44 @@
             this.radioButton2.UseVisualStyleBackColor = true;
             this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
-            // radioHTree
+            // checkBox1
             // 
-            this.radioHTree.AutoSize = true;
-            this.radioHTree.Location = new System.Drawing.Point(102, 17);
-            this.radioHTree.Name = "radioHTree";
-            this.radioHTree.Size = new System.Drawing.Size(55, 17);
-            this.radioHTree.TabIndex = 95;
-            this.radioHTree.TabStop = true;
-            this.radioHTree.Text = "HTree";
-            this.radioHTree.UseVisualStyleBackColor = true;
-            this.radioHTree.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(16, 264);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(127, 17);
+            this.checkBox1.TabIndex = 95;
+            this.checkBox1.Text = "Save distances to file";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // button3
+            // 
+            this.button3.Enabled = false;
+            this.button3.Location = new System.Drawing.Point(628, 260);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(26, 23);
+            this.button3.TabIndex = 97;
+            this.button3.Text = "...";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // textBox2
+            // 
+            this.textBox2.Enabled = false;
+            this.textBox2.Location = new System.Drawing.Point(198, 262);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(424, 20);
+            this.textBox2.TabIndex = 96;
             // 
             // OmicsHeatMap
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(670, 301);
+            this.ClientSize = new System.Drawing.Size(670, 340);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.numericUpDown1);
@@ -382,5 +418,8 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioHTree;
         private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.TextBox textBox2;
     }
 }

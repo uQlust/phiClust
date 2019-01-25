@@ -10,100 +10,168 @@ using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using phiClustCore.Interface;
+using System.Runtime.Serialization.Formatters.Binary;
+
 //using phiClustCore;
 
 namespace phiClustCore.Profiles
 {
-    public enum CodingAlg
-    {
-        PERCENTILE,
-        Z_SCORE,
-        EQUAL_DIST,     
-    };
-    public class OmicsProfile : UserDefinedProfile
+    [Serializable]
+    public class OmicsProfile : UserDefinedProfile,ISerialize
     {
         public static string omicsSettings = "omicsSettings.dat";
-        public int numCol=10;
-        public int numRow=18;
-        public bool genePosition;
-        public int selectGenes = 0;
-        public bool zScore;
-        public bool quantile;
-        public int numStates = 6;
+        public OmicsInput oInput=new OmicsInput();
+
         public List<int> labelGeneStart = null;
         public List<int> labelSampleStart = null;       
-        public bool uLabelGene = false;
-        public bool uLabelSample = false;
-        public int labelNumRows = 1;
-        public string processName;
-        public bool heatmap = false;
-
-        profileNode localNode = null;
-        profileNode localNodeDist = null;
+//        profileNode localNode = null;
+//        profileNode localNodeDist = null;
         List<string> labels = new List<string>();
         public List<string> []labelGenes =null;
         public List<string>[] labelSamples = null;
         public string[] labId = null;
-        public string fileSelectedGenes = "";
         List<string> labelsData=new List<string>();
-        Dictionary<string,int> selectedGenes = null;
-        Dictionary<int, string> indexSelectedGenes = null;
-        public bool transpose = false;
-        public CodingAlg coding = CodingAlg.EQUAL_DIST;
         static int profSize = 0;
 
         double []dev = null;
       
         double []avr=null;
 
-        private static string ProfileName ="Ömics profile";
+        private static string ProfileName ="Omics profile";
         Settings set=new Settings();
         public OmicsProfile()
         {
-                ProfileName = "Omics profile";
-                profileName = ProfileName;
-                AddInternalProfiles();
-                destination = new List<INPUTMODE>();
-                destination.Add(INPUTMODE.OMICS);
-                maxV = 100;
-                currentProgress = 0;
-                set.Load();
-                LoadOmicsSettings();
-
+            InitProfile();            
         }
-        public void SaveOmicsSettings()
+        public OmicsProfile(Options opt):this()
         {
-            StreamWriter wr = new StreamWriter(omicsSettings);
+            InitProfile();
+            //opt.SaveOptions("ggg");
+           
+            oInput = opt.omics;
+            labelSampleStart = GetLabelsPositions(oInput.labelSampleStartString);
+            labelGeneStart = GetLabelsPositions(oInput.labelGeneStartString);
 
-            wr.WriteLine("Column " + numCol);
-            wr.WriteLine("Rows " + numRow);
-            wr.WriteLine("Use gene labels " + uLabelGene);
-            wr.WriteLine("Use sample labels " + uLabelSample);
-            string s = "";
-            for (int i = 0; i < labelGeneStart.Count - 1; i++)
-                s += labelGeneStart[i] + ";";
-            s += labelGeneStart[labelGeneStart.Count - 1];
-            wr.WriteLine("Label Genes " + s);
-            s = "";
-            for (int i = 0; i < labelSampleStart.Count - 1; i++)
-                s += labelSampleStart[i] + ";";
-            s += labelSampleStart[labelSampleStart.Count-1];
-            wr.WriteLine("Label Samples " +s);
-            wr.WriteLine("Label Number of rows " + labelNumRows);
-            wr.WriteLine("States " + numStates);
-            wr.WriteLine("transposition " + transpose);
-            wr.WriteLine("Coding Algorithm " + coding);
-            wr.WriteLine("Heatmap " + heatmap);
-            if(processName.Length>0)
-                wr.WriteLine("OutputName " + processName);
-            wr.WriteLine("Gene Position Rows " + genePosition);
-            wr.WriteLine("Z-score " + zScore);
-            wr.WriteLine("Quantile " + quantile);
-            wr.WriteLine("Selected genes " + fileSelectedGenes);
-            if (selectGenes > 0)
-                wr.Write("Select genes " + selectGenes);
-            wr.Close();
+            labelGenes = new List<string>[labelGeneStart.Count];
+            for (int i = 0; i < labelGenes.Length; i++)
+                labelGenes[i] = new List<string>();
+
+            labelSamples = new List<string>[labelSampleStart.Count];
+            for (int i = 0; i < labelSamples.Length; i++)
+                labelSamples[i] = new List<string>();
+
+            labId = new string[labelSamples.Length];
         }
+        void InitProfile()
+        {
+            ProfileName = "Omics profile";
+            profileName = ProfileName;
+            AddInternalProfiles();
+            destination = new List<INPUTMODE>();
+            destination.Add(INPUTMODE.OMICS);
+            maxV = 100;
+            currentProgress = 0;
+            set.Load();
+
+        }
+        public void ISaveBinary(string fileName)
+        {
+            Stream stream = File.Open(fileName, FileMode.Create);
+            BinaryFormatter bFormatter = new BinaryFormatter();
+            bFormatter.Serialize(stream, this);
+            stream.Close();
+
+        }
+        public object ILoadBinary(string fileName)
+        {
+            OmicsProfile outObject;
+            Stream stream = File.Open(fileName, FileMode.Open);
+            BinaryFormatter bFormatter = new BinaryFormatter();
+            outObject = (OmicsProfile)bFormatter.Deserialize(stream);
+
+            return outObject;
+        }
+
+        List<int> GetLabelsPositions(string positions)
+        {
+            List<int> res = null;
+
+            if (positions.Length > 0)
+            {
+                res = new List<int>();
+                if (positions.Contains(";"))
+                {
+                    string[] aux = positions.Split(';');
+                    foreach (var item in aux)
+                    {
+                        try
+                        {
+                            int x = Convert.ToInt32(item);
+                            res.Add(x);
+                        }
+                        catch { }
+
+                    }
+                }
+                else
+                    try
+                    {
+                        int x = Convert.ToInt32(positions);
+                        res.Add(x);
+                    }
+                    catch { }
+
+
+
+            }
+            return res;
+        }
+            public void Load(string fileName)
+        {
+            StreamReader file = new StreamReader(fileName);
+
+            oInput.ReadOptionFile(file);
+            labelSampleStart = GetLabelsPositions(oInput.labelSampleStartString);
+            labelGeneStart = GetLabelsPositions(oInput.labelGeneStartString);
+
+            labelGenes = new List<string>[labelGeneStart.Count];
+            for (int i = 0; i < labelGenes.Length; i++)
+                labelGenes[i] = new List<string>();
+
+            labelSamples = new List<string>[labelSampleStart.Count];
+            for (int i = 0; i < labelSamples.Length; i++)
+                labelSamples[i] = new List<string>();
+
+            labId = new string[labelSamples.Length];
+
+            file.Close();
+        }
+        public void Save(string fileName)
+        {
+            StreamWriter file = new StreamWriter(fileName);
+            if (labelSampleStart != null && labelSampleStart.Count > 0)
+            {
+                oInput.labelSampleStartString = "";
+                int i = 0;
+                for (i = 0; i < labelSampleStart.Count - 1; i++)
+                    oInput.labelSampleStartString += labelSampleStart[i] + ";";
+                oInput.labelSampleStartString += labelSampleStart[i];
+            }
+            if (labelGeneStart != null && labelGeneStart.Count > 0)
+            {
+                oInput.labelGeneStartString = "";
+                int i = 0;
+                for (i = 0; i < labelGeneStart.Count - 1; i++)
+                    oInput.labelGeneStartString += labelGeneStart[i] + ";";
+                oInput.labelGeneStartString += labelGeneStart[i];
+            }
+
+            oInput.SaveOptions(file);
+
+            file.Close();
+        }
+
         public override void AddInternalProfiles()
         {
             profileNode node = new profileNode();
@@ -111,112 +179,6 @@ namespace phiClustCore.Profiles
             node.profName = ProfileName;
             node.internalName = ProfileName;
             InternalProfilesManager.AddNodeToList(node, this.GetType().FullName);
-        }
-        public void LoadOmicsSettings()
-        {
-            if (!File.Exists(omicsSettings))
-                return;
-
-            StreamReader r = new StreamReader(omicsSettings);
-            string line = r.ReadLine();
-
-            while (line != null)
-            {
-                string[] aux = line.Split(' ');
-                if (line.Contains("Column "))
-                    numCol = Convert.ToInt32(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if (aux[0].Equals("Rows"))
-                    numRow = Convert.ToInt32(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if (line.Contains("Label"))
-                    if (line.Contains("Genes"))
-                    {
-                        labelGeneStart = new List<int>();
-                        labelGeneStart.Add(Convert.ToInt32(aux[aux.Length - 1], CultureInfo.InvariantCulture));
-                    }
-                    else
-                        if (line.Contains("Samples"))
-                        {
-                            labelSampleStart = new List<int>();
-                            if (aux[aux.Length - 1].Contains(";"))
-                            {
-                                string[] s = aux[aux.Length - 1].Split(';');
-                                foreach (var item in s)
-                                    labelSampleStart.Add(Convert.ToInt32(item, CultureInfo.InvariantCulture));
-                            }
-                            else
-                                labelSampleStart.Add(Convert.ToInt32(aux[aux.Length - 1], CultureInfo.InvariantCulture));
-                        }
-                        else
-                            if (line.Contains("Number"))
-                                labelNumRows = Convert.ToInt32(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if (line.Contains("Use"))
-                    if (line.Contains("gene"))
-                        uLabelGene = Convert.ToBoolean(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                    else
-                        if (line.Contains("sample"))
-                            uLabelSample = Convert.ToBoolean(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-
-
-                if (line.Contains("States"))
-                    numStates = Convert.ToInt32(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if (line.Contains("trans"))
-                    transpose = Convert.ToBoolean(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if (line.Contains("Algo"))
-                    coding = (CodingAlg)Enum.Parse(typeof(CodingAlg), aux[aux.Length - 1]);
-                if (line.Contains("Heatmap"))
-                    heatmap = Convert.ToBoolean(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if (line.Contains("OutputName"))
-                    processName = aux[aux.Length - 1];
-                if (line.Contains("Gene Position Rows"))
-                    genePosition = Convert.ToBoolean(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if (line.Contains("Z-score"))
-                    zScore = Convert.ToBoolean(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if (line.Contains("Quantile"))
-                    quantile = Convert.ToBoolean(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                if(line.Contains("Selected"))
-                {
-
-                    fileSelectedGenes = aux[aux.Length - 1];
-                    if(File.Exists(fileSelectedGenes))
-                    {
-                        selectedGenes = new Dictionary<string, int>();
-                        StreamReader gR = new StreamReader(fileSelectedGenes);
-                        string rLine = gR.ReadLine();
-                        while(rLine!=null)
-                        {
-                            selectedGenes.Add(rLine, 0);
-                            rLine = gR.ReadLine();
-                        }
-
-                        gR.Close();
-
-                    }
-                }
-                if(line.Contains("Select "))
-                {
-                    if (aux[aux.Length - 1].Length > 0)
-                        selectGenes = Convert.ToInt32(aux[aux.Length - 1], CultureInfo.InvariantCulture);
-                    else
-                        selectGenes = 0;
-                }
-                line = r.ReadLine();
-            }
-            r.Close();
-            if (labelGeneStart != null && labelGeneStart.Count>0)
-            {
-                labelGenes = new List<string>[labelGeneStart.Count];
-                for (int i = 0; i < labelGenes.Length; i++)
-                    labelGenes[i] = new List<string>();
-            }
-            if (labelSampleStart != null && labelSampleStart.Count > 0)
-            {
-                labelSamples = new List<string>[labelSampleStart.Count];
-                for (int i = 0; i < labelSamples.Length; i++)
-                    labelSamples[i] = new List<string>();
-            }
-            if(labelSamples!=null)
-                labId = new string[labelSamples.Length];
-
         }
         public void CombineTrainigTest(string fileName, string fileNameTrain, string fileNameTest)
         {
@@ -232,7 +194,7 @@ namespace phiClustCore.Profiles
             List<string> auxRowTest = null;
             List<string> auxColTest = null;
             int i = 0;
-            if (genePosition)
+            if (oInput.genePosition)
             {
                 auxRowTest =new List<string>( labelGenes[0]);
                 auxColTest = new List <string>(labelSamples[0]);
@@ -247,7 +209,7 @@ namespace phiClustCore.Profiles
 
             List<string> auxRow = null;
             List<string> auxCol = null;
-            if (genePosition)
+            if (oInput.genePosition)
             {
                 auxRow = labelGenes[0];
                 auxCol = labelSamples[0];
@@ -341,7 +303,7 @@ namespace phiClustCore.Profiles
         }
         string GetProfileName(string fileName)
         {
-            return set.profilesDir + Path.DirectorySeparatorChar +  processName;
+            return set.profilesDir + Path.DirectorySeparatorChar +  oInput.processName;
         }
         public double [,] QuantileNorm(double[,] data)
         {
@@ -398,7 +360,7 @@ namespace phiClustCore.Profiles
         void AddLabelsToGeneORSample(List <string> labels,int k)
         {
             
-            if (!genePosition)
+            if (!oInput.genePosition)
                 labelGenes[k]=labels;
             else
                 labelSamples[k]=labels;
@@ -406,7 +368,7 @@ namespace phiClustCore.Profiles
         }
         List<int>  GetLabelPosition()
         {
-            if (!genePosition)
+            if (!oInput.genePosition)
                 return labelGeneStart;
             else
                 return labelSampleStart;
@@ -420,23 +382,59 @@ namespace phiClustCore.Profiles
             List<string> tmpAux;
             char locDelimiter = ' ';
             rowPositions = GetLabelPosition();
-            for (i=1;i<rowPositions[rowPositions.Count-1]; i++)
+            rowPositions.Sort(delegate (int x,int y) { return x.CompareTo(y); });
+            for (i=1;i<=rowPositions[rowPositions.Count-1]; i++)
             {
                 line = r.ReadLine();
                 if (!line.Contains(delimiter))
                     delimiter = locDelimiter;
                 line = ProcessCSVLine(line, delimiter);
-                if (i== rowPositions[countPos]-1)
+                if (i==rowPositions[countPos])
                 {
                     tmpAux = new List<string>();
                     string[] aux = line.Split(delimiter);
                     labId[countPos]=aux[0];
-                    for (int j = numCol, n = 0; j < aux.Length; j++, n++)
+                    for (int j = oInput.numCol, n = 0; j < aux.Length; j++, n++)
                         tmpAux.Add(aux[j]);
 
                     AddLabelsToGeneORSample(tmpAux,countPos);
                     countPos++;
                 }
+
+            }
+            List<string>[] tmp = null;
+            if (!oInput.genePosition)
+                tmp=labelGenes;
+            else
+                tmp=labelSamples;
+
+            bool generic = false;
+            Dictionary<string, int> xx = new Dictionary<string, int>();
+            for(int j=0;j<tmp[0].Count;j++)
+            {
+                if (!xx.ContainsKey(tmp[0][j]))
+                    xx.Add(tmp[0][j], 1);
+                else
+                {
+                    generic = true;
+                    break;
+                }
+            }
+            if(generic)
+            {
+                List<string>[] yy = new List<string>[tmp.Length + 1];
+                List<string> zz = new List<string>();
+                for (int j = 0; j < tmp[0].Count; j++)
+                    zz.Add("Num_" + j);
+
+                yy[0] = zz;
+                for (int j = 1; j < yy.Length; j++)
+                    yy[j] = tmp[j - 1];
+
+                if (!oInput.genePosition)
+                    labelGenes=yy;
+                else
+                    labelSamples=yy;
 
             }
 
@@ -459,13 +457,13 @@ namespace phiClustCore.Profiles
                     line = r.ReadLine();
                 line = line.Replace(tab.ToString(), " ");
                 aux = line.Split(' ');
-                for (int i = numCol; i < aux.Length; i++)
+                for (int i = oInput.numCol; i < aux.Length; i++)
                     labels.Add(aux[i]);
 
             }
             else
             {
-                for (int i=0; i <=numRow; i++)
+                for (int i=0; i <=oInput.numRow; i++)
                     line = r.ReadLine();
               
                 while (line != null)
@@ -527,7 +525,7 @@ namespace phiClustCore.Profiles
                     if (reader.ElementType == typeof(Row) && reader.IsStartElement)
                     {
                         rowCounter++;
-                        if (rowCounter < numRow - 1 && rowCounter != labelPosition[0])                                                 
+                        if (rowCounter < oInput.numRow - 1 && rowCounter != labelPosition[0])                                                 
                             continue;
                
                         if((int)(rowCounter*step)>rem)
@@ -550,7 +548,7 @@ namespace phiClustCore.Profiles
                                 for (numLabel = 0; numLabel < labelPosition.Count;numLabel++)
                                     if (rowCounter == labelPosition[numLabel])
                                     {
-                                        if (cellCounter >= numCol)
+                                        if (cellCounter >= oInput.numCol)
                                             labels.Add(GetCellValue(c, wp));
                                         cellCounter++;
                                     }
@@ -558,7 +556,7 @@ namespace phiClustCore.Profiles
                                         text.Append(GetCellValue(c, wp));
                             }
                             while (reader.ReadNextSibling());
-                            if(rowCounter>=numRow)
+                            if(rowCounter>=oInput.numRow)
                                 ProcessRow(text.ToString(), localData,';');
                         }                        
                     }
@@ -614,7 +612,7 @@ namespace phiClustCore.Profiles
         private void GenerateDefaultLabels(int dataCount,int rowCount)
         {
             int i;
-            if (!genePosition)
+            if (!oInput.genePosition)
             {
                 if (labelSamples[0] != null && labelSamples[0].Count == 0)
                 {
@@ -658,35 +656,25 @@ namespace phiClustCore.Profiles
                 return;
             try
             {
-                for (int i = numCol; i < aux.Length; i++)
+                for (int i = oInput.numCol; i < aux.Length; i++)
                 {
                     double tmp = 0;
                     tmp = Convert.ToDouble(aux[i], CultureInfo.InvariantCulture);
                     row.Add(tmp);
                 }
-                if (genePosition && uLabelGene)
+                if (oInput.genePosition && oInput.uLabelGene)
                 {
                     int count=0;
-
-                    if(selectedGenes!=null)
-                        if(!selectedGenes.ContainsKey(aux[labelGeneStart[0]-1]))
-                            return;
 
                     foreach (var item in labelGeneStart)
                         labelGenes[count++].Add(aux[item - 1]);
                 }
                 else
-                    if (!genePosition && uLabelSample)
+                    if (!oInput.genePosition && oInput.uLabelSample)
                     {
                         int count = 0;
                         foreach (var item in labelSampleStart)
                             labelSamples[count++].Add(aux[item - 1]);
-                        //Remove genes from row
-
-                        if (indexSelectedGenes != null)
-                            for (int i = 0; i < row.Count; i++)
-                                if (!indexSelectedGenes.ContainsKey(i))
-                                    row.RemoveAt(i);
 
                     }
                 if (row.Count > 0)
@@ -772,6 +760,10 @@ namespace phiClustCore.Profiles
         {
             List<List<double>> localData = new List<List<double>>();
 
+            if (!File.Exists(fileName))
+                throw new Exception("File :" + fileName + " cannot be open");
+
+
             if (Path.GetExtension(fileName).Contains("xlsx"))
                 return ReadOmicsExcelFile(fileName);
 
@@ -786,15 +778,17 @@ namespace phiClustCore.Profiles
             
             string line= r.ReadLine();
             List<List<double>> data = new List<List<double>>();
-            for (int  v= 0; v < labelGenes.Length;v++ )
-               labelGenes[v].Clear();
-            for (int v = 0; v < labelSamples.Length; v++)
-                labelSamples[v].Clear();
+            if(labelGenes!=null)
+                for (int  v= 0; v < labelGenes.Length;v++ )
+                    labelGenes[v].Clear();
+            if(labelSamples!=null)
+                for (int v = 0; v < labelSamples.Length; v++)
+                    labelSamples[v].Clear();
 
-            if(genePosition && uLabelSample || !genePosition && uLabelGene)
+            if(oInput.genePosition && oInput.uLabelSample || !oInput.genePosition && oInput.uLabelGene)
                 i = ReadLabels(r,line,delimiter);
 
-            for (; i < numRow-1; i++)
+            for (; i < oInput.numRow-1; i++)
                 line = r.ReadLine();
 
 
@@ -889,11 +883,11 @@ namespace phiClustCore.Profiles
         }
         double[,] QuantileCoding(double[,] dataFinal)
         {
-            if (!genePosition)
+            if (!oInput.genePosition)
                 dataFinal = TransposeData(dataFinal);
             
-            if (zScore)
-                dataFinal = StandardData(dataFinal, false, selectGenes);
+            if (oInput.zScore)
+                dataFinal = StandardData(dataFinal, false, oInput.selectGenes);
             currentProgress += 20;
 
             dataFinal = QuantileNorm(dataFinal);
@@ -904,10 +898,10 @@ namespace phiClustCore.Profiles
         }
         double[,] ZScoreCoding(double[,] dataFinal)
         {
-            if (!genePosition)
+            if (!oInput.genePosition)
                 dataFinal = TransposeData(dataFinal);
            
-            dataFinal = StandardData(dataFinal, false, selectGenes);
+            dataFinal = StandardData(dataFinal, false, oInput.selectGenes);
 
             double[,] cc = dataFinal;// TransposeData(dataFinal);
             currentProgress += 20;
@@ -926,10 +920,14 @@ namespace phiClustCore.Profiles
             string fileName = ((ThreadFiles)(processParams)).fileName;
             StreamReader r = new StreamReader(fileName);
             int i;
+            StreamWriter test = new StreamWriter("hhh");
+            oInput.SaveOptions(test);
+            test.Close();
 
-            if (heatmap)
+
+            if (oInput.heatmap)
                 return 0;
-
+            //Load(OmicsInput.fileName);
             List<List<double>> data = ReadOmicsFile(fileName);
 
             dev = new double[data.Count];
@@ -942,7 +940,7 @@ namespace phiClustCore.Profiles
                 for (int j = 0; j < data[i].Count; j++)
                         dataFinal[i, j] = data[i][j];
 
-            if (genePosition)
+            if (oInput.genePosition)
             {
                 List<string>[] temp;
                 if (labelGenes[0].Count > 0)
@@ -963,10 +961,10 @@ namespace phiClustCore.Profiles
 
             }
             double[,] outData;
-            if (quantile)
+            if (oInput.quantile)
                 outData = QuantileCoding(dataFinal);
             else
-                if (zScore)
+                if (oInput.zScore)
                 outData = ZScoreCoding(dataFinal);
             else
                 outData = IntervalCoding(dataFinal);
@@ -989,7 +987,7 @@ namespace phiClustCore.Profiles
             wr.Close();
             currentProgress += 20;
             List<string>[] tx;
-            if (!genePosition)            
+            if (!oInput.genePosition)            
                 tx = labelGenes;
             else
                 tx=labelSamples;
@@ -997,6 +995,8 @@ namespace phiClustCore.Profiles
 
                 labelsData = new List<string>();
                 string st = "";
+
+
                 for (int n = 0; n < tx[0].Count; n++)
                 {
                     st = "";
@@ -1034,10 +1034,12 @@ namespace phiClustCore.Profiles
                 profSize = td.masterNode[keys[0]].codingToByte.Count;
 
                 List<string> m = new List<string>(ts.masterNode.Keys);
-                localNode = ts.masterNode[m[0]];
-                localNodeDist = td.masterNode[m[0]];
+                //localNode = ts.masterNode[m[0]];
 
                 currentProgress = maxV;
+
+            ISaveBinary("proba.bin");
+
             return 0;
 
         }
@@ -1173,8 +1175,7 @@ namespace phiClustCore.Profiles
                         break;
                     }
                 }
-                if (code == 11)
-                    Console.Write("kssks");
+       
                 codedData[j] = code;
             }
 
@@ -1232,8 +1233,9 @@ namespace phiClustCore.Profiles
             Dictionary<double, int> hashValues = new Dictionary<double, int>();
             double[] colValues = new double[data.GetLength(1)];
             double[,] intervals=null;
+            double[,] intervalsRem = null;
             double[,] outData = new double[data.GetLength(0), data.GetLength(1)];
-            if (coding == CodingAlg.Z_SCORE)
+            if (oInput.coding == CodingAlg.Z_SCORE)
                 newData = ZscoreCoding(data);
 
             for (int j = 0; j < newData.GetLength(0); j++)
@@ -1250,10 +1252,6 @@ namespace phiClustCore.Profiles
                 }
                 int[] coded=null;
                 //Array.Sort(colValues);
-                if (hashValues.Keys.Count < 10)
-                    Console.Write("ksjdksjd");
-                if (j == 129)
-                Console.Write("jsjs");
                 try
                 {
 
@@ -1266,27 +1264,27 @@ namespace phiClustCore.Profiles
                 }
                 coded = IntervalCodigPerSample(data, j, intervals);
 
-
                 for (int i = 0; i < coded.Length; i++)
-                {
-                    if (coded[i] == 11)
-                        Console.Write("jdjdj");
                     outData[j, i] = coded[i];
-                }
             }
+
+            SaveLabIdAndIntervals(intervals);
+
+            return outData;
+
+        }
+        void SaveLabIdAndIntervals(double [,]intervals)
+        {
             StreamWriter ir;
-            if (processName.Length > 0)
-                ir = new StreamWriter("generatedProfiles/OmicsIntervals_" + processName + ".dat");
+            if (oInput.processName.Length > 0)
+                ir = new StreamWriter("generatedProfiles/OmicsIntervals_" + oInput.processName + ".dat");
             else
                 ir = new StreamWriter("generatedProfiles/OmicsIntervals_.dat");
             foreach (var item in labId)
                 ir.WriteLine("Label " + item);
             for (int i = 0; i < intervals.GetLength(0); i++)
-                ir.WriteLine("Code " + i + " " + intervals[i, 0] + " " + intervals[i, 1]);
-            ir.Close();            
-
-            return outData;
-
+                    ir.WriteLine("Code " + i + " " + intervals[i, 0] + " " + intervals[i, 1]);
+            ir.Close();
         }
         double [,] IntervalCoding(double [,] data)
         {
@@ -1294,7 +1292,7 @@ namespace phiClustCore.Profiles
             Dictionary<double, int> hashValues = new Dictionary<double, int>();
             double[,] intervals;
             double[,] outData;
-            if (coding == CodingAlg.Z_SCORE)
+            if (oInput.coding == CodingAlg.Z_SCORE)
                 newData=ZscoreCoding(data);
             
             for (int j = 0; j < newData.GetLength(0); j++)
@@ -1310,34 +1308,18 @@ namespace phiClustCore.Profiles
                 //Array.Sort(colValues);
             }
 
-            int nn=0;
-            //colValues = new double[hashValues.Count];
-            //foreach (var item in hashValues.Keys)
-              //  colValues[nn++] = item;
-            //Array.Sort(colValues);
             intervals = SetupIntervals(hashValues);
-
-            
-            StreamWriter ir;
-            if(processName.Length>0)
-                ir = new StreamWriter("generatedProfiles/OmicsIntervals_"+processName+".dat");
-            else
-                ir = new StreamWriter("generatedProfiles/OmicsIntervals_.dat");
-            foreach (var item in labId)
-                ir.WriteLine("Label " + item);
-            for (int i = 0; i < intervals.GetLength(0); i++)
-                ir.WriteLine("Code " + i + " " + intervals[i,0] + " " + intervals[i,1]);
-            ir.Close();
-
+                       
+            SaveLabIdAndIntervals(intervals);
             outData = IntervalCodig(data, intervals);
 
             return outData;
         }
         double[, ] SetupIntervals(Dictionary <double,int> dataValues)
         {
-            if (numStates < 3)
-                numStates = 3;
-            double [,] intervals=new double [numStates,2];
+            if (oInput.numStates < 3)
+                oInput.numStates = 3;
+            double [,] intervals=new double [oInput.numStates,2];
             double max, min;
             max = double.MinValue;
             min = double.MaxValue;
@@ -1349,14 +1331,21 @@ namespace phiClustCore.Profiles
             dlist.Sort();
             min = dlist[0];
             max = dlist[dlist.Count - 1];
-            switch (coding)
+            for (int q = 0; q < intervals.GetLength(0); q++)
+            {
+                intervals[q, 0] = double.MaxValue/2;
+                intervals[q, 1] = double.MaxValue/2;
+            }
+
+
+            switch (oInput.coding)
             {
                 case CodingAlg.Z_SCORE:
                     int s = 0;                   
-                    double st = 3.0 / numStates;
+                    double st = 3.0 / oInput.numStates;
                     intervals[s, 0] = -100000;
-                    intervals[s++, 1] = -st *(int)(numStates/2);                  
-                    for(i=(numStates-2)/2;i>=1;i--,s++)
+                    intervals[s++, 1] = -st *(int)(oInput.numStates/2);                  
+                    for(i=(oInput.numStates-2)/2;i>=1;i--,s++)
                     {
                         intervals[s, 0] = -st * (i + 1);
                         intervals[s, 1] = -st * i;
@@ -1364,19 +1353,19 @@ namespace phiClustCore.Profiles
                     intervals[s, 0] = -st;
                     intervals[s++, 1] = st;
 
-                    for (i=1;i<=(numStates-2)/2;i++,s++)
+                    for (i=1;i<=(oInput.numStates-2)/2;i++,s++)
                     {
                         intervals[s, 0] = st * i;
                         intervals[s, 1] = st * (i+1);
                     }
-                    intervals[s, 0] = st*(int)(numStates/2);
+                    intervals[s, 0] = st*(int)(oInput.numStates/2);
                     intervals[s, 1] = 100000;
 
                     break;
                 case CodingAlg.EQUAL_DIST:
                 
-                    step = (max - min) / numStates;
-                    for (i = 0; i < numStates; i++)
+                    step = (max - min) / oInput.numStates;
+                    for (i = 0; i < oInput.numStates; i++)
                     {
                         intervals[i, 0] = dlist[0] + i * step;
                         intervals[i, 1] = dlist[0] + (i + 1) * step;
@@ -1386,14 +1375,14 @@ namespace phiClustCore.Profiles
                 case CodingAlg.PERCENTILE:
                     int counter = 0;
                     double end = 0;
+
+
                     foreach (var item in dataValues.Values)
                         counter += item;
-                    int amount = counter / numStates;
+                    int amount = counter / oInput.numStates;
                     counter = 0;
                     int k = 0;
                     double begin = dlist[0];
-                    if (dlist.Count < 100)
-                        Console.Write("ksjdksd");
                     foreach(var item in dlist)
                     {
                         counter += dataValues[item];
@@ -1405,8 +1394,14 @@ namespace phiClustCore.Profiles
                             if (begin == end)
                                 end = end + 0.01 * end;
 
-                            intervals[k, 1] = end;
+                            intervals[k, 1] = end;                            
                             begin = intervals[k++, 1];
+
+                        }
+                        if(k>=intervals.GetLength(0))
+                        {
+                            intervals[k - 1, 1] = double.MaxValue/2;
+                            break;
                         }
                     }
                     if (counter>0 && counter < amount)
@@ -1414,14 +1409,11 @@ namespace phiClustCore.Profiles
                         if (k < intervals.GetLength(0))
                         {
                             intervals[k, 0] = begin;
-                            end = dlist[dlist.Count - 1];
-                            if (begin == end)
-                                end += 0.01 * end;
-
+                            end = double.MaxValue/2;
                             intervals[k, 1] = end;
                         }
                         else
-                            intervals[k-1, 1] = dlist[dlist.Count - 1];
+                            intervals[k-1, 1] = double.MaxValue/2;
                     }
 
                     break;
@@ -1485,9 +1477,10 @@ namespace phiClustCore.Profiles
         public override Dictionary<string, protInfo> GetProfile(profileNode node, string fileNameProf)
         {
             Dictionary<string, protInfo> data;
+            profileNode localNode;
             string fileName = GetProfileName(fileNameProf);
 
-            if (heatmap || transpose)
+            if (oInput.heatmap || oInput.transpose)
                 fileName = fileName + "_transpose";
 
             ProfileTree ts = new ProfileTree();

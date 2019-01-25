@@ -39,10 +39,10 @@ namespace phiClustCore
     {
         Dictionary<string, string> classification = new Dictionary<string, string>();
 
-        public GuidedHashCluster(string dirName, string alignFile,HashCInput input):base(dirName,alignFile,input)
+        public GuidedHashCluster(string dirName, string alignFile,Options input):base(dirName,alignFile,input)
         {
         }
-        public GuidedHashCluster(Dictionary<string, List<byte>> profiles, Alignment _al, HashCInput input):base(profiles,_al,input)
+        public GuidedHashCluster(Dictionary<string, List<byte>> profiles, Alignment _al):base(profiles,_al)
         {
         }
         public void ReadClassLabels(string fileName)

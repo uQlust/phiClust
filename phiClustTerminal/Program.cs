@@ -11,6 +11,7 @@ using phiClustCore.Distance;
 using phiClustCore.Profiles;
 
 
+
 namespace phiClustTerminal
 {
     class Program
@@ -45,6 +46,10 @@ namespace phiClustTerminal
             bool binary = false;
             bool progress = false;
             bool automaticProfiles=false;
+            bool graphics = false;
+            int resWidth = 0;
+            int resHeight = 0;
+            string graphFileName = "";
             string configFileName = "";
 
             Options opt = new Options();
@@ -74,6 +79,7 @@ namespace phiClustTerminal
                 Console.WriteLine("-t \n\tshow time information");
                 Console.WriteLine("-a \n\tgenerate automatic profiles (can be used only when aligned profile is set in configuration file)");
                 Console.WriteLine("-b \n\tSave results to binary file (readable by GUI version)");
+                Console.WriteLine("-sg fileName resWidthxresHeigth \n\tSave results to png file (if possible)");
                 Console.WriteLine("-p \n\tShow progres bar");
                 return;
             }
@@ -131,12 +137,6 @@ namespace phiClustTerminal
                         {
                             set.Load();
                             i++;
-                            /*                            if (args[i] == "PROTEIN")
-                                                            set.mode = INPUTMODE.PROTEIN;
-                                                        else
-                                                            if (args[i] == "RNA")
-                                                                set.mode = INPUTMODE.RNA;
-                                                            else*/
                             if (args[i] == "USER")
                                 set.mode = INPUTMODE.USER_DEFINED;
                             else
@@ -162,6 +162,35 @@ namespace phiClustTerminal
                     case "-p":
                         progress = true;
                         break;
+                    case "-sg":
+                        graphics = true;                       
+                        if(i+2>args.Length)
+                        {
+                            Console.WriteLine("Incorrect graphics format should be: fileName resWidthxresHeight, e.g. test.png 1000x500");
+                            return;
+                        }
+                        graphFileName = args[++i];
+                        string tmp = args[++i];
+                        string[] x = tmp.Split('x');
+                        if (x.Length == 2)
+                        {
+                            try
+                            {
+                                resWidth = Convert.ToInt32(x[0]);
+                                resHeight = Convert.ToInt32(x[1]);
+                            }
+                            catch
+                            {
+                                Console.WriteLine("Incorrect resolution format, should be resWidthxresHeight, e.g. 1000x500");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Incorrect resolution formt, should be resWidthxresHeight, e.g. 1000x500");
+                            return;
+                        }
+                        break;
                     default:
                         if(args[i].Contains("-"))
                             Console.WriteLine("Unknown option " + args[i]);
@@ -176,14 +205,15 @@ namespace phiClustTerminal
                 return;
             }
 
-            string[] aux = null;
             try
             {
+                Random r = new Random();
                 Console.WriteLine("Configuration file " + configFileName);
                 opt.ReadOptionFile(configFileName);
+                opt.omics.processName = "Batch_" + r.Next(1000);
                 if(automaticProfiles)
                     opt.GenerateAutomaticProfiles(null);
-                aux = args[0].Split('.');
+
                 manager.opt = opt;
                 manager.message = ErrorMessage;
                 if (progress)
@@ -191,7 +221,7 @@ namespace phiClustTerminal
                     TimeIntervalTerminal.InitTimer(UpdateProgress);
                     TimeIntervalTerminal.Start();
                 }
-                manager.RunJob("");
+                manager.RunJob(opt.omics.processName);
                 manager.WaitAllNotFinished();
                 UpdateProgress(null,null);
                 
@@ -214,8 +244,11 @@ namespace phiClustTerminal
                         clustName=clustName.Replace(':', '-');
                     }
                     clusterOut.output.SaveTxt(clustName + "_" + opt.outputFile);
-                    //clusterOut.SCluster(clustName+"_"+opt.outputFile);
-                    if (binary)
+                    if (graphics)
+                    {
+                        clusterOut.output.SaveGraph(graphFileName,resWidth,resHeight);                       
+                    }
+                        if (binary)
                     {
                         string fileName=opt.outputFile + "_" + item + ".cres";
                         StreamWriter file = new StreamWriter(fileName);

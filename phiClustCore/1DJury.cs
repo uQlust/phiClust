@@ -14,6 +14,7 @@ namespace phiClustCore
 	public class jury1D:IProgressBar
 	{
         string currentProfile="";
+        Options opt;
         //public static string defaultProfileFile = "defaultJury1d.profile";
 
         Dictionary<string, List<byte>> stateAlign;
@@ -44,11 +45,12 @@ namespace phiClustCore
         public double StartProgress { set { startProgress = value; } get { return startProgress; } }
         public double EndProgress { set { endProgress = value; } get { return endProgress; } }
 
-        public jury1D()
+        public jury1D(Options opt)
         {
+            this.opt = opt;
             maxV = 1;
             currentV = 0;
-            al = new Alignment();
+            al = new Alignment(opt);
             set.Load();
             threadNumbers = set.numberOfCores;
         }

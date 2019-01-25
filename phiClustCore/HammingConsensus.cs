@@ -12,17 +12,17 @@ namespace phiClustCore
         Dictionary<string, string> consensus = new Dictionary<string, string>();
         public Dictionary<string,int> distanceOrdered = new Dictionary<string,int>();
        
-        public HammingConsensus(string dirName, string alignFile, bool flag, string consensusProfile)
-            :base(dirName, alignFile,flag, consensusProfile)
+        public HammingConsensus(string dirName, string alignFile, bool flag, string consensusProfile,Options opt)
+            :base(dirName, alignFile,flag, consensusProfile,opt)
         {
         }
-        public HammingConsensus(List<string> fileNames, string alignFile, bool flag, string consensusProfile)
-            :base(fileNames, alignFile, flag,consensusProfile)
+        public HammingConsensus(List<string> fileNames, string alignFile, bool flag, string consensusProfile,Options opt)
+            :base(fileNames, alignFile, flag,consensusProfile,opt)
         {
         }
 
         public override void InitMeasure()
-        {
+        {            
             if (fileNames != null)
                 base.InitMeasure(fileNames, alignFile, flag, refJuryProfile);
             else

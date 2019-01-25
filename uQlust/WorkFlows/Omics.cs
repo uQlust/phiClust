@@ -24,6 +24,8 @@ namespace WorkFlows
     public partial class Omics : Form
     {
         Form parent;
+        Form c = null;
+        OmicsInput om = new OmicsInput();
         bool previous = false;
         public string processName = null;
         OMICS_CHOOSE nextWindow;
@@ -63,30 +65,77 @@ namespace WorkFlows
         {
             return Path.GetFileNameWithoutExtension(textBox1.Text);
         }
+        public void SetOptions()
+        {
+            numericUpDown2.Value=om.numCol;
+            numericUpDown1.Value=om.numRow;
+            checkBox4.Checked= om.uLabelGene;
+            geneLabelPosition.Value = Convert.ToInt32(om.labelGeneStartString);
+            textBox2.Text=om.labelSampleStartString ;
+            checkBox5.Checked=om.uLabelSample;
+            numericUpDown3.Value=om.numStates;
+            checkBox1.Checked=om.transpose;
+            comboBox1.SelectedItem=om.coding;
+            radioButton3.Checked=om.genePosition;
+            checkBox2.Checked=om.zScore;
+            checkBox3.Checked=om.quantile;
+            textBox3.Text=om.fileSelectedGenes;
+            numericUpDown4.Value=om.selectGenes;
+
+        }
         public void SaveOptions()
         {
-            StreamWriter w = new StreamWriter(OmicsProfile.omicsSettings);
-            w.WriteLine("Column " + numericUpDown2.Value);
-            w.WriteLine("Rows " + numericUpDown1.Value);
-            w.WriteLine("Use gene labels " + checkBox4.Checked);
-            w.WriteLine("Label Genes " + geneLabelPosition.Value);
-            w.WriteLine("Label Samples " + textBox2.Text);
-            w.WriteLine("Label Number of rows 1");
-            w.WriteLine("Use sample labels " + checkBox5.Checked);
-            w.WriteLine("Label Number of rows 1");
-            w.WriteLine("States " + numericUpDown3.Value);
-            w.WriteLine("transposition " + checkBox1.Checked);
-            w.WriteLine("Coding Algorithm " + comboBox1.SelectedItem);
-            w.WriteLine("OutputName " +GetProcessName());
-            w.WriteLine("Gene Position Rows " + radioButton3.Checked);
-            w.WriteLine("Z-score " + checkBox2.Checked);
-            w.WriteLine("Quantile " + checkBox3.Checked);
-            if (textBox3.Text.Length > 0 &&!checkBox6.Checked)
-                w.WriteLine("Selected genes " + textBox3.Text);
-            if (checkBox6.Checked)
-                w.WriteLine("Select genes "+numericUpDown4.Value);
-            w.Close();
 
+            om.numCol =(int) numericUpDown2.Value;
+            om.numRow = (int)numericUpDown1.Value;
+            om.uLabelGene = checkBox4.Checked;
+            om.labelGeneStartString = geneLabelPosition.Value.ToString();
+            om.labelSampleStartString = textBox2.Text;
+            om.uLabelSample = checkBox5.Checked;
+            om.numStates = (int)numericUpDown3.Value;
+            om.transpose = checkBox1.Checked;
+            om.coding = (CodingAlg)comboBox1.SelectedItem;
+            om.processName = GetProcessName();
+            om.genePosition = radioButton3.Checked;
+            om.zScore = checkBox2.Checked;
+            om.quantile = checkBox3.Checked;
+            if(textBox3.Text.Length>0)
+                om.fileSelectedGenes = textBox3.Text;
+            if (checkBox6.Checked)
+                om.selectGenes = (int)numericUpDown4.Value;
+        }
+        void CreateWindow(Settings set)
+        {
+            switch (nextWindow)
+            {
+                case OMICS_CHOOSE.NONE:
+                    if (c == null || !(c.GetType() == typeof(ClusteringChoose)))
+                        c = new ClusteringChoose(om, set, this, textBox1.Text);
+                    else
+                        ((ClusteringChoose)c).om = om;
+                    break;
+                case OMICS_CHOOSE.HNN:
+                    if (c == null || !(c.GetType() == typeof(HNN)))
+                        c = new HNN(om, this, set, Rna_Protein_UserDef.results, nextWindow, "workFlows" + Path.DirectorySeparatorChar + "omics" + Path.DirectorySeparatorChar + "uQlust_config_file_Rpart.txt", textBox1.Text);
+                    else
+                        ((HNN)c).om = om;
+                    ((HNN)c).processName = GetProcessName();
+                    break;
+                case OMICS_CHOOSE.GUIDED_HASH:
+                    if (c == null || !(c.GetType() == typeof(HNN)))
+                        c = new HNN(om, this, set, Rna_Protein_UserDef.results, nextWindow, "workFlows" + Path.DirectorySeparatorChar + "omics" + Path.DirectorySeparatorChar + "uQlust_config_file_GuidedHash.txt", textBox1.Text);
+                    else
+                        ((HNN)c).om = om;
+                    ((HNN)c).processName = GetProcessName();
+                    break;
+                case OMICS_CHOOSE.HEATMAP:
+                    if (c == null || !(c.GetType() == typeof(OmicsHeatMap)))
+                        c = new OmicsHeatMap(om, this, Rna_Protein_UserDef.results, textBox1.Text);
+                    else
+                        ((OmicsHeatMap)c).opt.omics = om;
+                    ((OmicsHeatMap)c).processName = GetProcessName();
+                    break;
+            }
         }
         public virtual void button1_Click(object sender, EventArgs e)
         {
@@ -101,25 +150,7 @@ namespace WorkFlows
             Settings set = new Settings();
             set.Load();
             set.mode = INPUTMODE.OMICS;
-            Form c=null;
-            switch(nextWindow)
-            {
-                case OMICS_CHOOSE.NONE:
-                    c = new ClusteringChoose(set, this,textBox1.Text);                    
-                    break;
-                case OMICS_CHOOSE.HNN:  
-                    c = new HNN(this, set, Rna_Protein_UserDef.results,nextWindow, "workFlows" + Path.DirectorySeparatorChar + "omics" + Path.DirectorySeparatorChar + "uQlust_config_file_Rpart.txt",textBox1.Text);
-                    ((HNN)c).processName = GetProcessName();
-                    break;
-                case OMICS_CHOOSE.GUIDED_HASH:
-                    c = new HNN(this, set, Rna_Protein_UserDef.results,nextWindow, "workFlows" + Path.DirectorySeparatorChar + "omics" + Path.DirectorySeparatorChar + "uQlust_config_file_GuidedHash.txt",textBox1.Text);
-                    ((HNN)c).processName = GetProcessName();
-                    break;
-                case OMICS_CHOOSE.HEATMAP:
-                    c = new OmicsHeatMap(this, Rna_Protein_UserDef.results,textBox1.Text);
-                    ((OmicsHeatMap)c).processName = GetProcessName();
-                    break;              
-            }
+            CreateWindow(set);
             c.Show();
             this.Hide();
             counter++;
@@ -184,8 +215,13 @@ namespace WorkFlows
                         string[] aux = line.Split('\t');
                         if (aux.Length == 4)
                         {
+                            int metaSamples = Convert.ToInt32(aux[3]);
                             numericUpDown2.Value = Convert.ToInt32(aux[2]) + 2;
-                            numericUpDown1.Value = Convert.ToInt32(aux[3]) + 3;
+                            numericUpDown1.Value = metaSamples + 2;
+                            textBox2.Text = "";
+                            for (int i = 0; i < metaSamples - 1; i++)
+                                textBox2.Text += (i + 2) + ";";
+                            textBox2.Text += (metaSamples + 1);
                         }
                     }
                     r.Close();

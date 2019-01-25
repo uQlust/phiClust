@@ -53,7 +53,7 @@ namespace Graph
             winName = name;
             this.Text = name;
             vecColor = labels;
-            InitVisHier();
+            InitVisHier();            
         }
 
         public visHierar(HClusterNode hnode,string name,string measureName,Dictionary<string,string> labels)
@@ -104,7 +104,16 @@ namespace Graph
             drawH.maxGraphicsY = pictureBox1.Height-drawH.posStart-30;
             drawH.maxGraphicsX = pictureBox1.Width - drawH.posStart - 30;
         }
+        public void SaveToFile(string fileName,bool ShowLegend,int LineThickness,Color lineColor,int resWidth=800,int resHeight=600)
+        {
+                Bitmap bmp = new Bitmap(resWidth, resHeight);
+                drawH.PrepareGraphNodes(bmp);
 
+                drawH.DrawOnBuffer(bmp,ShowLegend, LineThickness, lineColor);
+                SavePicture(fileName, bmp);
+                drawH.PrepareGraphNodes(buffer);
+
+        }
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             ClusterOutput output = new ClusterOutput();

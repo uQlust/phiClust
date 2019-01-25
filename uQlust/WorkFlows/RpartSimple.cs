@@ -15,6 +15,7 @@ namespace WorkFlows
     public partial class RpartSimple : Form, IclusterType
     {
         protected Options opt=new Options();
+        public OmicsInput om;
         protected ResultWindow results;
         public string processName;
         public static int counter = 0;
@@ -73,6 +74,10 @@ namespace WorkFlows
                 label9.Text = tree.GetStringActiveProfiles();
             }
         }
+        public RpartSimple(OmicsInput om,Form parent, Settings set, ResultWindow results, string fileName = null, string dataFileName = null):this(parent, set,results, fileName,dataFileName )
+        {
+            this.om = om;
+        }
         public void ShowLabels()
         {
             label4.Visible = true;
@@ -99,7 +104,8 @@ namespace WorkFlows
             percentData.Value = opt.hash.perData;
             refPoints.Value = opt.hash.refPoints;
             opt.clusterAlgorithm.Clear();
-            opt.clusterAlgorithm.Add(ClusterAlgorithm.HashCluster);        
+            opt.clusterAlgorithm.Add(ClusterAlgorithm.HashCluster);
+            opt.omics = om;
         }
         public void SetProfileName(string name)
         {
@@ -134,6 +140,7 @@ namespace WorkFlows
             opt.hash.relClusters = (int)relevantC.Value;
             opt.hash.perData = (int)percentData.Value;
             opt.hash.refPoints = (int)refPoints.Value;
+            opt.hash.selReference = selectReference.Checked;
             if (checkBox1.Checked)
                 opt.hash.GenerateAutomaticProfiles(textBox1.Text);
             set.Save();            

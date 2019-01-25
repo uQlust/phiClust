@@ -21,11 +21,22 @@ namespace WorkFlows
 
         public HashSimple(Form parent,Settings set,ResultWindow results,string fileName=null,string dataFileName=null): base(parent,set,results,fileName,dataFileName)
         {
+            Initialize();
+            opt.hash.combine = false;           
+        }
+        public HashSimple(OmicsInput om,Form parent, Settings set, ResultWindow results, string fileName = null, string dataFileName = null) :  base(om,parent, set, results, fileName, dataFileName)
+        {
+            Initialize();
+            opt.hash.combine = false;
+
+        }
+        void Initialize()
+        {
             InitializeComponent();
             this.Text = "Hash";
             ShowLabels();
             checkBox1.Checked = opt.hash.useConsensusStates;
-            opt.hash.combine = false;           
+
         }
         public override void SetProfileOptions()
         {
@@ -49,6 +60,11 @@ namespace WorkFlows
         }
 
         private void button2_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click_2(object sender, EventArgs e)
         {
 
         }

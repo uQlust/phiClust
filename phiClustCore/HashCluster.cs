@@ -15,7 +15,7 @@ namespace phiClustCore
     class HashCluster:IProgressBar
     {
         public Dictionary<string, List<byte>> stateAlign;
-
+        public Options opt;
         struct threadParam
         {
             public int threadNum;
@@ -40,7 +40,7 @@ namespace phiClustCore
         public List<string> structNames = null;
         protected int maxV = 100;
         protected int currentV = 0;
-
+        
         double startProgress = 0;
         double endProgress = 1;
 
@@ -59,7 +59,7 @@ namespace phiClustCore
         Dictionary<byte, int>[] columnsReg = null;
 
         Dictionary<string, List<int>> threadingKeys;
-        List<int> validIndexes = new List<int>();
+        public List<int> validIndexes = new List<int>();
 //Neaded for thread Tasks
         ManualResetEvent[] resetEvents = null;
         List<int>[] threadStructures;
@@ -75,31 +75,33 @@ namespace phiClustCore
         protected HashCInput input = null;
         int threadNumbers;
         int refPoints;
-        public HashCluster(string dirName, string alignFile,HashCInput input)
+        public HashCluster(string dirName, string alignFile,Options opt)
         {
+            this.opt = opt;
             this.dirName = dirName;
+            this.input = opt.hash;
             this.refPoints = input.refPoints;
-            this.alignFile = alignFile;
-            this.input = input;
+            this.alignFile = alignFile;            
             dirSettings.Load();
             consensusProjection = input.useConsensusStates;
             threadNumbers = dirSettings.numberOfCores;
             threadNumbers = 3;
             maxV += refPoints * 20;
         }
-        public HashCluster(Alignment _al, HashCInput input)
+        public HashCluster(Alignment _al)
         {
             al = _al;
-            this.input = input;
+            this.opt = al.opt;
+            this.input = al.opt.hash;
             dirSettings.Load();
             consensusProjection = input.useConsensusStates;
             threadNumbers = dirSettings.numberOfCores;
             stateAlign = al.GetStateAlign();
             maxV += refPoints * 20;
         }
-        public HashCluster(Dictionary<string, List<byte>> profiles, Alignment _al, HashCInput input)
+        public HashCluster(Dictionary<string, List<byte>> profiles, Alignment _al)
         {
-            this.input = input;
+            this.input = al.opt.hash;
             this.refPoints = input.refPoints;
             stateAlign = profiles;
             al = _al;            
@@ -119,7 +121,7 @@ namespace phiClustCore
         {         
                 if(alignFile!=null && alignFile.Length>0)
                 {
-                    al = new Alignment();
+                    al = new Alignment(opt);
                     al.Prepare(alignFile, input.profileName);
                    // al.Prepare(profiles, profName, input.profileName);
 
@@ -139,7 +141,7 @@ namespace phiClustCore
                             stateAlignReg = stateAlign;
                         else
                         {
-                            Alignment alReg = new Alignment();
+                            Alignment alReg = new Alignment(opt);
                             if (alignFile != null)
                                 alReg.Prepare(alignFile, input.profileNameReg);
                             else
@@ -174,7 +176,7 @@ namespace phiClustCore
         {
             dirSettings.Load();
             this.dirName = dirName;
-            al = new Alignment();
+            al = new Alignment(opt);
             if (alignFile != null)
                  al.Prepare(alignFile, input.profileName);
             else
@@ -190,7 +192,7 @@ namespace phiClustCore
                     stateAlignReg = stateAlign;
                 else
                 {
-                    Alignment alReg = new Alignment();
+                    Alignment alReg = new Alignment(opt);
 
                     if(alignFile!=null)
                         alReg.Prepare(alignFile, input.profileNameReg);
@@ -1966,6 +1968,10 @@ namespace phiClustCore
                     dicFinal = FastCombineKeysNew(dicC, structNames, true);
                     dic = dicFinal;
                 }
+                else
+                {
+                    dicFinal = dic;
+                }
                 currentV++;
                 DebugClass.WriteMessage("After FastCombine: " + dicC.Keys.Count);
 
@@ -1993,7 +1999,7 @@ namespace phiClustCore
 
             if (input.selReference)
             {
-                jury = new jury1D();
+                jury = new jury1D(opt);
                 jury.PrepareJury(al);
             }
 
@@ -2412,7 +2418,7 @@ namespace phiClustCore
             for (int i = 0; i < backOutput.Length; i++)
                 backOutput[i] = new ClusterOutput();
 
-            jury = new jury1D();
+            jury = new jury1D(opt);
             jury.PrepareJury(allItems, null, input.profileName);
 
             Dictionary<string, List<int>> remDic = new Dictionary<string, List<int>>(dicC);
@@ -2617,7 +2623,7 @@ namespace phiClustCore
         }
         protected Dictionary <byte,int>[] JuryConsensusStates(Alignment alUse,List<string> structNames)
         {
-            jury1D juryLocal = new jury1D();
+            jury1D juryLocal = new jury1D(opt);
             juryLocal.PrepareJury(alUse,stateAlign);
 
             Dictionary <byte ,int>[] cons=new Dictionary<byte,int>[columns.Length];

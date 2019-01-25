@@ -145,7 +145,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Rna_Protein_UserDef";
-            this.Text = "Omics";
+            this.Text = "phiClust";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Rna_Protein_UserDef_FormClosed);
             this.ResumeLayout(false);
 

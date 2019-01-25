@@ -21,7 +21,7 @@ namespace phiClustCore.Profiles
         public int aux2;
         //public DistanceMeasure distance;
     }
-
+    [Serializable]
     public abstract class InternalProfileBase:IProgressBar
     {
         protected Exception ex = null;
@@ -425,14 +425,14 @@ namespace phiClustCore.Profiles
         }    
     
 
-        public Dictionary<string, protInfo> GetProfile(profileNode node,string listFile)
+        public Dictionary<string, protInfo> GetProfile(Options opt,profileNode node,string listFile)
         {
             profileNode n=GetNode(node.internalName);
                Dictionary<string, protInfo> res=null;
                if (n != null)
                {
                    Type t = Type.GetType(internalList[n]);
-                   InternalProfileBase c = Activator.CreateInstance(t) as InternalProfileBase;
+                   InternalProfileBase c = Activator.CreateInstance(t,opt) as InternalProfileBase;
                    progressInfo = c;
                    res = c.GetProfile(node, listFile);
                    progressInfo = null;
@@ -491,14 +491,15 @@ namespace phiClustCore.Profiles
         {
             internalList.Clear();
         }
-        public void RunProfile(string name,string listFile)
+        public void RunProfile(Options opt,string name,string listFile)
         {
             profileNode node=GetNode(name);
 
             if (node != null)
             {
                 Type t = Type.GetType(internalList[node]);
-                InternalProfileBase c = Activator.CreateInstance(t) as InternalProfileBase;
+
+                InternalProfileBase c = Activator.CreateInstance(t, opt) as InternalProfileBase;
                 c.CheckIfAvailable();
                 progressInfo = c;
                 c.RunThreads(listFile);

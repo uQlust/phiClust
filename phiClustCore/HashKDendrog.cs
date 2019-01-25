@@ -8,9 +8,9 @@ namespace phiClustCore
 {
     class HashKDendrog : HashCluster
     {
-        public HashKDendrog(string dirName, string alignFile, HashCInput input) : base(dirName, alignFile, input) { }
-        public HashKDendrog(Alignment _al, HashCInput input) : base(_al, input) { }
-        public HashKDendrog(Dictionary<string, List<byte>> profiles, Alignment _al, HashCInput input) : base(profiles, _al, input) { }
+        public HashKDendrog(string dirName, string alignFile, Options input) : base(dirName, alignFile, input) { }
+        public HashKDendrog(Alignment _al) : base(_al) { }
+        public HashKDendrog(Dictionary<string, List<byte>> profiles, Alignment _al, HashCInput input) : base(profiles, _al) { }
 
 
         public override ClusterOutput Cluster(List<string> _structNames, bool dendrog = false)

@@ -10,23 +10,23 @@ namespace phiClustCore.Distance
 
     {
     
-        public Euclidian(string dirName, string alignFile, bool flag, string profileName):
-                base(dirName,alignFile,flag,profileName)
+        public Euclidian(string dirName, string alignFile, bool flag, string profileName,Options opt):
+                base(dirName,alignFile,flag,profileName,opt)
         {
 
         }
-        public Euclidian(List<string> fileNames, string alignFile, bool flag, string profileName, string refJuryProfile = null) 
-            :base(fileNames, alignFile, flag,  profileName,refJuryProfile)
+        public Euclidian(List<string> fileNames, string alignFile, bool flag, string profileName, Options opt,string refJuryProfile = null) 
+            :base(fileNames, alignFile, flag,  profileName,opt,refJuryProfile)
         {
 
         }
-        public Euclidian(string dirName,string alignFile,bool flag,string profileName,string refJuryProfile=null) 
-            :base(dirName,alignFile,flag,profileName,refJuryProfile) 
+        public Euclidian(string dirName,string alignFile,bool flag,string profileName,Options opt,string refJuryProfile=null) 
+            :base(dirName,alignFile,flag,profileName,opt,refJuryProfile) 
         {
           
         }
-        public Euclidian(string profilesFile, bool flag, string profileName, string refJuryProfile)
-            :base(profilesFile,flag,profileName,refJuryProfile)
+        public Euclidian(string profilesFile, bool flag, string profileName, string refJuryProfile,Options opt)
+            :base(profilesFile,flag,profileName,opt,refJuryProfile)
         {
         }
         public Euclidian(Alignment al, bool flag)

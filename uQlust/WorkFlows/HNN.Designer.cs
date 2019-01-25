@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HNN));
             this.label11 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
@@ -36,6 +37,7 @@
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.radioButton3 = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.percentData)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.refPoints)).BeginInit();
@@ -107,10 +109,18 @@
             this.label9.Location = new System.Drawing.Point(204, 140);
             this.label9.Visible = false;
             // 
+            // refPoints
+            // 
+            this.refPoints.Location = new System.Drawing.Point(514, 114);
+            // 
+            // label10
+            // 
+            this.label10.Location = new System.Drawing.Point(373, 116);
+            // 
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(15, 229);
+            this.label11.Location = new System.Drawing.Point(15, 233);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(79, 13);
             this.label11.TabIndex = 73;
@@ -118,14 +128,14 @@
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(207, 222);
+            this.textBox2.Location = new System.Drawing.Point(207, 226);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(381, 20);
             this.textBox2.TabIndex = 74;
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(594, 220);
+            this.button3.Location = new System.Drawing.Point(594, 224);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(26, 23);
             this.button3.TabIndex = 75;
@@ -135,19 +145,20 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.radioButton3);
             this.groupBox1.Controls.Add(this.numericUpDown1);
             this.groupBox1.Controls.Add(this.radioButton2);
             this.groupBox1.Controls.Add(this.radioButton1);
             this.groupBox1.Location = new System.Drawing.Point(15, 34);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(272, 77);
+            this.groupBox1.Size = new System.Drawing.Size(272, 82);
             this.groupBox1.TabIndex = 76;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Position of class labels";
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(134, 39);
+            this.numericUpDown1.Location = new System.Drawing.Point(134, 19);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             10000000,
             0,
@@ -189,13 +200,24 @@
             this.checkBox1.AutoSize = true;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(15, 192);
+            this.checkBox1.Location = new System.Drawing.Point(15, 210);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(146, 17);
             this.checkBox1.TabIndex = 77;
             this.checkBox1.Text = "use consensus projection";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.Visible = false;
+            // 
+            // radioButton3
+            // 
+            this.radioButton3.AutoSize = true;
+            this.radioButton3.Location = new System.Drawing.Point(5, 65);
+            this.radioButton3.Name = "radioButton3";
+            this.radioButton3.Size = new System.Drawing.Size(51, 17);
+            this.radioButton3.TabIndex = 3;
+            this.radioButton3.TabStop = true;
+            this.radioButton3.Text = "None";
+            this.radioButton3.UseVisualStyleBackColor = true;
             // 
             // HNN
             // 
@@ -207,6 +229,7 @@
             this.Controls.Add(this.button3);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.label11);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "HNN";
             this.Text = "HNN";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HNN_FormClosing);
@@ -253,6 +276,6 @@
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.CheckBox checkBox1;
-
+        private System.Windows.Forms.RadioButton radioButton3;
     }
 }

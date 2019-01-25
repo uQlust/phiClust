@@ -521,8 +521,9 @@
             this.Controls.Add(this.numericUpDown3);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.checkBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Omics";
-            this.Text = "Omics";
+            this.Text = "Omics profile";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Genome_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();

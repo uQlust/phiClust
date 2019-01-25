@@ -8,8 +8,8 @@ namespace phiClustCore.Distance
 {
     public class HammingDistance:HammingBase
     {
-        public HammingDistance(string dirName, string alignFile, bool flag, string profileName):
-            base(dirName, alignFile, flag, profileName)
+        public HammingDistance(string dirName, string alignFile, bool flag,Options opt, string profileName):
+            base(dirName, alignFile, flag, profileName,opt)
         {
             this.dirName = dirName;
             this.alignFile = alignFile;

@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 namespace phiClustCore.Profiles
 {
     
+    [Serializable]
     public class UserDefinedProfile:InternalProfileBase        
     {
         //string profileName;
@@ -23,6 +24,16 @@ namespace phiClustCore.Profiles
             //destination.Add(INPUTMODE.RNA);
             destination.Add(INPUTMODE.USER_DEFINED);
         }
+        public UserDefinedProfile(Options opt)
+        {
+
+            AddInternalProfiles();
+            destination = new List<INPUTMODE>();
+            //destination.Add(INPUTMODE.PROTEIN);
+            //destination.Add(INPUTMODE.RNA);
+            destination.Add(INPUTMODE.USER_DEFINED);
+        }
+
         public static string GetName()
         {
             return ProfileName;

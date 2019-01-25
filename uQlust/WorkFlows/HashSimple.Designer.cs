@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HashSimple));
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.percentData)).BeginInit();
@@ -36,18 +37,19 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(3, 212);
+            this.button4.Location = new System.Drawing.Point(3, 245);
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(581, 212);
+            this.button2.Location = new System.Drawing.Point(581, 245);
+            this.button2.Click += new System.EventHandler(this.button2_Click_2);
             // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(15, 192);
+            this.checkBox1.Location = new System.Drawing.Point(15, 213);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(146, 17);
             this.checkBox1.TabIndex = 72;
@@ -58,8 +60,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(644, 250);
+            this.ClientSize = new System.Drawing.Size(644, 283);
             this.Controls.Add(this.checkBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "HashSimple";
             this.Text = "HashSimple";
             this.Controls.SetChildIndex(this.refPoints, 0);

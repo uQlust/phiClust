@@ -8,23 +8,23 @@ namespace phiClustCore.Distance
 {
     class CosineDistance : JuryDistance
     {
-        public CosineDistance(string dirName, string alignFile, bool flag, string profileName):
-                base(dirName,alignFile,flag,profileName)
+        public CosineDistance(string dirName, string alignFile, bool flag, string profileName,Options opt):
+                base(dirName,alignFile,flag,profileName,opt)
         {
 
         }
-        public CosineDistance(List<string> fileNames, string alignFile, bool flag, string profileName, string refJuryProfile = null) 
-            :base(fileNames, alignFile, flag,  profileName,refJuryProfile)
+        public CosineDistance(List<string> fileNames, string alignFile, bool flag, string profileName, Options opt,string refJuryProfile = null) 
+            :base(fileNames, alignFile, flag,  profileName,opt,refJuryProfile)
         {
 
         }
-        public CosineDistance(string dirName,string alignFile,bool flag,string profileName,string refJuryProfile=null) 
-            :base(dirName,alignFile,flag,profileName,refJuryProfile) 
+        public CosineDistance(string dirName,string alignFile,bool flag,string profileName,Options opt,string refJuryProfile=null) 
+            :base(dirName,alignFile,flag,profileName,opt,refJuryProfile) 
         {
           
         }
-        public CosineDistance(string profilesFile, bool flag, string profileName, string refJuryProfile)
-            :base(profilesFile,flag,profileName,refJuryProfile)
+        public CosineDistance(string profilesFile, bool flag, string profileName, string refJuryProfile,Options opt)
+            :base(profilesFile,flag,profileName,opt,refJuryProfile)
         {
         }
         public CosineDistance(Alignment al, bool flag)

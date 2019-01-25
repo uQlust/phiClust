@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using phiClustCore.Interface;
+using phiClustCore;
 using System.IO;
 
 namespace phiClustCore.Distance
@@ -16,7 +17,7 @@ namespace phiClustCore.Distance
         protected Dictionary<string, Dictionary<string, float [,]>> rotStruct = new Dictionary<string, Dictionary<string, float [,]>>();
         public Dictionary<string,int> structNames;
         protected List<string> structures;
-//		protected  Optimization opt = null;   
+		protected  Options opt = null;   
         public bool order; //false if best are biggest values otherwise like in regular distance true.
         public double maxSimilarity;
         private const int ErrorValue = int.MaxValue;
@@ -47,17 +48,19 @@ namespace phiClustCore.Distance
             this.dirName = dirName;
             if (referenceFlag)
             {
-                jury = new jury1D();
+                
+                jury = new jury1D(opt);
                 jury.PrepareJury(dirName, alignFile, juryProfile);
                 //AddErrors(jury.errors);
             }
         }
-        public virtual void InitMeasure(List<string> fileNames, string alignFile, bool referenceFlag, string juryProfile = null)
+        public virtual void InitMeasure(List<string> fileNames, string alignFile, bool referenceFlag,string juryProfile = null)
         {
             this.alignFile = alignFile;
             if (referenceFlag)
             {
-                jury = new jury1D();
+                this.opt = opt;
+                jury = new jury1D(opt);
                  jury.PrepareJury(fileNames, alignFile, juryProfile);
                 //AddErrors(jury.errors);
             }
@@ -67,14 +70,15 @@ namespace phiClustCore.Distance
             this.alignFile = profilesFile;
 
             if (referenceFlag)
-            {
-                jury = new jury1D();
+            {                
+                jury = new jury1D(opt);
                 jury.PrepareJury(profilesFile, refJuryProfile);
                 //AddErrors(jury.errors);
             }
         }
         public virtual void InitMeasure(Alignment al, bool flag)
         {
+            opt = al.opt;
         }
         public abstract void InitMeasure();
         public virtual int GetDistance(string m, string n){ return 0;}

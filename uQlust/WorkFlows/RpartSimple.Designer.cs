@@ -49,6 +49,7 @@
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.refPoints = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
+            this.selectReference = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.percentData)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.refPoints)).BeginInit();
@@ -152,7 +153,7 @@
             // button2
             // 
             this.button2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.button2.Location = new System.Drawing.Point(581, 186);
+            this.button2.Location = new System.Drawing.Point(581, 238);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(53, 36);
             this.button2.TabIndex = 65;
@@ -188,7 +189,7 @@
             // 
             this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button4.Image = ((System.Drawing.Image)(resources.GetObject("button4.Image")));
-            this.button4.Location = new System.Drawing.Point(3, 186);
+            this.button4.Location = new System.Drawing.Point(3, 238);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(53, 36);
             this.button4.TabIndex = 4;
@@ -245,11 +246,24 @@
             this.label10.TabIndex = 74;
             this.label10.Text = "Number of referance points";
             // 
+            // selectReference
+            // 
+            this.selectReference.AutoSize = true;
+            this.selectReference.Checked = true;
+            this.selectReference.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.selectReference.Location = new System.Drawing.Point(16, 191);
+            this.selectReference.Name = "selectReference";
+            this.selectReference.Size = new System.Drawing.Size(170, 17);
+            this.selectReference.TabIndex = 76;
+            this.selectReference.Text = "Find reference for each cluster";
+            this.selectReference.UseVisualStyleBackColor = true;
+            // 
             // RpartSimple
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(646, 224);
+            this.ClientSize = new System.Drawing.Size(646, 276);
+            this.Controls.Add(this.selectReference);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.refPoints);
             this.Controls.Add(this.checkBox1);
@@ -305,5 +319,6 @@
         private System.Windows.Forms.CheckBox checkBox1;
         public System.Windows.Forms.NumericUpDown refPoints;
         public  System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox selectReference;
     }
 }

@@ -410,6 +410,7 @@ namespace phiClustCore
 	{
 		DistanceMeasure dMeasure;
         AglomerativeType linkageType;
+        Options opt;
         public string mustRefStructure = null;
         string dirName;
         int min;
@@ -425,13 +426,14 @@ namespace phiClustCore
         public double EndProgress { set { endProgress = value; } get { return endProgress; } }
 
 
-		public hierarchicalCluster (DistanceMeasure dMeasure,HierarchicalCInput hier,string dirName)
+		public hierarchicalCluster (DistanceMeasure dMeasure,Options opt,string dirName)
 		{
 			this.dMeasure=dMeasure;
-            this.linkageType = hier.linkageType;
+            this.linkageType = opt.hierarchical.linkageType;
             this.dirName = dirName;
             progressRead = 0;
-            hierOpt = hier;
+            hierOpt = opt.hierarchical;
+            this.opt = opt;
 
 		}
         public double ProgressUpdate()
@@ -603,7 +605,7 @@ namespace phiClustCore
             progressRead = 1;
             dMeasure.CalcDistMatrix(structures);
 
-            jury1D jury = new jury1D();
+            jury1D jury = new jury1D(opt);
             jury.PrepareJury(((HammingBase)dMeasure).al);
             for (int i=0;i<structures.Count;i++)
 			{

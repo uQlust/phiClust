@@ -51,57 +51,55 @@ namespace Graph
                 active.Close();          
 
         }
-        public void SClusters(string item,string measureName,string option)
+        public void SClusters(string item,string measureName,string option,bool graphics=false)
         {
             Dictionary<string, string> dic = ClusterOutput.ReadLabelsFile(output.GetLabelFile());
             if (output.clusters != null)
             {
-                
-                switch(option)
+
+                if (option == "Order Visual")
                 {
-                    case "Order Visual":
-                        if (active == null || !(active is VisOrder))
-                        {
-                            VisOrder visOrder;
-                            visOrder = new VisOrder(output.clusters, item, null);
-                            visOrder.closeForm = Closing;
-                            active = visOrder;
-                            visOrder.Show();
-                        }
-                        return;
-                    case "Text List":
-                    default:
-                        if (active == null || !(active is ListVisual))
-                        {
-                            ListVisual visBaker;
-                            visBaker = new ListVisual(output, item,dic);
-                            visBaker.closeForm = Closing;
-                            active = visBaker;
-                            visBaker.Show();
-                        }
-                        return;
-            }
-             
-            }
-            if (output.hNode != null)
-            {
-               // win = new visHierar(output.hNode,item,measureName);
-                if (option == null)
-                    return;
-                switch (option)
+                    if (active == null || !(active is VisOrder))
+                    {
+                        VisOrder visOrder;
+                        visOrder = new VisOrder(output.clusters, item, null);
+                        visOrder.closeForm = Closing;
+                        active = visOrder;
+                        visOrder.Show();
+                    }
+                }
+                else
                 {
-                    case "Dendrogram":
-                    default:
+                    if (active == null || !(active is ListVisual))
+                    {
+                        ListVisual visBaker;
+                        visBaker = new ListVisual(output, item, dic);
+                        visBaker.closeForm = Closing;
+                        active = visBaker;
+                        visBaker.Show();
+                    }
+
+                }
+
+
+                if (output.hNode != null)
+                {
+                    // win = new visHierar(output.hNode,item,measureName);
+                    if (option == null)
+                        return;
+                    if (option == "Dendrogram")
                         if (active == null || !(active is visHierar))
                         {
                             visHierar winH;
-                            winH = new visHierar(output, item, measureName,dic);
+                            winH = new visHierar(output, item, measureName, dic);
                             winH.closeForm = Closing;
                             active = winH;
-                            winH.Show();
+                            if (graphics)
+                                winH.SaveToFile("result.png", true, 2, Color.Black, 1200, 800);
+                            else
+                                winH.Show();
                         }
-                        return;                        
-                    case "Sunburst chart":
+                    if (option == "Sunburst chart")
                         if (active == null || !(active is VisHierarCircle))
                         {
 
@@ -111,36 +109,35 @@ namespace Graph
                             active = winC;
                             winC.Show();
                         }
-                        return;                        
+
+
+
+
                 }
-
-
-            }
-            if (output.juryLike != null || output.hNNRes!=null)
-            {
-                if (active == null || !(active is FormText))
+                if (output.juryLike != null || output.hNNRes != null)
                 {
+                    if (active == null || !(active is FormText))
+                    {
 
-                    FormText showRes;
-                    if(output.juryLike!=null)
-                        showRes = new FormText(output.juryLike, item);
-                    else
-                        showRes = new FormText(output.hNNRes, item);
-                    showRes.closeForm = Closing;
-                    active = showRes;
-                    showRes.Show();
+                        FormText showRes;
+                        if (output.juryLike != null)
+                            showRes = new FormText(output.juryLike, item);
+                        else
+                            showRes = new FormText(output.hNNRes, item);
+                        showRes.closeForm = Closing;
+                        active = showRes;
+                        showRes.Show();
+                    }
                 }
-                return;
-            }
-            if(output.nodes!=null)
-            {
-                HeatMap heatRes = new HeatMap(output.nodes[1], output.nodes[0], null,output);
-                heatRes.PrepareDataForHeatMap();
-                active = heatRes;
-                heatRes.Show();
+                if (output.nodes != null)
+                {
+                    HeatMap heatRes = new HeatMap(output.nodes[1], output.nodes[0], null, output);
+                    heatRes.PrepareDataForHeatMap();
+                    active = heatRes;
+                    heatRes.Show();
 
+                }
             }
-
 
         }
 

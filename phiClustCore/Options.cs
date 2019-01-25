@@ -75,10 +75,6 @@ namespace phiClustCore
         public string profiles1DJuryMeasureFile;
         [Description("Cluster algorithm to be used (available: uQlustTree, HKmeans, HierarchicalCluster, FastHCluster, Kmeans, ThresholdCluster, Jury1D, Jury3D, Sift)")]
         public List<ClusterAlgorithm> clusterAlgorithm=new List<ClusterAlgorithm>();
-        [Description("Labels fileName needed for hNN")]
-        public string hNNLabels;
-        [Description("Labels position")]
-        public int labelsPos;
         [Description("Name of distance file")]
         public string distanceFile = "";
 
@@ -89,6 +85,8 @@ namespace phiClustCore
         public ThresholdCInput threshold=new ThresholdCInput();        
         public KmeansInput kmeans=new KmeansInput();        
         public HashCInput hash = new HashCInput();
+        public OmicsInput omics = new OmicsInput();
+        public HNNCInput hnn = new HNNCInput();
         [NonSerialized]
         private Dictionary<string, string> dicField=new Dictionary<string,string>();
         [NonSerialized]
@@ -227,7 +225,19 @@ namespace phiClustCore
                 hash.SaveOptions(file);
                 file.WriteLine("########## End ##########");
             }
+            if(omics!=null)
+            {
+                file.WriteLine("########## Parameters Omics ##########");
+                omics.SaveOptions(file);
+                file.WriteLine("########## End ##########");
 
+            }
+            if(hnn!=null)
+            {
+                file.WriteLine("########## Parameters HNN ##########");
+                hnn.SaveOptions(file);
+                file.WriteLine("########## End ##########");
+            }
             file.Close();
         }
         private string PrepareDefaultName()
@@ -260,16 +270,24 @@ namespace phiClustCore
                             hierarchical.ReadOptionFile(r);
                         else
                             if (line.Contains("Parameters threshold"))
-                                threshold.ReadOptionFile(r);
-                            else
+                            threshold.ReadOptionFile(r);
+                        else
                                 if (line.Contains("Parameters other"))
-                                    other.ReadOptionFile(r);
-                                else
+                            other.ReadOptionFile(r);
+                        else
                                     if (line.Contains("Parameters Hash"))
-                                        hash.ReadOptionFile(r);
-                                    else
-                                        if(line.Contains("Parameters kmeans"))
-                                         kmeans.ReadOptionFile(r);
+                            hash.ReadOptionFile(r);
+                        else
+                                        if (line.Contains("Parameters kmeans"))
+                            kmeans.ReadOptionFile(r);
+                        else
+                                            if (line.Contains("Omics"))
+                            omics.ReadOptionFile(r);
+                        else
+                                                if (line.Contains("HNN"))
+                            hnn.ReadOptionFile(r);
+                                            
+                                        
 
                        
                     }

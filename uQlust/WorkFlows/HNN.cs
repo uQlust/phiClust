@@ -31,10 +31,25 @@ namespace WorkFlows
             if (fileName!=null)
             {
                 opt.ReadOptionFile(fileName);
-                textBox2.Text = opt.hNNLabels;               
+                textBox2.Text = opt.hnn.testFile;
+                textBox1.Text = opt.hnn.trainingFile;
+                
+                if(opt.hnn.labelPosition==-1)
+                {
+                    radioButton1.Checked = false;
+                    radioButton2.Checked = false;
+                    radioButton3.Checked = true;
+                }
+                if(opt.hnn.labelPosition>0)
+                    this.numericUpDown1.Value = opt.hnn.labelPosition;
             }
+            
             if (set.mode == INPUTMODE.USER_DEFINED)
                 checkBox1.Visible = true;
+        }
+        public HNN(OmicsInput om,Form parent, Settings set, ResultWindow results, OMICS_CHOOSE alg, string fileName = null, string dataFileName = null):this(parent, set,results,alg,fileName , dataFileName)
+        {
+            opt.omics = om;
         }
         void SaveFile(string fileName,List<string> labels,List<string> classLabels)
         {
@@ -48,11 +63,11 @@ namespace WorkFlows
         {
             if(opt.hash.profileName.Contains("omics"))
             {
-                OmicsProfile om = new OmicsProfile();
-                om.LoadOmicsSettings();
+                OmicsProfile om = new OmicsProfile(opt);
+                //om.Load(OmicsInput.fileName);
                 if (radioButton2.Checked)
-                    om.transpose = true;
-                om.SaveOmicsSettings();
+                    om.oInput.transpose = true;
+                om.Save(OmicsInput.fileName);
                 List<string> classLabels = om.ReadClassLabels(this.dataFileName,radioButton1.Checked,(int)numericUpDown1.Value);
                 om.ReadOmicsFile(this.dataFileName);
                 Console.WriteLine("labL=" + om.labelGenes[0][om.labelGenes[0].Count - 1]+" "+classLabels[classLabels.Count-1]);
@@ -78,58 +93,6 @@ namespace WorkFlows
 
                 om.CombineTrainigTest(ChangeFileName(this.dataFileName,"combine"), this.dataFileName, textBox2.Text);
             }
-            else
-            {
-                StreamReader w = new StreamReader(textBox1.Text);
-                StreamWriter r=new StreamWriter(ChangeFileName(textBox1.Text,"combine_"));
-                StreamWriter rl = new StreamWriter(textBox2.Text + "_labels");
-                string line = "";
-                string remlabel = "";
-                string remName = "";
-                line = w.ReadLine();
-                
-                while(line!=null)
-                {
-                    if (!line.Contains(">"))
-                    {
-                        string[] aux = line.Split(' ');
-                       // r.Write("pdb_FragBag sequence");
-                       if(!line.Contains(" profile "))
-                            r.Write("pdb_FragBag profile");
-                        for (int i = 0; i < aux.Length; i++)
-                        {
-                            if (i != numericUpDown1.Value - 1)
-                                r.Write(" "+aux[i]);                            
-                        }
-                        remlabel = aux[(int)numericUpDown1.Value - 1];
-                        rl.WriteLine(remName + " " + remlabel);
-                        r.WriteLine();
-                    }
-                    else
-                    {
-                        r.WriteLine(line);
-                        remName = line.Remove(0,1);
-                        remName = remName.TrimEnd('\r', '\n');
-                    }
-                    
-                    line = w.ReadLine();
-                }
-                w.Close();
-                rl.Close();
-                w = new StreamReader(textBox2.Text);
-                line = w.ReadLine();
-                while (line != null)
-                {
-                    if (!line.Contains(">"))
-                        if(!line.Contains(" profile "))
-                            r.Write("pdb_FragBag profile ");
-                    r.WriteLine(line);
-                    line = w.ReadLine();
-                }
-
-                w.Close();
-                r.Close();
-            }
 
         }
         string ChangeFileName(string fileName,string prefix)
@@ -152,15 +115,18 @@ namespace WorkFlows
             else
                 opt.clusterAlgorithm.Add(ClusterAlgorithm.GuidedHashCluster);
             opt.profileFiles.Clear();
-            opt.hNNLabels = textBox2.Text+"_labels";
+            opt.hnn.testFile = textBox2.Text;
+            if(!radioButton3.Checked)
+                opt.hnn.labelPosition = (int)numericUpDown1.Value;
+            else
+                opt.hnn.labelPosition = -1;
+            opt.hnn.trainingFile = textBox1.Text;
             if (opt.hash.profileName.Contains("omics"))
-            {
-        
+            {        
                 opt.profileFiles.Add(ChangeFileName(this.dataFileName,"combine"));
-                OmicsProfile om = new OmicsProfile();
             }
             else
-                opt.profileFiles.Add(ChangeFileName(textBox1.Text,"combine"));
+                opt.profileFiles.Add(textBox1.Text);
             opt.hash.relClusters = (int)relevantC.Value;
             opt.hash.perData = (int)percentData.Value;
             opt.hash.useConsensusStates = checkBox1.Checked;
@@ -189,7 +155,8 @@ namespace WorkFlows
         {
             previous = true;
             parent.Show();
-            this.Close();
+            this.Hide();
+            //this.Close();
         }
 
 

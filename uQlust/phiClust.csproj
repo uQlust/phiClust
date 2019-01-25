@@ -28,7 +28,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -36,7 +36,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -79,13 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Graph\ClusterGraphVis.cs" />
-    <Compile Include="Graph\DistanceControl.cs">
+    <Compile Include="DistanceControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Graph\DistanceControl.designer.cs">
+    <Compile Include="DistanceControl.designer.cs">
       <DependentUpon>DistanceControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Graph\DrawHierarchical.cs" />
     <Compile Include="Graph\DrawPanel.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -295,7 +294,7 @@
     <Compile Include="WorkFlows\UserOrOmics.Designer.cs">
       <DependentUpon>UserOrOmics.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Graph\DistanceControl.resx">
+    <EmbeddedResource Include="DistanceControl.resx">
       <DependentUpon>DistanceControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Graph\DrawPanel.resx">
@@ -452,7 +451,7 @@
     <None Include="Resources\load.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\uQlustCore\phiClustCore.csproj">
+    <ProjectReference Include="..\phiClustCore\phiClustCore.csproj">
       <Project>{71c7bb85-5d7b-470d-9bd0-a13e7d161f29}</Project>
       <Name>phiClustCore</Name>
     </ProjectReference>

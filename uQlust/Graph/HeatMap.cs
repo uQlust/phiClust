@@ -16,25 +16,12 @@ namespace Graph
 {
     public partial class HeatMap : Form,IVisual
     {
-        List<Color> colorMap;
-        List<int> indexLabels;
-        List<Color> barMap;
+        HeatMapDraw draw = null;
         Dictionary<Region, KeyValuePair<bool, string>> regionBarColor = new Dictionary<Region, KeyValuePair<bool, string>>();
         Dictionary<string, Color> labelToColor = new Dictionary<string, Color>();
-        DrawHierarchical upper;
-        DrawHierarchical left;        
-        Bitmap upperBitMap;
-        Bitmap leftBitMap;
         bool showLabels = false;
         HClusterNode colorNodeUpper = null;
         HClusterNode colorNodeLeft = null;
-        HClusterNode upperNode,auxUpper;
-        HClusterNode leftNode,auxLeft;
-        List<KeyValuePair<string, List<byte>>> rowOmicsProfiles;
-        Dictionary<string, Dictionary<string,int>> omicsProfiles;
-        Dictionary<int, int> distV = new Dictionary<int, int>();
-        ClusterOutput outp;
-        Dictionary<string, string> labels;
         public void ToFront()
         {
             this.BringToFront();
@@ -44,233 +31,42 @@ namespace Graph
         {
             upperNode.ClearColors(Color.Black);
             leftNode.ClearColors(Color.Black);
-            this.outp = outp;
-            this.upperNode = auxUpper=upperNode;
             InitializeComponent();
             this.Text = outp.alignFile;
-            this.leftNode = auxLeft=leftNode;
-            List<KeyValuePair<string, List<byte>>> colOmicsProfiles=new List<KeyValuePair<string,List<byte>>>();
-            rowOmicsProfiles = new List<KeyValuePair<string, List<byte>>>();
-            this.labels = labels;
-            
+            //draw=new HeatMapDraw(new Bitmap(tableLayoutPanel1.Width, tableLayoutPanel1.Height), upperNode, leftNode, labels, outp);
+            draw = new HeatMapDraw(new Bitmap(pictureBox2.Width,pictureBox2.Height),new Bitmap(pictureBox3.Width,pictureBox3.Height),
+                new Bitmap(pictureBox1.Width,pictureBox1.Height),new Bitmap(pictureBox4.Width,pictureBox4.Height),upperNode, leftNode, labels, outp);
         }
         public void PrepareDataForHeatMap()
         {
-            List<HClusterNode> leaves = leftNode.GetLeaves();
-            Dictionary<string, List<byte>> dic1 = new Dictionary<string, List<byte>>();
-            Dictionary<string, List<byte>> dic2 = new Dictionary<string, List<byte>>();
-            string[] aux = outp.name.Split(';');
+            draw.PrepareDataForHeatMap();
 
-            rowOmicsProfiles = OmicsProfile.ReadOmicsProfile(/*"omics_Omics_profile"+"_"+*/aux[0]);
-            //colOmicsProfiles = OmicsProfile.ReadOmicsProfile(/*"omics_Omics_profile"+"_"+*/aux[0]+"_transpose");
-            omicsProfiles = new Dictionary<string, Dictionary<string, int>>();
-            for (int i = 0; i < rowOmicsProfiles.Count; i++)
-            {
-                if (!omicsProfiles.ContainsKey(rowOmicsProfiles[i].Key))
-                    omicsProfiles.Add(rowOmicsProfiles[i].Key, new Dictionary<string, int>());
-
-                for (int j = 0; j < outp.aux1.Count; j++)
-                {
-                    if (!omicsProfiles[rowOmicsProfiles[i].Key].ContainsKey(outp.aux1[j]))
-                        omicsProfiles[rowOmicsProfiles[i].Key].Add(outp.aux1[j], rowOmicsProfiles[i].Value[j]);
-
-                }
-            }
-            colorMap = outp.profilesColor;
-            indexLabels = outp.auxInt;
+            this.Name = "HeatMap " + draw.outp.dirName;
             
-            this.Name = "HeatMap " + outp.dirName;
-            for (int i = 1; i < outp.aux2.Count; i++)
-                comboBox1.Items.Add(outp.aux2[i]);
-            upperBitMap = new Bitmap(pictureBox2.Width, pictureBox2.Height);
-            leftBitMap = new Bitmap(pictureBox3.Width, pictureBox3.Height);
-            upper = new DrawHierarchical(upperNode, outp.measure, labels, upperBitMap, true);
-            //upper.viewType = true;
-            left = new DrawHierarchical(leftNode, outp.measure, labels, leftBitMap, false);
-            //left.viewType = true;
-            foreach (var item in rowOmicsProfiles)
-                foreach (var v in item.Value)
-                    if (!distV.ContainsKey(v))
-                        distV.Add(v, 0);
-            BarColors();
+                        
+            for (int i = 1; i < draw.outp.aux2.Count; i++)
+                comboBox1.Items.Add(draw.outp.aux2[i]);
+
+            if (comboBox1.Items.Count > 0)
+                comboBox1.SelectedIndex = 0;
+            else
+                comboBox1.Visible = false;
+
+
             pictureBox2.Refresh();
         }
-        void BarColors()
-        {
-            barMap = new List<Color>();
-            barMap.Add(Color.Black);
-            barMap.Add(Color.Red);
-            barMap.Add(Color.Blue);
-            barMap.Add(Color.Green);
-            barMap.Add(Color.Orange);
-            barMap.Add(Color.Plum);
-            barMap.Add(Color.Navy);
-            barMap.Add(Color.LightGreen);
-            barMap.Add(Color.MediumTurquoise);
-            barMap.Add(Color.Olive);
-            barMap.Add(Color.Yellow);
-            barMap.Add(Color.CornflowerBlue);
-            barMap.Add(Color.Ivory);
-
-
-        }
-        double CalculateProfilesAccuracy(List<string> profiles, List<string> leaves,bool reverse)
-        {
-            double res = 0;
-
-
-            if(reverse)
-                for (int j = 0; j < leaves.Count; j++)
-                { 
-                    for (int i = 0; i < profiles.Count; i++)                                    
-                    {
-                        int ind = omicsProfiles[profiles[i]][leaves[j]];
-                        if (ind == omicsProfiles[profiles[0]][leaves[j]])
-                            res++;
-                    }
-                }
-            else
-            for (int i = 0; i < profiles.Count; i++)
-            {
-                for (int j = 0; j < leaves.Count; j++)
-                {
-                    int ind = omicsProfiles[profiles[i]][leaves[j]];
-                    if (ind == omicsProfiles[profiles[0]][leaves[j]])
-                        res++;
-                }
-            }
-            res /= leaves.Count * profiles.Count;
-            return res;
-
-        }
-        void DrawHeatMapNode(Bitmap bmp,List<string> profiles,List<string> leaves)
-        {
-            Graphics g = Graphics.FromImage(bmp);
-            int width = bmp.Width;
-            int height = bmp.Height;
-            float xStep=(float)width;
-            float yStep = (float)height;
-
-
-            //if(upperLeaves.Count>1)
-                xStep = (float)width /(leaves.Count);
-            
-            //if(profiles.Count>1)
-                yStep = (float)height /(profiles.Count);
-
-            int currentX = 0;
-            int currentY = 0;
-            SolidBrush b = new SolidBrush(Color.Black);
-            for (int i = 0; i < profiles.Count;i++ )
-            {
-                currentY = (int)(i * yStep);
-                for (int j = 0; j < leaves.Count; j++)
-                {
-                    int ind = omicsProfiles[profiles[i]][leaves[j]];
-                    ind--;
-                    if (colorMap.Count <= ind)
-                        throw new Exception("Color map is to small");                    
-
-                    Color c = colorMap[ind];
-                    b.Color = c;
-                    currentX = (int)(j * xStep);
-                    g.FillRectangle(b, currentX, currentY, xStep, yStep);
-                    
-                }
-                
-            }
-
-          
-        }
-        void DrawHeatMap(Graphics g)
-        {
-            List<HClusterNode> upperLeaves =auxUpper.GetLeaves();
-            List<HClusterNode> leftLeaves = auxLeft.GetLeaves();
-            
-            upperLeaves=upperLeaves.OrderByDescending(o => o.gNode.x).Reverse().ToList();
-            leftLeaves=leftLeaves.OrderByDescending(o => o.gNode.y).Reverse().ToList();
-            SolidBrush b = new SolidBrush(Color.Black);
-            double yPos1, yPos2;
-            for(int i=0;i<leftLeaves.Count;i++)
-            {
-
-                int y = leftLeaves[i].gNode.y;
-                if (i == 0)
-                {
-                    yPos1 = y - (leftLeaves[i + 1].gNode.y - y) / 2.0;
-                    yPos2 = y + (leftLeaves[i + 1].gNode.y - y) / 2.0;
-
-                }
-                else
-                    if (i + 1 < leftLeaves.Count)
-                    {
-                        yPos1 = y - (y - leftLeaves[i - 1].gNode.y) / 2.0;
-                        yPos2 = y + (leftLeaves[i + 1].gNode.y - y) / 2.0;
-
-                    }
-                    else
-                    {
-                        yPos1 = y - (y - leftLeaves[i - 1].gNode.y) / 2.0;
-                        yPos2 = y + (y - leftLeaves[i - 1].gNode.y) / 2.0;
-
-                    }
-
-
-                double xPos1, xPos2;
-                for(int j=0;j<upperLeaves.Count;j++)
-                {
-                    int x = upperLeaves[j].gNode.x;
-                    double vv = 0;
-
-                    if (j + 1 < upperLeaves.Count)
-                        vv = (upperLeaves[j + 1].gNode.x - x) / 2.0;
-                    if (j == 0)
-                    {
-                        xPos1 = x - vv;
-                        xPos2 = x + vv;
-
-                    }
-                    else
-                        if (j + 1 < upperLeaves.Count)
-                        {
-                            xPos1 = x - (x - upperLeaves[j - 1].gNode.x) / 2.0;
-                            xPos2 = x + vv;
-                        }
-                        else
-                        {
-                            xPos1 = x - (x - upperLeaves[j - 1].gNode.x) / 2.0;
-                            xPos2 = x + (x - upperLeaves[j - 1].gNode.x) / 2.0;
-                        }
-                    if ((xPos2 - xPos1) == 0)
-                        continue;
-                    if (!omicsProfiles.ContainsKey(leftLeaves[i].refStructure))
-                        throw new Exception("Omics profile does not contain " + leftLeaves[i].refStructure);
-                    if(!omicsProfiles[leftLeaves[i].refStructure].ContainsKey(upperLeaves[j].refStructure))
-                        throw new Exception("Omics profile does not contain " + upperLeaves[j].refStructure);
-                    int ind = omicsProfiles[leftLeaves[i].refStructure][upperLeaves[j].refStructure];
-                    ind--;
-                    if (colorMap.Count <= ind)
-                        throw new Exception("Color map is to small");
-                    Color c = colorMap[ind];
-                    b.Color = c;                   
-                    if(yPos2-yPos1>0)
-                        g.FillRectangle(b, (float)xPos1,(float) yPos1, (float)(xPos2-xPos1), (float)(yPos2-yPos1));                    
-                }
-            }
-
-        }   
         void PrepareBarRegions(Graphics g)
         {
             int x = 50, y = 0;
             bool regionTest = false;
 
-            if (upper.labColor == null || upper.labColor.Keys.Count == 0)
+            if (draw.upper.labColor == null || draw.upper.labColor.Keys.Count == 0)
                 return;
 
             if (regionBarColor.Count > 0)
                 regionTest = true;
 
-            List<string> labKeys = new List<string>(upper.labColor.Keys);
+            List<string> labKeys = new List<string>(draw.upper.labColor.Keys);
             Font drawFont = new System.Drawing.Font("Arial", 8);
             foreach (var item in labKeys)
             {
@@ -290,26 +86,26 @@ namespace Graph
             foreach (var regItem in regionBarColor)
             {
                 if (regItem.Value.Key)
-                    upper.labColor[regItem.Value.Value] = Color.Empty;
+                    draw.upper.labColor[regItem.Value.Value] = Color.Empty;
             }
 
         }
         private void pictureBox2_Paint(object sender, PaintEventArgs e)
         {
-            Graphics g = Graphics.FromImage(upperBitMap);
+            Graphics g = Graphics.FromImage(draw.upperBitMap);
             PrepareBarRegions(e.Graphics);            
             g.Clear(this.BackColor);
             //e.Graphics.Clear(pictureBox2.BackColor);
             
-            upper.DrawOnBuffer(upperBitMap, false, 1, Color.Empty);
-            e.Graphics.DrawImage(upperBitMap, 0, 0);
-            if ( upper.labColor!=null &&  upper.labColor.Count>0)
+            draw.upper.DrawOnBuffer(draw.upperBitMap, false, 1, Color.Empty);
+            e.Graphics.DrawImage(draw.upperBitMap, 0, 0);
+            if ( draw.upper.labColor!=null &&  draw.upper.labColor.Count>0)
             {
                 Font drawFont = new System.Drawing.Font("Arial", 8);
                 foreach(var item in regionBarColor)
                 {
                     RectangleF rec = item.Key.GetBounds(e.Graphics);
-                    SolidBrush drawBrush = new System.Drawing.SolidBrush(upper.labColor[item.Value.Value]);
+                    SolidBrush drawBrush = new System.Drawing.SolidBrush(draw.upper.labColor[item.Value.Value]);
                     e.Graphics.FillRectangle(drawBrush,rec.X, rec.Y,rec.Width, rec.Height);
 
                     SizeF textSize = e.Graphics.MeasureString(item.Value.Value, drawFont);
@@ -331,24 +127,24 @@ namespace Graph
         private void pictureBox3_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.Clear(this.BackColor);
-            left.posStart = 5;
-            left.DrawOnBuffer(leftBitMap, false, 1, Color.Empty);
-            e.Graphics.DrawImage(leftBitMap, 0, 0);
+            draw.left.posStart = 5;
+            draw.left.DrawOnBuffer(draw.leftBitMap, false, 1, Color.Empty);
+            e.Graphics.DrawImage(draw.leftBitMap, 0, 0);
         }
 
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.Clear(this.BackColor);
-            DrawHeatMap(e.Graphics);
+            draw.DrawHeatMap(e.Graphics);
         }
 
         private void HeatMap_ResizeEnd(object sender, EventArgs e)
         {
-            upperBitMap = new Bitmap(pictureBox2.Width, pictureBox2.Height);
-            leftBitMap = new Bitmap(pictureBox3.Width, pictureBox3.Height);
-            left.PrepareGraphNodes(leftBitMap);
-            upper.PrepareGraphNodes(upperBitMap);
+            draw.upperBitMap = new Bitmap(pictureBox2.Width, pictureBox2.Height);
+            draw.leftBitMap = new Bitmap(pictureBox3.Width, pictureBox3.Height);
+            draw.left.PrepareGraphNodes(draw.leftBitMap);
+            draw.upper.PrepareGraphNodes(draw.upperBitMap);
             pictureBox1.Refresh();
             pictureBox2.Refresh();
             pictureBox3.Refresh();
@@ -364,14 +160,14 @@ namespace Graph
             System.Drawing.SolidBrush drawBrush = new System.Drawing.SolidBrush(System.Drawing.Color.Black);
             System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
 
-            List<int> ordered = distV.Keys.ToList();
+            List<int> ordered = draw.distV.Keys.ToList();
             ordered.Sort();
             foreach (var item in ordered)
             {
-                b.Color = colorMap[item - 1];
+                b.Color = draw.colorMap[item - 1];
                 e.Graphics.FillRectangle(b, xPos, yPos, 15, 10);
                 //e.Graphics.DrawString(item.ToString(), drawFont, drawBrush, xPos+25,yPos-3);
-                e.Graphics.DrawString(indexLabels[item - 1].ToString(), drawFont, drawBrush, xPos + 25, yPos - 3);
+                e.Graphics.DrawString(draw.indexLabels[item - 1].ToString(), drawFont, drawBrush, xPos + 25, yPos - 3);
                 yPos += 25;
                 if (yPos > pictureBox4.Height)
                 {
@@ -379,7 +175,7 @@ namespace Graph
                     xPos += 40;
                 }
             }
-             
+            //test.Paint();             
         }
 
         private void tableLayoutPanel1_Paint_1(object sender, PaintEventArgs e)
@@ -392,25 +188,25 @@ namespace Graph
             bool test = false;
             if (colorNodeUpper != null)
             {
-                upper.ChangeColors(colorNodeUpper, Color.Black);
+                draw.upper.ChangeColors(colorNodeUpper, Color.Black);
                 test = true;
             }
 
-            colorNodeUpper = upper.FindClosestNode(e.X, e.Y);
+            colorNodeUpper = draw.upper.FindClosestNode(e.X, e.Y);
 
             if(colorNodeUpper!=null)
             {
-                upper.ChangeColors(colorNodeUpper, Color.Red);
+                draw.upper.ChangeColors(colorNodeUpper, Color.Red);
                 test = true;
             }
             if (test)
             {
-                Graphics g = Graphics.FromImage(upperBitMap);
+                Graphics g = Graphics.FromImage(draw.upperBitMap);
                 g.Clear(pictureBox2.BackColor);
                
                 if (colorNodeUpper != null)
                 {
-                    float v = ((float)colorNodeUpper.setStruct.Count) / upperNode.setStruct.Count * 360;
+                    float v = ((float)colorNodeUpper.setStruct.Count) / draw.upperNode.setStruct.Count * 360;
                     g.FillPie(new SolidBrush(Color.Black), new Rectangle(e.X - 20, e.Y, 15, 15), v, 360 - v);
                     g.FillPie(new SolidBrush(Color.Red), new Rectangle(e.X - 20, e.Y, 15, 15), 0, v);
                 }
@@ -435,9 +231,9 @@ namespace Graph
                             if (item.IsVisible(e.X, e.Y))
                             {
                                 regionBarColor[item] = new KeyValuePair<bool, string>(!regionBarColor[item].Key, regionBarColor[item].Value) ;
-                                upper.labColor = new Dictionary<string, Color>();
+                                draw.upper.labColor = new Dictionary<string, Color>();
                                 foreach (var itemColor in labelToColor)
-                                    upper.labColor.Add(itemColor.Key, itemColor.Value);
+                                    draw.upper.labColor.Add(itemColor.Key, itemColor.Value);
                                 testFlag = true;                         
                             }
                         if (testFlag)
@@ -458,32 +254,32 @@ namespace Graph
                         pn.Height = pn.Width;
                         pn.Width = tmp;
                         pn.CreateBMP();
-                        List<HClusterNode> leftLeaves = auxLeft.GetLeaves();
+                        List<HClusterNode> leftLeaves = draw.auxLeft.GetLeaves();
                         leftLeaves = leftLeaves.OrderByDescending(o => o.gNode.y).Reverse().ToList();
                         List<string> refList = new List<string>();
                         foreach (var item in leftLeaves)
                             refList.Add(item.refStructure);
-                        pn.drawPic = delegate { DrawHeatMapNode(pn.bmp, refList, nodeC.setStruct); pn.Text = nodeC.consistency.ToString(); };
+                        pn.drawPic = delegate { draw.DrawHeatMapNode(pn.bmp, refList, nodeC.setStruct); pn.Text = nodeC.consistency.ToString(); };
                         pn.Show();
                     }
                     else
                     {
                         if (colorNodeUpper != null && colorNodeUpper.joined != null)
-                            auxUpper = colorNodeUpper;
+                            draw.auxUpper = colorNodeUpper;
                     }
                     break;      
                 case MouseButtons.Right:
-                        auxUpper = upperNode;
+                        draw.auxUpper = draw.upperNode;
                         break;
             }
-            if (auxUpper != null)
+            if (draw.auxUpper != null)
             {
                 if(colorNodeUpper!=null)
-                    upper.ChangeColors(colorNodeUpper, Color.Black);
+                    draw.upper.ChangeColors(colorNodeUpper, Color.Black);
                 colorNodeUpper = null;
-                upper.rootNode = auxUpper;
-                upper.PrepareGraphNodes(upperBitMap);
-                Graphics g = Graphics.FromImage(upperBitMap);
+                draw.upper.rootNode = draw.auxUpper;
+                draw.upper.PrepareGraphNodes(draw.upperBitMap);
+                Graphics g = Graphics.FromImage(draw.upperBitMap);
                 g.Clear(pictureBox2.BackColor);
                 pictureBox2.Refresh();
                 pictureBox1.Refresh();
@@ -496,24 +292,24 @@ namespace Graph
             if (colorNodeLeft != null)
             {
                 test = true;
-                left.ChangeColors(colorNodeLeft, Color.Black);
+                draw.left.ChangeColors(colorNodeLeft, Color.Black);
             }
 
-            colorNodeLeft = left.FindClosestNode(e.X, e.Y);
+            colorNodeLeft = draw.left.FindClosestNode(e.X, e.Y);
 
             if (colorNodeLeft != null)
             {
-                left.ChangeColors(colorNodeLeft, Color.Red);
+                draw.left.ChangeColors(colorNodeLeft, Color.Red);
                 test = true;
             }
             if (test)
             {
-                Graphics g = Graphics.FromImage(leftBitMap);
+                Graphics g = Graphics.FromImage(draw.leftBitMap);
                 g.Clear(pictureBox3.BackColor);
                 
                 if(colorNodeLeft!=null)
                 { 
-                    float v=((float)colorNodeLeft.setStruct.Count)/leftNode.setStruct.Count*360;
+                    float v=((float)colorNodeLeft.setStruct.Count)/draw.leftNode.setStruct.Count*360;
                     g.FillPie(new SolidBrush(Color.Black), new Rectangle(e.X - 20, e.Y, 15, 15), v,360-v);
                     g.FillPie(new SolidBrush(Color.Red), new Rectangle(e.X-20, e.Y, 15, 15), 0, v);
                 }
@@ -536,31 +332,31 @@ namespace Graph
                         rr.Show();
                         DrawPanel pn = new DrawPanel("Leave profile: " + nodeC.refStructure);
                          pn.CreateBMP();
-                         List<HClusterNode> upperLeaves = auxUpper.GetLeaves();
+                         List<HClusterNode> upperLeaves = draw.auxUpper.GetLeaves();
                          upperLeaves = upperLeaves.OrderByDescending(o => o.gNode.y).Reverse().ToList();
                          List<string> refList = new List<string>();
                         foreach(var item in upperLeaves)
                             refList.Add(item.refStructure);
-                        pn.drawPic = delegate {DrawHeatMapNode(pn.bmp, nodeC.setStruct, refList); pn.Text = nodeC.consistency.ToString(); };
+                        pn.drawPic = delegate {draw.DrawHeatMapNode(pn.bmp, nodeC.setStruct, refList); pn.Text = nodeC.consistency.ToString(); };
                          pn.Show();
                          pn.pictureBox1.Invalidate();
                     }
                     else
                         if (colorNodeLeft != null && colorNodeLeft.joined!=null)
-                            auxLeft = colorNodeLeft;
+                            draw.auxLeft = colorNodeLeft;
                     break;
                 case MouseButtons.Right:
-                    auxLeft = leftNode;
+                    draw.auxLeft = draw.leftNode;
                     break;
             }
-            if (auxLeft != null)
+            if (draw.auxLeft != null)
             {
                 if (colorNodeLeft != null)
-                    left.ChangeColors(colorNodeLeft, Color.Black);
+                    draw.left.ChangeColors(colorNodeLeft, Color.Black);
                 colorNodeLeft = null;
-                left.rootNode = auxLeft;
-                left.PrepareGraphNodes(leftBitMap);
-                Graphics g = Graphics.FromImage(leftBitMap);
+                draw.left.rootNode = draw.auxLeft;
+                draw.left.PrepareGraphNodes(draw.leftBitMap);
+                Graphics g = Graphics.FromImage(draw.leftBitMap);
                 g.Clear(pictureBox3.BackColor);
                 pictureBox3.Refresh();
                 pictureBox1.Refresh();
@@ -576,13 +372,13 @@ namespace Graph
         private void toolStripLabel1_Click(object sender, EventArgs e)
         {
             showLabels = !showLabels;
-            upper.showLabels = showLabels;
+            draw.upper.showLabels = showLabels;
             numericUpDown1.Visible = showLabels;
-            numericUpDown1.Value = upper.labelSize;
-            left.showLabels = showLabels;
-            Graphics g = Graphics.FromImage(upperBitMap);
+            numericUpDown1.Value = draw.upper.labelSize;
+            draw.left.showLabels = showLabels;
+            Graphics g = Graphics.FromImage(draw.upperBitMap);
             g.Clear(pictureBox2.BackColor);
-            g = Graphics.FromImage(leftBitMap);
+            g = Graphics.FromImage(draw.leftBitMap);
             g.Clear(pictureBox3.BackColor);
 
             pictureBox3.Refresh();
@@ -591,12 +387,12 @@ namespace Graph
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            left.labelSize = (int)numericUpDown1.Value;
-            upper.labelSize = (int)numericUpDown1.Value;
+            draw.left.labelSize = (int)numericUpDown1.Value;
+            draw.upper.labelSize = (int)numericUpDown1.Value;
 
-            Graphics g = Graphics.FromImage(upperBitMap);
+            Graphics g = Graphics.FromImage(draw.upperBitMap);
             g.Clear(pictureBox2.BackColor);
-            g = Graphics.FromImage(leftBitMap);
+            g = Graphics.FromImage(draw.leftBitMap);
             g.Clear(pictureBox3.BackColor);
 
             pictureBox3.Refresh();
@@ -608,9 +404,9 @@ namespace Graph
         {
             if (colorNodeUpper != null)
             {             
-                upper.ChangeColors(colorNodeUpper, Color.Black);
+                draw.upper.ChangeColors(colorNodeUpper, Color.Black);
                 colorNodeUpper = null;
-                Graphics g = Graphics.FromImage(upperBitMap);
+                Graphics g = Graphics.FromImage(draw.upperBitMap);
                 g.Clear(pictureBox2.BackColor);
                 pictureBox2.Refresh();                 
             }
@@ -623,7 +419,7 @@ namespace Graph
             {
                 string fileName = saveFileDialog1.FileName;
                 List<List<string>> clusters = new List<List<string>>();
-                List<HClusterNode> nodes = leftNode.GetLeaves();
+                List<HClusterNode> nodes = draw.leftNode.GetLeaves();
                 List<double> cons = new List<double>();
                 foreach (var item in nodes)
                 {
@@ -637,7 +433,7 @@ namespace Graph
 
                 clusters.Clear();
                 cons = new List<double>();
-                nodes = upperNode.GetLeaves();
+                nodes = draw.upperNode.GetLeaves();
                 foreach (var item in nodes)
                 {
                     clusters.Add(item.setStruct);
@@ -661,9 +457,9 @@ namespace Graph
         {
             if (colorNodeLeft != null)
             {         
-                left.ChangeColors(colorNodeLeft, Color.Black);
+                draw.left.ChangeColors(colorNodeLeft, Color.Black);
                 colorNodeLeft = null;
-                Graphics g = Graphics.FromImage(leftBitMap);
+                Graphics g = Graphics.FromImage(draw.leftBitMap);
                 g.Clear(pictureBox3.BackColor);
 
                 //g.DrawArc(new Pen(Color.DarkGreen),new Rectangle(e.X,e.Y,10,10), 0.0, v);
@@ -674,7 +470,7 @@ namespace Graph
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            List<HClusterNode> leaveas = upperNode.GetLeaves();                
+            List<HClusterNode> leaveas = draw.upperNode.GetLeaves();                
             int index=1;
             labelToColor.Clear();
             regionBarColor.Clear();
@@ -685,26 +481,26 @@ namespace Graph
                     string[] aux = item.refStructure.Split(';');
                     if (!labelToColor.ContainsKey(aux[comboBox1.SelectedIndex + 1]))
                     {
-                        labelToColor.Add(aux[comboBox1.SelectedIndex + 1], barMap[0]);
+                        labelToColor.Add(aux[comboBox1.SelectedIndex + 1], draw.barMap[0]);
                     }
                 }
             }
             List<string> labels = new List<string>(labelToColor.Keys);
             labelToColor.Clear();
             foreach (var item in labels)
-                labelToColor.Add(item, barMap[index++]);
+                labelToColor.Add(item, draw.barMap[index++]);
 
-            upper.labColor = new Dictionary<string, Color>();
+            draw.upper.labColor = new Dictionary<string, Color>();
             foreach (var item in labelToColor)            
-                upper.labColor.Add(item.Key,item.Value);
+                draw.upper.labColor.Add(item.Key,item.Value);
             
             
-            upper.currentLabelIndex = comboBox1.SelectedIndex+1;
+            draw.upper.currentLabelIndex = comboBox1.SelectedIndex+1;
             
             
             //int step = (barMap.Count-1) / labels.Count;
 
-            if (labels.Count > barMap.Count)
+            if (labels.Count > draw.barMap.Count)
             {
                 MessageBox.Show("To many colors need to be used!");
                 return;

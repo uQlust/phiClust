@@ -64,7 +64,31 @@ namespace phiClustCore
                 //Save(hNode.GetClusters(10),stream,true);
                 ExportToAtr(hNode,Path.GetFileNameWithoutExtension(fileName)+".atr");
             }
+            if(hNNRes!=null)
+            {
+                SaveHnn(hNNRes,fileName+"_HNN");
+            }
             stream.Close();
+        }
+        public void SaveGraph(string fileName,int Width,int Height)
+        {
+            if (juryLike != null)
+                throw new Exception("1D jury does not have graphical output");
+            if (nodes != null && nodes.Count > 1)
+            {
+                HeatMapDraw heatMap = new HeatMapDraw(new Bitmap(Width, Height), nodes[1], nodes[0], null, this);
+                heatMap.SavePaint(fileName);
+            }
+            else
+                if(hNode!=null)
+                {
+                Dictionary<string, string> dic = ClusterOutput.ReadLabelsFile(GetLabelFile());
+                Bitmap bit = new Bitmap(Width,Height);
+                DrawHierarchical h = new DrawHierarchical(hNode, measure, dic, bit, true);
+                h.Save(fileName, bit);
+                }
+            else
+                throw new Exception("Graphics can be saved only for heatmap!");
         }
         static public void Save(List<List<string>> list,List<double> clCons,StreamWriter stream,bool reference,List<int> selectedFeatures=null)
         {
@@ -88,6 +112,15 @@ namespace phiClustCore
                     stream.WriteLine(it);
                 stream.WriteLine("=======================================");
             }
+        }
+        static public void SaveHnn(Dictionary<string,string>hnnRes,string fileName)
+        {
+            StreamWriter wr = new StreamWriter(fileName);
+            foreach(var item in hnnRes)
+            {
+                wr.WriteLine(item.Key + " " + item.Value);
+            }
+            wr.Close();
         }
         static public void ExportToAtr(HClusterNode node,string fileName)
         {

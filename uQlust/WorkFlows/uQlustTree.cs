@@ -99,10 +99,10 @@ namespace WorkFlows
                 case INPUTMODE.OMICS:
                     distanceControl1.distDef = DistanceMeasures.COSINE;
                     break;
-                case INPUTMODE.PROTEIN:
+/*                case INPUTMODE.PROTEIN:
                 case INPUTMODE.RNA:
                     distanceControl1.HideCosine = true;
-                    break;
+                    break;*/
 
             }
             if (opt.hash.profileName != null)

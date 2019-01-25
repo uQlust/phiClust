@@ -13,7 +13,7 @@ namespace phiClustCore.Distance
         public Dictionary<string, List<byte>> stateAlign;
         protected Dictionary<byte, Dictionary<byte, double>> weights;
         Settings dirSettings = new Settings();
-        public Alignment al;
+        public Alignment al;       
 
         protected Dictionary<string, int> states = new Dictionary<string, int>();
         protected List<Dictionary<string, int>> lStates = new List<Dictionary<string, int>>();
@@ -25,23 +25,26 @@ namespace phiClustCore.Distance
         protected string refJuryProfile;
         protected List<string> fileNames=null;
         string profilesFile="";
-        public  HammingBase(List<string> fileNames, string alignFile, bool flag,string profileName,string refJuryProfile=null)
+        public  HammingBase(List<string> fileNames, string alignFile, bool flag,string profileName,Options opt,string refJuryProfile=null)
         {
+            this.opt = opt;
             this.fileNames = fileNames;
             this.alignFile = alignFile;
             this.flag = flag;
             this.profileName = profileName;
             this.refJuryProfile = refJuryProfile;
         }
-        public HammingBase(string profilesFile, bool flag, string profileName, string refJuryProfile = null)
+        public HammingBase(string profilesFile, bool flag, string profileName, Options opt,string refJuryProfile = null)
         {
+            this.opt = opt;
             this.profilesFile = profilesFile;
             this.flag = flag;
             this.profileName = profileName;
             this.refJuryProfile = refJuryProfile;
         }
-        public HammingBase(string dirName,string alignFile,bool flag,string profileName,string refJuryProfile=null)
+        public HammingBase(string dirName,string alignFile,bool flag,string profileName,Options opt,string refJuryProfile=null)
         {
+            this.opt = opt;
             this.dirName = dirName;
             this.alignFile = alignFile;
             this.flag = flag;
@@ -51,10 +54,11 @@ namespace phiClustCore.Distance
         public HammingBase(Alignment al, bool flag)
         {
             this.al = al;
+            this.opt = al.opt;
             this.flag = flag;
         }
         public override void InitMeasure()
-        {
+        {            
             if (fileNames != null)
                 InitMeasure(fileNames, alignFile, flag, profileName, refJuryProfile);
             else
@@ -70,7 +74,7 @@ namespace phiClustCore.Distance
 
         public void InitMeasure(string dirName, string alignFile, bool flag,string profileName,string refJuryProfile=null)            
         {
-            al = new Alignment();
+            al = new Alignment(opt);
             if (profileName != null)
                 currentProfile = profileName;
 
@@ -79,7 +83,7 @@ namespace phiClustCore.Distance
             else
                 al.Prepare(alignFile, currentProfile);
             
-            base.InitMeasure(dirName, alignFile, flag, refJuryProfile);
+            base.InitMeasure(dirName, alignFile, flag,refJuryProfile);
             
             dirSettings.Load();
             this.alignFile = alignFile;
@@ -89,14 +93,14 @@ namespace phiClustCore.Distance
         public override void InitMeasure(Alignment al, bool flag)            
         {
             this.al = al;
-         
+            this.opt = al.opt;
             base.InitMeasure(al, flag);            
             stateAlign = al.GetStateAlign();
            
             //al.MyAlign(alignFile);
             stateAlign = al.GetStateAlign();
             //AddErrors(al.errors);
-            jury = new jury1D();
+            jury = new jury1D(al.opt);
             jury.PrepareJury(al);
             structNames = new Dictionary<string, int>();
             foreach (string item in stateAlign.Keys)
@@ -116,7 +120,7 @@ namespace phiClustCore.Distance
                 currentProfile = profileName;
 
             dirSettings.Load();
-            al = new Alignment();
+            al = new Alignment(opt) ;
             if (alignFile == null)
                 al.Prepare(fileNames, dirSettings, currentProfile);
             else
@@ -144,7 +148,7 @@ namespace phiClustCore.Distance
             base.InitMeasure(profilesFile, flag, profileName, refJuryProfile);
             if (profileName != null)
                 currentProfile = profileName;
-            al = new Alignment();
+            al = new Alignment(opt);
             al.Prepare(profilesFile, currentProfile);
             al.MyAlign(alignFile);
             structNames = new Dictionary<string, int>();

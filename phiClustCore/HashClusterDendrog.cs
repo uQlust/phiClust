@@ -19,36 +19,37 @@ namespace phiClustCore
     {
          DistanceMeasures dMeasure;
          DistanceMeasure dist=null;
-         AglomerativeType linkageType;       
+         AglomerativeType linkageType;        
          bool jury1d;
          string profileName;
          string refJuryProfile;
          string dirName;
          HierarchicalCInput hier;
          hierarchicalCluster hk = null;
-         public HashClusterDendrog(string dirName, string alignFile, HashCInput input, HierarchicalCInput dendrogOpt)
-             : base(dirName, alignFile, input)
+         public HashClusterDendrog(string dirName, string alignFile, Options opt)
+             : base(dirName, alignFile, opt)
         {
-            this.dMeasure=dendrogOpt.distance;
-            this.linkageType=dendrogOpt.linkageType;        
-            this.jury1d = dendrogOpt.reference1DjuryH;
-            this.profileName = dendrogOpt.hammingProfile;
-            this.refJuryProfile = dendrogOpt.jury1DProfileH;
-
+            this.opt = opt;
+            this.dMeasure = opt.hierarchical.distance;
+            this.linkageType = opt.hierarchical.linkageType;
+            this.jury1d = opt.hierarchical.reference1DjuryH;
+            this.profileName = opt.hierarchical.hammingProfile;
+            this.refJuryProfile = opt.hierarchical.jury1DProfileH;            
             this.dirName = dirName;
-            hier = dendrogOpt;
+            hier = opt.hierarchical;
         }
-         public HashClusterDendrog(string dirName, HashCInput input,HierarchicalCInput dendrogOpt,Alignment al)
-             : base(al,input)
+         public HashClusterDendrog(string dirName, Alignment al)
+             : base(al)
          {
-             this.dMeasure = dendrogOpt.distance;
-             this.linkageType = dendrogOpt.linkageType;         
-             this.jury1d = dendrogOpt.reference1DjuryH;
-             this.profileName = dendrogOpt.hammingProfile;
-             this.refJuryProfile = dendrogOpt.jury1DProfileH;
-             this.dirName = dirName;
+            this.opt = al.opt;
+            this.dMeasure = opt.hierarchical.distance;
+            this.linkageType = opt.hierarchical.linkageType;
+            this.jury1d = opt.hierarchical.reference1DjuryH;
+            this.profileName = opt.hierarchical.hammingProfile;
+            this.refJuryProfile = opt.hierarchical.jury1DProfileH;
+            this.dirName = dirName;
              this.al = al;
-             hier = dendrogOpt;
+             hier = opt.hierarchical;
          }
     
         public void InitHashClusterDendrog()
@@ -101,7 +102,8 @@ namespace phiClustCore
         static public List<string> ClustersReferences(List<List<string>> structures, Alignment al)
         {
             List<string> refCluster = new List<string>();
-            jury1D juryLocal = new jury1D();
+           
+            jury1D juryLocal = new jury1D(al.opt);
             juryLocal.PrepareJury(al);
 
 
@@ -120,7 +122,7 @@ namespace phiClustCore
         static public Dictionary<string,KeyValuePair<List<string>,Dictionary<byte,int>[]>> StructuresToDenrogram(List<List<string>> structures,Alignment al)
          {
              Dictionary<string, KeyValuePair<List<string>,Dictionary<byte,int>[]>> translateToCluster = new Dictionary<string,KeyValuePair<List<string>,Dictionary<byte,int>[]>>(structures.Count);
-             jury1D juryLocal = new jury1D();
+             jury1D juryLocal = new jury1D(al.opt);
              juryLocal.PrepareJury(al);
 
             
@@ -187,7 +189,7 @@ namespace phiClustCore
              DebugClass.WriteMessage("Start hierarchical");
              //Console.WriteLine("Start hierarchical " + Process.GetCurrentProcess().PeakWorkingSet64);
              currentV = maxV;
-             hk = new hierarchicalCluster(dist, hier, dirName);
+             hk = new hierarchicalCluster(dist, opt, dirName);
              dist.InitMeasure();
 
              //Now just add strctures to the leaves   
@@ -234,7 +236,7 @@ namespace phiClustCore
          }
          public ClusterOutput DendrogUsingMeasures(List<string> structures)
          {
-             jury1D juryLocal = new jury1D();
+             jury1D juryLocal = new jury1D(opt);
              juryLocal.PrepareJury(al);
              
              ClusterOutput outC = null;
@@ -340,7 +342,7 @@ namespace phiClustCore
                          dist = new JuryDistance(this.al, true);
                      }
                      else
-                         dist = new JuryDistance(structuresFullPath, alignFile, true, profileName, refJuryProfile);
+                         dist = new JuryDistance(structuresFullPath, alignFile, true, profileName, opt,refJuryProfile);
                          //dist.InitMeasure();
                          break;
 
@@ -352,7 +354,7 @@ namespace phiClustCore
                              dist = new CosineDistance(this.al, jury1d);
                          }
                          else
-                            dist = new CosineDistance(structuresFullPath, alignFile, jury1d, profileName, refJuryProfile);
+                            dist = new CosineDistance(structuresFullPath, alignFile, jury1d, profileName, opt,refJuryProfile);
                      break;
                  case DistanceMeasures.EUCLIDIAN:
                      if (aux1.Equals(aux2) && aux1.Equals(aux3))
@@ -361,7 +363,7 @@ namespace phiClustCore
                          dist = new Euclidian(this.al, jury1d);
                      }
                      else
-                        dist = new Euclidian(structuresFullPath, alignFile, jury1d, profileName, refJuryProfile);
+                        dist = new Euclidian(structuresFullPath, alignFile, jury1d, profileName, opt,refJuryProfile);
                      break;
 
                  case DistanceMeasures.PEARSON:
@@ -371,7 +373,7 @@ namespace phiClustCore
                          dist = new Pearson(this.al, jury1d);
                      }
                      else
-                        dist=new Pearson(structuresFullPath, alignFile, jury1d, profileName, refJuryProfile);
+                        dist=new Pearson(structuresFullPath, alignFile, jury1d, profileName, opt,refJuryProfile);
                      break;
              }
 
@@ -379,7 +381,7 @@ namespace phiClustCore
              DebugClass.WriteMessage("Start hierarchical");
              //Console.WriteLine("Start hierarchical " + Process.GetCurrentProcess().PeakWorkingSet64);
              currentV = maxV;
-             hk = new hierarchicalCluster(dist, hier, dirName);
+             hk = new hierarchicalCluster(dist, opt, dirName);
              dist.InitMeasure();
             
              //Now just add strctures to the leaves             

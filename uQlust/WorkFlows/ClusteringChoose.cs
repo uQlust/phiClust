@@ -15,6 +15,7 @@ namespace WorkFlows
 
     public partial class ClusteringChoose : Form
     {
+        public OmicsInput om;
         static string userDefinedPath = "workFlows" + Path.DirectorySeparatorChar + "userDefined" + Path.DirectorySeparatorChar;
         static string genomePath = "workFlows" + Path.DirectorySeparatorChar + "omics" + Path.DirectorySeparatorChar;
         static  Dictionary<string, string> profiles = new Dictionary<string, string>()
@@ -38,12 +39,12 @@ namespace WorkFlows
             this.results = Rna_Protein_UserDef.results;
             switch (set.mode)
             {
-                case INPUTMODE.PROTEIN:
+/*                case INPUTMODE.PROTEIN:
                     this.Text = "Proteins clustering";
                     break;
                 case INPUTMODE.RNA:
                     this.Text = "Rna clustering";
-                    break;
+                    break;*/
                 case INPUTMODE.USER_DEFINED:
                     this.Text = "User define profiles clustering";
                     break;
@@ -54,12 +55,16 @@ namespace WorkFlows
             }
 
         }
-
+        public ClusteringChoose(OmicsInput om,Settings set, Form parent, string dataFileName = null):this(set,parent,dataFileName)
+        {
+            this.om = om;
+        }
         void button4_Click(object sender, EventArgs e)
         {
             previus = true;
             parent.Show();
-            this.Close();
+            this.Hide();
+            //this.Close();
         }
         string GetProcessName(object o)
         {
@@ -69,7 +74,7 @@ namespace WorkFlows
         {
                 RpartSimple rpart;
                 if(set.mode==INPUTMODE.OMICS)
-                    rpart = new RpartSimple(this, set, results, genomePath + profiles["Rpart"],dataFileName);
+                    rpart = new RpartSimple(om,this, set, results, genomePath + profiles["Rpart"],dataFileName);
                 else
                     rpart = new RpartSimple(this, set, results, userDefinedPath + profiles["Rpart"]);
                 rpart.processName = GetProcessName(rpart);
@@ -81,7 +86,7 @@ namespace WorkFlows
         {
             HashSimple hash;
             if(set.mode==INPUTMODE.OMICS)
-                hash = new HashSimple(this, set, results, genomePath + profiles["Hash"],dataFileName);
+                hash = new HashSimple(om,this, set, results, genomePath + profiles["Hash"],dataFileName);
             else
                 hash = new HashSimple(this, set, results, userDefinedPath + profiles["Hash"]);
                 hash.processName = GetProcessName(hash);

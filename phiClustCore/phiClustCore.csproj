@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -64,9 +64,8 @@
     <Compile Include="Distance\HammingDistance.cs" />
     <Compile Include="Distance\JuryDistance.cs" />
     <Compile Include="Distance\Pearson.cs" />
+    <Compile Include="DrawHierarchical.cs" />
     <Compile Include="ErrorBase.cs" />
-    <Compile Include="FastDendrog.cs" />
-    <Compile Include="Fraction.cs" />
     <Compile Include="graphNode.cs" />
     <Compile Include="GStatisticsData.cs" />
     <Compile Include="GuidedHashCluster.cs" />
@@ -75,18 +74,22 @@
     <Compile Include="HashCluster.cs" />
     <Compile Include="HashClusterDendrog.cs" />
     <Compile Include="HashKDendrog.cs" />
+    <Compile Include="HeatMapDraw.cs" />
     <Compile Include="HierarchicalCInput.cs" />
     <Compile Include="hierarchicalCluster.cs" />
     <Compile Include="HNN.cs" />
+    <Compile Include="HNNCInput.cs" />
     <Compile Include="HTree.cs" />
     <Compile Include="Interface\IAutomaticProfiles.cs" />
     <Compile Include="Interface\IProgressBar.cs" />
+    <Compile Include="Interface\ISerialize.cs" />
     <Compile Include="Interface\IShowResults.cs" />
     <Compile Include="Interface\ITimeInterval.cs" />
     <Compile Include="Interface\IVisual.cs" />
     <Compile Include="JobManager.cs" />
     <Compile Include="kMeans.cs" />
     <Compile Include="KmeansInput.cs" />
+    <Compile Include="OmicsInput.cs" />
     <Compile Include="Profiles\OmicsProfile.cs" />
     <Compile Include="Profiles\MAlignment.cs" />
     <Compile Include="Options.cs" />

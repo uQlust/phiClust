@@ -8,9 +8,12 @@ using System.IO;
 
 namespace phiClustCore
 {
+    [Serializable]
     public class BaseCInput
     {
+        [NonSerialized]
         private Dictionary<string, string> dicField = new Dictionary<string, string>();
+        [NonSerialized]
         private Dictionary<string, MemberInfo> dicMem = new Dictionary<string, MemberInfo>();
 
         //[Description("Use 1DJury to find reference vectors")]
@@ -102,8 +105,11 @@ namespace phiClustCore
                             case "AglomerativeType":
                                 memB.ReflectedType.GetField(memB.Name).SetValue(this, Enum.Parse(typeof(AglomerativeType), strTab[1]));
                                 break;
+                            case "CodingAlg":
+                                memB.ReflectedType.GetField(memB.Name).SetValue(this, Enum.Parse(typeof(CodingAlg), strTab[1]));
+                                break;
 
-                        }
+                    }
 
                         //SetValue(this, strTab[1]);
                     }

@@ -53,6 +53,7 @@ namespace phiClustCore
             progressObject = mgr;
             set.Load();
         }
+
         public double ProgressUpdate()
         {
             double sum = 0;
@@ -573,7 +574,7 @@ namespace phiClustCore
             return profList;
 		}
 
-        public void MakeProfiles()
+        public void MakeProfiles(Options opt)
         {
             int active = 0;
             List<profileNode> prof = GetActiveProfiles();
@@ -582,7 +583,7 @@ namespace phiClustCore
             profilesNum = GetActiveProfiles().Count;
             profilesProgress=new List<double>(profilesNum);            
 
-            active = GenerateActiveProfiles(masterNode);
+            active = GenerateActiveProfiles(opt,masterNode);
             foreach(var item in profiles)
             {
                 foreach(var it in item.Value)
@@ -594,7 +595,7 @@ namespace phiClustCore
 
         }
         //public void PrepareProfil
-        public void PrepareProfiles(string fullPath)
+        public void PrepareProfiles(Options opt,string fullPath)
         {
             string[] files;
             
@@ -625,14 +626,14 @@ namespace phiClustCore
             if (masterNode == null || masterNode.Values == null || masterNode.Values.Count == 0)
                 throw new Exception("Error: Profiles have not been defined");
 
-            MakeProfiles();
+            MakeProfiles(opt);
 
             if (File.Exists(listFile))
                 File.Delete(listFile);
 
 
         }
-        public void PrepareProfiles(List<string> fileNames)
+        public void PrepareProfiles(Options opt,List<string> fileNames)
         {
             profiles = new Dictionary<string, Dictionary<string, protInfo>>();
             RemoveOutFiles();
@@ -651,7 +652,7 @@ namespace phiClustCore
                 throw new Exception("Error: Profiles have not been defined");
 
 
-            MakeProfiles();
+            MakeProfiles(opt);
 
             if (File.Exists(listFile))
                 File.Delete(listFile);
@@ -753,7 +754,7 @@ namespace phiClustCore
 
             return active;
         }
-        public int GenerateActiveProfiles(Dictionary<string, profileNode> node)
+        public int GenerateActiveProfiles(Options opt,Dictionary<string, profileNode> node)
         {
             int activeProfiles = 0;
             
@@ -790,12 +791,12 @@ namespace phiClustCore
                     else
                     {
                         DebugClass.WriteMessage("Run profiling");                        
-                            mgr.RunProfile(item.internalName, listFile);
+                            mgr.RunProfile(opt,item.internalName, listFile);
                         activeProfiles++;
                     }
 
                     if (item.childrens.Count > 0)
-                        activeProfiles += GenerateActiveProfiles(item.childrens);
+                        activeProfiles += GenerateActiveProfiles(opt,item.childrens);
                     else
                     {
                         if (!profiles.ContainsKey(item.profName))
@@ -804,7 +805,7 @@ namespace phiClustCore
                                 profString = ReadProfile(item);
                             else
                             {
-                                    profString = mgr.GetProfile(item, listFile);
+                                    profString = mgr.GetProfile(opt,item, listFile);
                             }
                             if (profString!=null && profString.Count > 0)
                                 profiles.Add(item.profName, profString);

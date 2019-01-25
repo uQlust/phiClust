@@ -22,8 +22,6 @@ namespace phiClustCore
         public int regThreshold = 1;
         [Description("Combine clusters based on the hamming distance between them")]
         public bool combine = true;
-        [Description("Hamming distance below this threshold will lead to joining clusters")]
-        public int hDistance = 1;
         [Description("Use consensus states if true, otherwise orginal coding will be used")]
         public bool useConsensusStates = true;
         [Description("Use 1Djury to find consesnsus states ")]

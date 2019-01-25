@@ -39,11 +39,11 @@
             // button5
             // 
             this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button5.Location = new System.Drawing.Point(129, 21);
+            this.button5.Location = new System.Drawing.Point(132, 21);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(175, 46);
+            this.button5.Size = new System.Drawing.Size(225, 46);
             this.button5.TabIndex = 78;
-            this.button5.Text = "Omics";
+            this.button5.Text = "Omics profile";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
@@ -76,11 +76,11 @@
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(129, 82);
+            this.button3.Location = new System.Drawing.Point(132, 82);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(175, 46);
+            this.button3.Size = new System.Drawing.Size(225, 46);
             this.button3.TabIndex = 81;
-            this.button3.Text = "User defined";
+            this.button3.Text = "User defined profile";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -94,6 +94,7 @@
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.panel4);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "UserOrOmics";
             this.Text = "UserOrOmics";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.UserOrOmics_FormClosed);

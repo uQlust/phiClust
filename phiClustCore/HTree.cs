@@ -12,7 +12,8 @@ namespace phiClustCore
     {
         HashCluster hCluster;
         Alignment al;
-        jury1D juryLocal = new jury1D();
+        Options opt;
+        jury1D juryLocal;
         string alignmentFile;
         string dirName;
         Dictionary<string, List<byte>> stateAlign;
@@ -28,11 +29,15 @@ namespace phiClustCore
             this.dirName = dirName;
             this.alignmentFile = alignFile;
             hCluster = hCl;
+            opt = hCl.opt;
+            juryLocal = new jury1D(opt);
 
         }
         public HTree(Alignment _al, HashCluster hCl)  
         {
             al = _al;
+            opt = al.opt;
+            juryLocal = new jury1D(opt);
             stateAlign = al.GetStateAlign();
             hCluster = hCl;
         }

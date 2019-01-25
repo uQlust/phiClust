@@ -98,9 +98,9 @@ namespace phiClustCore
             HashCluster hk = null;
 
                 if(alignmentFile!=null)
-                    hk = new HashCluster("", alignmentFile, opt.hash);
+                    hk = new HashCluster("", alignmentFile, opt);
                 else
-                    hk = new HashCluster(dirName, null, opt.hash);
+                    hk = new HashCluster(dirName, null, opt);
 
             
             progressDic.Add(name, hk);
@@ -124,9 +124,9 @@ namespace phiClustCore
             GuidedHashCluster hk = null;
 
                 if (alignmentFile != null)
-                    hk = new GuidedHashCluster("", alignmentFile, opt.hash);
+                    hk = new GuidedHashCluster("", alignmentFile, opt);
                 else
-                    hk = new GuidedHashCluster(dirName, null, opt.hash);
+                    hk = new GuidedHashCluster(dirName, null, opt);
 
 
             progressDic.Add(name, hk);
@@ -137,7 +137,7 @@ namespace phiClustCore
             DateTime cpuPart2 = DateTime.Now;
 
             ClusterOutput output;
-            hk.ReadClassLabels(opt.hNNLabels);
+            //hk.ReadClassLabels(opt.hNNLabels);
             output = hk.RunHashCluster();
             UpdateOutput(name, dirName, alignmentFile, output, "HAMMING", cpuPart1, cpuPart2, hk);
 
@@ -149,9 +149,9 @@ namespace phiClustCore
             HashClusterDendrog hk = null;
 
                 if (alignmentFile != null)
-                    hk = new HashClusterDendrog(null, alignmentFile, opt.hash, opt.hierarchical);
+                    hk = new HashClusterDendrog(null, alignmentFile, opt);
                 else
-                    hk = new HashClusterDendrog(dirName, null, opt.hash, opt.hierarchical);
+                    hk = new HashClusterDendrog(dirName, null, opt);
             
 
             ClusterOutput output;
@@ -164,9 +164,7 @@ namespace phiClustCore
             output = hk.RunHashDendrogCombine();
             if (opt.hash.profileName.Contains("omics"))
             {
-                OmicsProfile om = new OmicsProfile();
-                om.LoadOmicsSettings();
-                string intvName = "generatedProfiles/OmicsIntervals_" + om.processName + ".dat";
+                string intvName = "generatedProfiles/OmicsIntervals_" + opt.omics.processName + ".dat";
                 if (File.Exists(intvName))
                 {
                     OmicsData res = ReadOmicsData(intvName);
@@ -217,7 +215,7 @@ namespace phiClustCore
                 if (codingInterv[item][0] < 0 && codingInterv[item][1] < 0)
                     cool.Add(item);
                 else
-                    if (codingInterv[item][0] > 0 && codingInterv[item][1] > 0)
+                    if (codingInterv[item][0] >= 0 && codingInterv[item][1] >= 0)
                         hot.Add(item);
             }
 
@@ -303,9 +301,9 @@ namespace phiClustCore
             
 
             if (alignmentFile != null)
-                hCluster = new HashCluster(null, alignmentFile,opt.hash);
+                hCluster = new HashCluster(null, alignmentFile,opt);
             else
-                hCluster = new HashCluster(dirName, null, opt.hash);
+                hCluster = new HashCluster(dirName, null, opt);
 
             HTree h = new HTree(dirName, alignmentFile, hCluster);
             beginJob(currentProcessName, h.ToString(), dirName, "HAMMING");
@@ -325,51 +323,31 @@ namespace phiClustCore
         {
             DateTime cpuPart1 = DateTime.Now;
             HashCluster hCluster = null;
-            OmicsProfile remOm = new OmicsProfile();
-            remOm.LoadOmicsSettings();
-            OmicsProfile profOm = new OmicsProfile();
-            profOm.LoadOmicsSettings();
-            profOm.numRow = 3;
-            profOm.numCol = 2;
-            profOm.labelGeneStart = new List<int>();
-            profOm.labelGeneStart.Add(1);
-            profOm.labelSampleStart = new List<int>();
-            profOm.labelSampleStart.Add(2);
-            profOm.SaveOmicsSettings();
+            opt.hash.fcolumns = true;
+            opt.hash.selectionMethod = COL_SELECTION.ENTROPY;
             if (alignmentFile != null)
-                hCluster = new HashCluster(null, alignmentFile, opt.hash);
+                hCluster = new HashCluster(null, alignmentFile, opt);
             else
-                hCluster = new HashCluster(dirName, null, opt.hash);
+                hCluster = new HashCluster(dirName, null, opt);
 
-            profOm.LoadOmicsSettings();
             string hClusterName = name + "upper";
             if (beginJob != null)
                 beginJob(currentProcessName, hCluster.ToString(), dirName, "HAMMING");
             progressDic.Add(name, hCluster);
 
-
-
             hCluster.InitHashCluster();
 
             DateTime cpuPart2 = DateTime.Now;
-            Dictionary<string, string> classLabels = ReadLabels(opt.hNNLabels);
-            ClusterOutput aux = hCluster.RunHashCluster(new List<string>(classLabels.Keys));
+            ClusterOutput aux = hCluster.RunHashCluster();
 
-            HNN knn = new HNN(hCluster,classLabels);
-            List<string> testList = new List<string>();
-
-            foreach(var item in hCluster.stateAlign.Keys)
-            {
-                if (!classLabels.ContainsKey(item))
-                    testList.Add(item);
-            }
-
-
-            Dictionary<string, string> resT = knn.HNNTest(testList);
-            remOm.SaveOmicsSettings();
+            HNN knn = new HNN(hCluster,aux);
+            
+            Dictionary<string, string> resT = knn.HNNTest(opt.hnn.testFile);
             //double res = knn.HNNValidate(knn.validateList);
             ClusterOutput output = new ClusterOutput();
             output.hNNRes = resT;
+            output.clusters = aux.clusters;
+            output.clusterConsisten = aux.clusterConsisten;
             UpdateOutput(name, dirName, alignmentFile, output, "NONE", cpuPart1, cpuPart2, knn);
 
         }
@@ -378,25 +356,23 @@ namespace phiClustCore
             DateTime cpuPart1 = DateTime.Now;
             HashClusterDendrog upper = null;
             HashClusterDendrog left = null;
-            OmicsProfile profOm = new OmicsProfile();
             HashCluster hashUpper = null;
             HashCluster hashLeft = null;
             ClusterOutput aux,output;
             //  opt.hierarchical.distance = DistanceMeasures.PEARSON;
-            profOm.LoadOmicsSettings();
             int numLeftClusters, numUpperClusters;
-
+            opt.omics.heatmap = false;
             numLeftClusters = opt.hash.reqClusters;
             numUpperClusters = opt.hash.relClusters;
             if (alignmentFile != null)
             {
-                hashUpper = new HashCluster("", alignmentFile, opt.hash);               
-                hashLeft = new HashCluster("", alignmentFile, opt.hash);
+                hashUpper = new HashCluster("", alignmentFile, opt);               
+                hashLeft = new HashCluster("", alignmentFile, opt);
             }
             else
             {
-                hashUpper = new HashCluster(dirName, null, opt.hash);
-                hashLeft = new HashCluster(dirName, null, opt.hash);
+                hashUpper = new HashCluster(dirName, null, opt);
+                hashLeft = new HashCluster(dirName, null, opt);
             }
             if (beginJob != null)
                 beginJob(currentProcessName, "HeatMap", dirName, "HAMMING");
@@ -416,20 +392,19 @@ namespace phiClustCore
             progressDic.Add(name, hashLeft);
 
             ClusterOutput outputLeft;
-            profOm.heatmap = true;
-            profOm.SaveOmicsSettings();
+            opt.omics.heatmap = true;
+//            profOm.Save(OmicsInput.fileName);
             opt.hash.relClusters = numLeftClusters;
            
             
             hashLeft.InitHashCluster();
             outputLeft = hashLeft.RunHashCluster();
 
-            OmicsProfile om = new OmicsProfile();
             Settings set = new Settings();
             set.Load();
 
 
-            string fileName=set.profilesDir + Path.DirectorySeparatorChar + om.processName;
+            string fileName=set.profilesDir + Path.DirectorySeparatorChar +opt.omics.processName;
 
             List<string> listUpper=OmicsProfile.GetOrderedProfiles(fileName);
             fileName += "_transpose";
@@ -459,8 +434,8 @@ namespace phiClustCore
          //   refStructUpper=HashCluster.CuttFreq(listLeft, new List<string>(refStructLeft.Keys), refStructUpper);
          //   refStructLeft=HashCluster.CuttFreq(listUpper, new List<string>(refStructUpper.Keys), refStructLeft);
 
-            left = new HashClusterDendrog(dirName, opt.hash, opt.hierarchical,hashLeft.al);
-           upper = new HashClusterDendrog(dirName, opt.hash, opt.hierarchical, hashUpper.al);
+            left = new HashClusterDendrog(dirName, hashLeft.al);
+           upper = new HashClusterDendrog(dirName, hashUpper.al);
            
             
 
@@ -495,8 +470,8 @@ namespace phiClustCore
            if (opt.hash.profileName.Contains("omics"))
            {
                //OmicsProfile om = new OmicsProfile();
-               om.LoadOmicsSettings();
-               string intvName = "generatedProfiles/OmicsIntervals_" + om.processName + ".dat";
+               
+               string intvName = "generatedProfiles/OmicsIntervals_" + opt.omics.processName + ".dat";
                if (File.Exists(intvName))
                {
                    OmicsData res = ReadOmicsData(intvName);
@@ -571,15 +546,15 @@ namespace phiClustCore
             HashClusterDendrog left = null;
             OmicsProfile profOm = new OmicsProfile();
             //  opt.hierarchical.distance = DistanceMeasures.PEARSON;
-            profOm.LoadOmicsSettings();
+            profOm.Load(OmicsInput.fileName);
 
             if (alignmentFile != null)
             {
-                upper = new HashClusterDendrog(null, alignmentFile, opt.hash, opt.hierarchical);
+                upper = new HashClusterDendrog(null, alignmentFile, opt);
             }
             else
             {
-                upper = new HashClusterDendrog(dirName, null, opt.hash, opt.hierarchical);
+                upper = new HashClusterDendrog(dirName, null, opt);
             }
 
             //profOm.LoadOmicsSettings();
@@ -599,9 +574,7 @@ namespace phiClustCore
 
             if (opt.hash.profileName.Contains("omics"))
             {
-                OmicsProfile om = new OmicsProfile();
-                om.LoadOmicsSettings();
-                string intvName = "generatedProfiles/OmicsIntervals_" + om.processName + ".dat";
+                string intvName = "generatedProfiles/OmicsIntervals_" + opt.omics.processName + ".dat";
                 if (File.Exists(intvName))
                 {
                     OmicsData res = ReadOmicsData(intvName);
@@ -614,13 +587,13 @@ namespace phiClustCore
             //  UpdateOutput(nameUpper, dirName, alignmentFile, output, "NONE", cpuPart1, cpuPart2, upper);
             opt.hash.relClusters = opt.hash.reqClusters;
             if (alignmentFile != null)
-                left = new HashClusterDendrog(null, alignmentFile, opt.hash, opt.hierarchical);
+                left = new HashClusterDendrog(null, alignmentFile, opt);
             else
-                left = new HashClusterDendrog(dirName, null, opt.hash, opt.hierarchical);
+                left = new HashClusterDendrog(dirName, null, opt);
 
             //profOm.transpose = true;
-            profOm.heatmap = true;
-            profOm.SaveOmicsSettings();
+            profOm.oInput.heatmap = true;
+            profOm.Save(OmicsInput.fileName);
             string nameLeft = name + "left";
             //progressDic.Add(nameLeft, left);
             left.StartProgress = 0.5;
@@ -646,7 +619,7 @@ namespace phiClustCore
                 alignFile, opt.hierarchical.hammingProfile, opt.hierarchical.jury1DProfileAglom);
 
             DebugClass.WriteMessage("Measure Created");          
-            hierarchicalCluster hk = new hierarchicalCluster(distance, opt.hierarchical,dirName);
+            hierarchicalCluster hk = new hierarchicalCluster(distance, opt,dirName);
             if (beginJob != null)
                 beginJob(currentProcessName,hk.ToString(), dirName, distance.ToString());
             clType = hk.ToString();
@@ -694,7 +667,7 @@ namespace phiClustCore
             ClusterOutput output;
 
 
-            jury1D ju=new jury1D();
+            jury1D ju=new jury1D(opt);
             if (beginJob != null)
                 beginJob(currentProcessName, ju.ToString(), dirName, "NONE");
 
@@ -790,21 +763,21 @@ namespace phiClustCore
             {
                 case DistanceMeasures.HAMMING:
                     if (alignFileName != null)
-                        dist = new JuryDistance(alignFileName, jury1d, profileName, refJuryProfile);
+                        dist = new JuryDistance(alignFileName, jury1d, profileName, opt,refJuryProfile);
                     else
-                        dist = new JuryDistance(dirName, alignFileName, jury1d, profileName, refJuryProfile);
+                        dist = new JuryDistance(dirName, alignFileName, jury1d, profileName,opt,refJuryProfile);
                     break;
                 case DistanceMeasures.COSINE:
                     if (alignFileName != null)
-                        dist = new CosineDistance(alignFileName, jury1d, profileName, refJuryProfile);
+                        dist = new CosineDistance(alignFileName, jury1d, profileName, refJuryProfile,opt);
                     else
-                        dist = new CosineDistance(dirName, alignFileName, jury1d, profileName, refJuryProfile);
+                        dist = new CosineDistance(dirName, alignFileName, jury1d, profileName, opt,refJuryProfile);
                     break;
 
                 case DistanceMeasures.PEARSON:
                     if (dirName == null)
                         throw new Exception("RMSD and MAXSUB measures cannot be used for aligned profiles!");
-                    dist = new Pearson(dirName, alignFileName, jury1d, refJuryProfile);
+                    dist = new Pearson(dirName, alignFileName, jury1d, refJuryProfile,opt);
                     break;
 
 

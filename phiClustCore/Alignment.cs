@@ -12,7 +12,8 @@ namespace phiClustCore
 {
     public class Alignment : IProgressBar
 	{
-        Settings dirSettings;        
+        Settings dirSettings;
+        public Options opt;
 		Dictionary <string,string> align=new Dictionary<string,string>();
         string refSeq = null;
         int maxV;
@@ -25,8 +26,9 @@ namespace phiClustCore
         public double EndProgress { set { endProgress = value; } get { return endProgress; } }
 
 
-        public Alignment()
+        public Alignment(Options opt)
         {
+            this.opt = opt;
             r = new ProfileTree();
         }
 
@@ -83,7 +85,7 @@ namespace phiClustCore
             r.LoadProfiles(profName);
             r.listFile = profilesFile;
             DebugClass.WriteMessage("profiles gen started "+profName);
-            r.MakeProfiles();
+            r.MakeProfiles(opt);
             DebugClass.WriteMessage("Prfofiles end");
         }
         private void StartAlignment(Settings dirSettings, string profName, string dirName, List<string> fileNames )
@@ -98,7 +100,7 @@ namespace phiClustCore
                 {
                     refFile = dirName + ".ref";
                     DebugClass.WriteMessage("profiles gen started");
-                    r.PrepareProfiles(dirName);
+                    r.PrepareProfiles(opt,dirName);
                     DebugClass.WriteMessage("finished");
                     refSeq=ReadRefSeq(refFile);
                 }
@@ -113,7 +115,7 @@ namespace phiClustCore
                     }
                     refFile = Directory.GetParent(name).ToString() + ".ref";
                     DebugClass.WriteMessage("profiles gen started");
-                    r.PrepareProfiles(fileNames);
+                    r.PrepareProfiles(opt,fileNames);
                     DebugClass.WriteMessage("finished");
                     refSeq = ReadRefSeq(refFile);
                 }

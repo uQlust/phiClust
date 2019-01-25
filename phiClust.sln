@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "phiClust", "uQlust\phiClust
 		{71C7BB85-5D7B-470D-9BD0-A13E7D161F29} = {71C7BB85-5D7B-470D-9BD0-A13E7D161F29}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "phiClustCore", "uQlustCore\phiClustCore.csproj", "{71C7BB85-5D7B-470D-9BD0-A13E7D161F29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "phiClustCore", "phiClustCore\phiClustCore.csproj", "{71C7BB85-5D7B-470D-9BD0-A13E7D161F29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "phiClustTerminal", "phiClustTerminal\phiClustTerminal.csproj", "{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,22 @@ Global
 		{71C7BB85-5D7B-470D-9BD0-A13E7D161F29}.Release|Win32.ActiveCfg = Release|Any CPU
 		{71C7BB85-5D7B-470D-9BD0-A13E7D161F29}.Release|x64.ActiveCfg = Release|Any CPU
 		{71C7BB85-5D7B-470D-9BD0-A13E7D161F29}.Release|x64.Build.0 = Release|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Debug|Win32.Build.0 = Debug|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Debug|x64.Build.0 = Debug|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Release|Win32.Build.0 = Release|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Release|x64.ActiveCfg = Release|Any CPU
+		{0B2149E9-3787-468B-AAB1-A96DFF9C5F4C}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

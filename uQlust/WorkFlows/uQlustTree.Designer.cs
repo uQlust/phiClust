@@ -50,8 +50,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioHTree = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.relevantC)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -267,6 +267,17 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tree algortihm";
             // 
+            // radioHTree
+            // 
+            this.radioHTree.AutoSize = true;
+            this.radioHTree.Location = new System.Drawing.Point(104, 19);
+            this.radioHTree.Name = "radioHTree";
+            this.radioHTree.Size = new System.Drawing.Size(55, 17);
+            this.radioHTree.TabIndex = 83;
+            this.radioHTree.Text = "HTree";
+            this.radioHTree.UseVisualStyleBackColor = true;
+            this.radioHTree.CheckedChanged += new System.EventHandler(this.radioHTree_CheckedChanged);
+            // 
             // radioButton2
             // 
             this.radioButton2.AutoSize = true;
@@ -278,17 +289,6 @@
             this.radioButton2.TabStop = true;
             this.radioButton2.Text = "Regular";
             this.radioButton2.UseVisualStyleBackColor = true;
-            // 
-            // radioHTree
-            // 
-            this.radioHTree.AutoSize = true;
-            this.radioHTree.Location = new System.Drawing.Point(104, 19);
-            this.radioHTree.Name = "radioHTree";
-            this.radioHTree.Size = new System.Drawing.Size(55, 17);
-            this.radioHTree.TabIndex = 83;
-            this.radioHTree.Text = "HTree";
-            this.radioHTree.UseVisualStyleBackColor = true;
-            this.radioHTree.CheckedChanged += new System.EventHandler(this.radioHTree_CheckedChanged);
             // 
             // uQlustTreeSimple
             // 
