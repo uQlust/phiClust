@@ -38,13 +38,6 @@ namespace phiClustCore
         public string loadableProfile = "";
         public string runParameters="";
 
-        static public void Save(string fileName,Object o)
-        {
-            Stream stream = File.Open(fileName, FileMode.Create);
-            BinaryFormatter bFormatter = new BinaryFormatter();
-            bFormatter.Serialize(stream,o);
-            stream.Close();
-        }
         public void SaveTxt(string fileName)
         {
             StreamWriter stream = new StreamWriter(fileName);

@@ -12,6 +12,7 @@ using phiClustCore.Interface;
 
 namespace phiClustCore
 {
+    [Serializable]
     class HashCluster:IProgressBar
     {
         public Dictionary<string, List<byte>> stateAlign;
@@ -61,6 +62,7 @@ namespace phiClustCore
         Dictionary<string, List<int>> threadingKeys;
         public List<int> validIndexes = new List<int>();
 //Neaded for thread Tasks
+        [NonSerialized]
         ManualResetEvent[] resetEvents = null;
         List<int>[] threadStructures;
         List<string> allStructures;

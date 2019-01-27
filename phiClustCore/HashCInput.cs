@@ -12,6 +12,7 @@ namespace phiClustCore
         ENTROPY,
         META_COL
     };
+    [Serializable]
     public class HashCInput:BaseCInput,IAutomaticProfiles
     {
         [Description("Hash clustering: Do you want to use regularization")]

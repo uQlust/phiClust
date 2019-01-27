@@ -7,6 +7,7 @@ using phiClustCore.Profiles;
 
 namespace phiClustCore
 {
+    [Serializable]
     public class KmeansInput:BaseCInput,IAutomaticProfiles
     {
         [Description("K-means algorithm: K in K-means")]

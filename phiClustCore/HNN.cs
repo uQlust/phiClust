@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using phiClustCore.Profiles;
 using System.IO;
+using phiClustCore.Interface;
 namespace phiClustCore
 {
-    class HNN
+    [Serializable]
+    class HNN:ISerialize
     {
         Dictionary<string, string> classLabels;
         Dictionary<string, string> caseBase = new Dictionary<string,string>();
@@ -13,19 +17,50 @@ namespace phiClustCore
         public List<string> validateList = new List<string>();
         public List<string> testList = new List<string>();
         HashCluster hk=null;
+        ClusterOutput outP=null;
+        public ClusterOutput outCl { get { return outP; } set { outP = value; } }
         Settings set;
-        ClusterOutput output;
+        HNNCInput opt;
 
-        public HNN(HashCluster hk,ClusterOutput outp,Dictionary<string,string> classLabels=null)        
+        public HNN(HashCluster hk,ClusterOutput outp,HNNCInput opt)        
         {
             this.hk=hk;
+            this.opt = opt;
             set = new Settings();
             set.Load();
-            PrepareCaseBaseLabels(outp,classLabels);
+            PrepareCaseBaseLabels(outp);
         }
-        void PrepareCaseBaseLabels(ClusterOutput outp,Dictionary<string,string> classLabels=null)
+        public void ISaveBinary(string fileName)
         {
-            this.classLabels = classLabels;
+            GeneralFunctionality.SaveBinary(fileName, this);
+        }
+        public ISerialize ILoadBinary(string fileName)
+        {
+            return GeneralFunctionality.LoadBinary(fileName);
+        }
+        static Dictionary<string,string> ReadClassLabels(string fileName)
+        {
+            Dictionary<string, string> labels = new Dictionary<string, string>();
+            StreamReader wr = new StreamReader(fileName);
+            string line = wr.ReadLine();
+            while(line!=null)
+            {
+                string[] aux = line.Split(' ');
+                if (aux.Length == 2)
+                    labels.Add(aux[0], aux[1]);
+
+                line = wr.ReadLine();
+            }
+            wr.Close();
+
+            return labels;
+        }
+        void PrepareCaseBaseLabels(ClusterOutput outp)
+        {
+            classLabels = null;
+            if(opt.labelsFile.Length>0)
+                classLabels = ReadClassLabels(opt.labelsFile);
+
             if (classLabels == null || classLabels.Count == 0)
             {
                 int num = 1;
@@ -97,7 +132,7 @@ namespace phiClustCore
             acc = (double)good / all;
             return acc;
         }
-        public Dictionary<string, string> HNNTest(string fileName)
+        public Dictionary<string, string> ITest(string fileName)
         {
             Dictionary<string, protInfo> test = new Dictionary<string, protInfo>();
             if (set.mode == INPUTMODE.USER_DEFINED)
@@ -106,13 +141,14 @@ namespace phiClustCore
                 List<string> nodes = new List<string>(hk.al.r.masterNode.Keys);
                 test = p.GetProfile(hk.al.r.masterNode[nodes[0]], fileName);
             }
+            
             foreach (var item in test)
             {
                 List<string> aux = new List<string>();
                 foreach (var state in item.Value.profile)
                     aux.Add(state.ToString());
-                string newKey = item.Key + "_test";
-                hk.al.r.AddItemsCombineStates(newKey, aux);
+                
+                hk.al.r.AddItemsCombineStates(item.Key, aux);
             }
             Dictionary<string, string> res = HNNTest(new List<string>(test.Keys));
 
@@ -132,16 +168,17 @@ namespace phiClustCore
                     StringBuilder newOrder = new StringBuilder();
                     for (int i = 0; i < hk.validIndexes.Count; i++)
                         newOrder.Append(keyList[j][hk.validIndexes[i]]);
-                    kk.Remove(keyList[j]);
+                    
                     string newKey = newOrder.ToString();
                     if (kk.ContainsKey(newKey))
                         kk[newKey].Add(j);
                     else
                     {
                         List<int> indx = new List<int>();
-                        indx.Add(j);
+                        indx.AddRange(kk[keyList[j]]);
                         kk.Add(newKey, indx);
                     }
+                    kk.Remove(keyList[j]);
                 }
             }
             List<string> caseKeys = new List<string>(kk.Keys);
@@ -183,6 +220,8 @@ namespace phiClustCore
             return res;
         }
 
-       // public HNNTest(List)
+       
+       
+
     }
 }

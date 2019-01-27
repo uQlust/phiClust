@@ -321,6 +321,7 @@ namespace phiClustCore.Profiles
         }
 
     }
+    [Serializable]
     public class InternalProfilesManager: IProgressBar
     {
         static string fileName = "internal.profiles";

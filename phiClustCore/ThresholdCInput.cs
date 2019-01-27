@@ -7,6 +7,7 @@ using phiClustCore.Profiles;
 
 namespace phiClustCore
 {
+    [Serializable]
     public class ThresholdCInput:BaseCInput,IAutomaticProfiles
     {
         [Description("Threshold clustering: What is the minimal number of structures in the cluster")]

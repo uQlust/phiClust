@@ -66,6 +66,7 @@
     <Compile Include="Distance\Pearson.cs" />
     <Compile Include="DrawHierarchical.cs" />
     <Compile Include="ErrorBase.cs" />
+    <Compile Include="GeneralFunctionality.cs" />
     <Compile Include="graphNode.cs" />
     <Compile Include="GStatisticsData.cs" />
     <Compile Include="GuidedHashCluster.cs" />

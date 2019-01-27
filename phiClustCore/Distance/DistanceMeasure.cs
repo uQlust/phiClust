@@ -13,6 +13,7 @@ namespace phiClustCore.Distance
     {
         protected int[] distanceMatrix = null;
         public Dictionary<string, int> hashIndex;// = new Dictionary<string, int>();
+        [NonSerialized]
         protected ManualResetEvent[] resetEvents = null;
         protected Dictionary<string, Dictionary<string, float [,]>> rotStruct = new Dictionary<string, Dictionary<string, float [,]>>();
         public Dictionary<string,int> structNames;

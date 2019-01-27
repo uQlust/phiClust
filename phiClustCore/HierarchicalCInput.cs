@@ -7,7 +7,7 @@ using phiClustCore.Profiles;
 
 namespace phiClustCore
 {
-   
+   [Serializable]
     public class HierarchicalCInput:BaseCInput,IAutomaticProfiles
     {
            [Description("K-means algorithm: Value of DB index")]

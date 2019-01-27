@@ -7,6 +7,7 @@ using phiClustCore.Profiles;
 
 namespace phiClustCore
 {
+    [Serializable]
     public class RankingCInput:BaseCInput,IAutomaticProfiles
     {       
         public string alignFileName;

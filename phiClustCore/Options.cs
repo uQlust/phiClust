@@ -77,7 +77,8 @@ namespace phiClustCore
         public List<ClusterAlgorithm> clusterAlgorithm=new List<ClusterAlgorithm>();
         [Description("Name of distance file")]
         public string distanceFile = "";
-
+        [Description("Save object to binary file")]
+        public string binaryFile = "";
 
         //[Description("Distance measure to be used [MAXSUB, RMSD, JURY1D]")]
         public RankingCInput other=new RankingCInput();

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Linq.Expressions;
 using System.Timers;
 using phiClustCore;
+using phiClustCore.Interface;
 using phiClustCore.Distance;
 using phiClustCore.Profiles;
 
@@ -51,7 +52,8 @@ namespace phiClustTerminal
             int resHeight = 0;
             string graphFileName = "";
             string configFileName = "";
-
+            string binaryFile = "";
+            string testFile = "";
             Options opt = new Options();
             ClusterVis clusterOut = new ClusterVis();
             try
@@ -78,7 +80,8 @@ namespace phiClustTerminal
                 Console.WriteLine("-n \n\t number of cores to be used");
                 Console.WriteLine("-t \n\tshow time information");
                 Console.WriteLine("-a \n\tgenerate automatic profiles (can be used only when aligned profile is set in configuration file)");
-                Console.WriteLine("-b \n\tSave results to binary file (readable by GUI version)");
+                Console.WriteLine("-b fileName \n\tSave results to binary file ");
+                Console.WriteLine("-l fileName profileTest\n\tTest profileTest file on object saved in fileName");
                 Console.WriteLine("-sg fileName resWidthxresHeigth \n\tSave results to png file (if possible)");
                 Console.WriteLine("-p \n\tShow progres bar");
                 return;
@@ -112,11 +115,11 @@ namespace phiClustTerminal
                         break;
                     case "-b":
                         binary = true;
+                        binaryFile = args[++i];                        
                         break;
                     case "-n":
                         if (args.Length > i)
-                        {
-                                        
+                        {                                        
                             int num;
                             try
                             {
@@ -191,6 +194,10 @@ namespace phiClustTerminal
                             return;
                         }
                         break;
+                    case "-l":
+                        binaryFile = args[++i];
+                        testFile = args[++i];
+                        break;
                     default:
                         if(args[i].Contains("-"))
                             Console.WriteLine("Unknown option " + args[i]);
@@ -204,42 +211,56 @@ namespace phiClustTerminal
                 Console.WriteLine("Configurarion file has been not provided!");
                 return;
             }
-
+            Dictionary<string, ClusterOutput> clOut = new Dictionary<string, ClusterOutput>();
             try
             {
-                Random r = new Random();
-                Console.WriteLine("Configuration file " + configFileName);
-                opt.ReadOptionFile(configFileName);
-                opt.omics.processName = "Batch_" + r.Next(1000);
-                if(automaticProfiles)
-                    opt.GenerateAutomaticProfiles(null);
-
-                manager.opt = opt;
-                manager.message = ErrorMessage;
-                if (progress)
+                if (testFile.Length > 0)
                 {
-                    TimeIntervalTerminal.InitTimer(UpdateProgress);
-                    TimeIntervalTerminal.Start();
+                    ISerialize test = GeneralFunctionality.LoadBinary(binaryFile);
+                    ClusterOutput res = null;
+                    res = test.outCl;
+                    res.hNNRes = test.ITest(testFile);
+                    clOut.Add("test", res);
+                    
                 }
-                manager.RunJob(opt.omics.processName);
-                manager.WaitAllNotFinished();
-                UpdateProgress(null,null);
-                
-                if(progress)
-                    TimeIntervalTerminal.Stop();
-                Console.Write("\r                                                                     ");
+                else
+                {
+                    Random r = new Random();
+                    Console.WriteLine("Configuration file " + configFileName);
+                    opt.ReadOptionFile(configFileName);
+                    opt.omics.processName = "Batch_" + r.Next(1000);
+                    if (automaticProfiles)
+                        opt.GenerateAutomaticProfiles(null);
+                    if (binary)
+                        opt.binaryFile = binaryFile;
+                    manager.opt = opt;
+                    manager.message = ErrorMessage;
+                    if (progress)
+                    {
+                        TimeIntervalTerminal.InitTimer(UpdateProgress);
+                        TimeIntervalTerminal.Start();
+                    }
+                    manager.RunJob(opt.omics.processName);
+                    manager.WaitAllNotFinished();
+                    UpdateProgress(null, null);
+
+                    if (progress)
+                        TimeIntervalTerminal.Stop();
+                    Console.Write("\r                                                                     ");
+                    clOut = manager.clOutput;
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Exception : " + ex.Message);
             }
-            if (manager.clOutput.Count > 0)
+            if (clOut.Count > 0)
             {
-                foreach (var item in manager.clOutput.Keys)
+                foreach (var item in clOut.Keys)
                 {
-                    clusterOut.output = manager.clOutput[item];
-                    string clustName = manager.clOutput[item].clusterType;
-                    if(clustName.Contains(":"))
+                    clusterOut.output = clOut[item];
+                    string clustName = clOut[item].clusterType;
+                    if(clustName!=null && clustName.Contains(":"))
                     {
                         clustName=clustName.Replace(':', '-');
                     }
@@ -248,20 +269,11 @@ namespace phiClustTerminal
                     {
                         clusterOut.output.SaveGraph(graphFileName,resWidth,resHeight);                       
                     }
-                        if (binary)
-                    {
-                        string fileName=opt.outputFile + "_" + item + ".cres";
-                        StreamWriter file = new StreamWriter(fileName);
-
-                        file.Close();
-                        ClusterOutput.Save(opt.outputFile + "_" + item + ".cres0", clusterOut.output);
-
-                    }
                 }
             }
             if (times)
             {
-                foreach (var item in manager.clOutput)
+                foreach (var item in clOut)
                     Console.WriteLine(item.Value.dirName + " " + item.Value.measure + " " + item.Value.time);
             }
             if (errors)

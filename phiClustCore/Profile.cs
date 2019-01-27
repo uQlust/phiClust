@@ -31,7 +31,7 @@ namespace phiClustCore
         string defaultProfile="default.profiles";
         public string listFile;
         public string currentProfileName = "";
-        Settings set = new Settings();
+        Settings set = new Settings();       
         public SerializableDictionary<string, profileNode> masterNode = new SerializableDictionary<string, profileNode>();
         public Dictionary<string,Dictionary<string, protInfo>> profiles = null;
         public Dictionary<string, List<byte>> protCombineStates = null;
@@ -920,11 +920,19 @@ namespace phiClustCore
         }
 
     }
-
+    [Serializable]
     [XmlRoot("dictionary")]
     public class SerializableDictionary<TKey, TValue>
         : Dictionary<TKey, TValue>, IXmlSerializable
     {
+        public SerializableDictionary()
+        : base()
+        {
+        }
+        public SerializableDictionary(SerializationInfo info, StreamingContext context)
+  : base(info, context)
+        {
+        }
         #region IXmlSerializable Members
         public System.Xml.Schema.XmlSchema GetSchema()
         {
@@ -986,12 +994,14 @@ namespace phiClustCore
         }
         #endregion
     }
+    [Serializable]
     public struct RangeWeight
     {
         public int start;
         public int stop;
         public double Weight;
     }
+    [Serializable]
     public struct protInfo
     {
         public string sequence;
@@ -1012,10 +1022,8 @@ namespace phiClustCore
         public bool deleteAble = true;
         public List<RangeWeight> rangeWeights = null;
         public SerializableDictionary<string, SerializableDictionary<string, double>> profWeights=new SerializableDictionary<string,SerializableDictionary<string,double>>();
-        public SerializableDictionary<string, string> states = new SerializableDictionary<string, string>();
-        [NonSerialized]
-        public SerializableDictionary<string, byte> codingToByte = new SerializableDictionary<string, byte>();
-        [NonSerialized]
+        public SerializableDictionary<string, string> states = new SerializableDictionary<string, string>();        
+        public SerializableDictionary<string, byte> codingToByte = new SerializableDictionary<string, byte>();        
         public SerializableDictionary<byte,string> codingToString = new SerializableDictionary<byte,string>();
         [NonSerialized]
         bool[] index = new bool[byte.MaxValue+1];

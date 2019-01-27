@@ -11,6 +11,7 @@ using System.Threading;
 using phiClustCore.Interface;
 namespace phiClustCore
 {
+    [Serializable]
 	public class jury1D:IProgressBar
 	{
         string currentProfile="";
@@ -34,6 +35,7 @@ namespace phiClustCore
         Dictionary<byte, Dictionary<byte,double>> weights;
         public Dictionary<byte, int>[] columns = null;
         List<string> allStructures;
+        [NonSerialized]
         ManualResetEvent[] resetEvents = null;
         long maxV, currentV;
         Settings set = new Settings();

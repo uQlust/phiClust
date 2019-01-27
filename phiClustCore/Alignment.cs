@@ -10,6 +10,7 @@ using phiClustCore.Interface;
 
 namespace phiClustCore
 {
+    [Serializable]
     public class Alignment : IProgressBar
 	{
         Settings dirSettings;

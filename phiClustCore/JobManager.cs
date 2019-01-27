@@ -340,14 +340,21 @@ namespace phiClustCore
             DateTime cpuPart2 = DateTime.Now;
             ClusterOutput aux = hCluster.RunHashCluster();
 
-            HNN knn = new HNN(hCluster,aux);
-            
-            Dictionary<string, string> resT = knn.HNNTest(opt.hnn.testFile);
-            //double res = knn.HNNValidate(knn.validateList);
+            HNN knn = new HNN(hCluster,aux,opt.hnn);
+
             ClusterOutput output = new ClusterOutput();
-            output.hNNRes = resT;
             output.clusters = aux.clusters;
             output.clusterConsisten = aux.clusterConsisten;
+            knn.outCl = output;
+            if (opt.binaryFile.Length > 0)
+                knn.ISaveBinary(opt.binaryFile);
+
+            Dictionary<string, string> resT = knn.ITest(opt.hnn.testFile);            
+            //double res = knn.HNNValidate(knn.validateList);
+
+            output.hNNRes = resT;
+            
+
             UpdateOutput(name, dirName, alignmentFile, output, "NONE", cpuPart1, cpuPart2, knn);
 
         }
@@ -930,7 +937,7 @@ namespace phiClustCore
             {
                 string name=fileName+count++;
                 w.WriteLine(name);
-                ClusterOutput.Save(name, clOutput[item]);
+                GeneralFunctionality.SaveBinary(name, clOutput[item]);
             }
             w.Close();
 

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using phiClustCore;
 using phiClustCore.Profiles;
+
 namespace WorkFlows
 {
     public partial class HNN : RpartSimple
@@ -32,16 +33,11 @@ namespace WorkFlows
             {
                 opt.ReadOptionFile(fileName);
                 textBox2.Text = opt.hnn.testFile;
-                textBox1.Text = opt.hnn.trainingFile;
+                textBox3.Text = opt.hnn.labelsFile;
+                if(opt.profileFiles!=null && opt.profileFiles.Count>0)
+                    textBox1.Text = opt.profileFiles[0];
                 
-                if(opt.hnn.labelPosition==-1)
-                {
-                    radioButton1.Checked = false;
-                    radioButton2.Checked = false;
-                    radioButton3.Checked = true;
-                }
-                if(opt.hnn.labelPosition>0)
-                    this.numericUpDown1.Value = opt.hnn.labelPosition;
+            
             }
             
             if (set.mode == INPUTMODE.USER_DEFINED)
@@ -59,56 +55,10 @@ namespace WorkFlows
             w.Close();
         }
 
-        void CombineTrainTest()
-        {
-            if(opt.hash.profileName.Contains("omics"))
-            {
-                OmicsProfile om = new OmicsProfile(opt);
-                //om.Load(OmicsInput.fileName);
-                if (radioButton2.Checked)
-                    om.oInput.transpose = true;
-                om.Save(OmicsInput.fileName);
-                List<string> classLabels = om.ReadClassLabels(this.dataFileName,radioButton1.Checked,(int)numericUpDown1.Value);
-                om.ReadOmicsFile(this.dataFileName);
-                Console.WriteLine("labL=" + om.labelGenes[0][om.labelGenes[0].Count - 1]+" "+classLabels[classLabels.Count-1]);
-
-                StreamWriter fileF = new StreamWriter("log");
-                for(int i=0;i< om.labelGenes[0].Count;i++)
-                {
-                    fileF.WriteLine(om.labelGenes[0][i]);
-                }
-                fileF.WriteLine("Next");
-                for (int i = 0; i < classLabels.Count; i++)
-                {
-                    fileF.WriteLine(classLabels[i]);
-                }
-                fileF.Close();
-                if (om.labelGenes[0].Count == classLabels.Count)
-                    SaveFile(textBox2.Text + "_labels",om.labelGenes[0],classLabels);
-                else
-                    if (om.labelSamples[0].Count == classLabels.Count)
-                        SaveFile(textBox2.Text + "_labels", om.labelSamples[0], classLabels);
-                    else
-                        throw new Exception("Incorrect numer of class labels");
-
-                om.CombineTrainigTest(ChangeFileName(this.dataFileName,"combine"), this.dataFileName, textBox2.Text);
-            }
-
-        }
-        string ChangeFileName(string fileName,string prefix)
-        {
-            string path = Path.GetDirectoryName(fileName);
-            string fName = Path.GetFileName(fileName);
-            fName = path + Path.DirectorySeparatorChar+"combine_" + fName;
-
-            return fName;
-        }
         private void buttonHNN_Click(object sender, EventArgs e)
         {
             opt.dataDir.Clear();
             opt.clusterAlgorithm.Clear();
-
-            CombineTrainTest();
                 
             if(alg==OMICS_CHOOSE.HNN)
                 opt.clusterAlgorithm.Add(ClusterAlgorithm.HNN);
@@ -116,14 +66,12 @@ namespace WorkFlows
                 opt.clusterAlgorithm.Add(ClusterAlgorithm.GuidedHashCluster);
             opt.profileFiles.Clear();
             opt.hnn.testFile = textBox2.Text;
-            if(!radioButton3.Checked)
-                opt.hnn.labelPosition = (int)numericUpDown1.Value;
-            else
-                opt.hnn.labelPosition = -1;
-            opt.hnn.trainingFile = textBox1.Text;
+            if (textBox3.Text.Length > 0)
+                opt.hnn.labelsFile = textBox3.Text;
+            
             if (opt.hash.profileName.Contains("omics"))
             {        
-                opt.profileFiles.Add(ChangeFileName(this.dataFileName,"combine"));
+                opt.profileFiles.Add(this.dataFileName);
             }
             else
                 opt.profileFiles.Add(textBox1.Text);

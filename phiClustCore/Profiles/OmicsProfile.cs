@@ -18,7 +18,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace phiClustCore.Profiles
 {
     [Serializable]
-    public class OmicsProfile : UserDefinedProfile,ISerialize
+    public class OmicsProfile : UserDefinedProfile
     {
         public static string omicsSettings = "omicsSettings.dat";
         public OmicsInput oInput=new OmicsInput();
@@ -74,23 +74,6 @@ namespace phiClustCore.Profiles
             currentProgress = 0;
             set.Load();
 
-        }
-        public void ISaveBinary(string fileName)
-        {
-            Stream stream = File.Open(fileName, FileMode.Create);
-            BinaryFormatter bFormatter = new BinaryFormatter();
-            bFormatter.Serialize(stream, this);
-            stream.Close();
-
-        }
-        public object ILoadBinary(string fileName)
-        {
-            OmicsProfile outObject;
-            Stream stream = File.Open(fileName, FileMode.Open);
-            BinaryFormatter bFormatter = new BinaryFormatter();
-            outObject = (OmicsProfile)bFormatter.Deserialize(stream);
-
-            return outObject;
         }
 
         List<int> GetLabelsPositions(string positions)
@@ -1036,9 +1019,7 @@ namespace phiClustCore.Profiles
                 List<string> m = new List<string>(ts.masterNode.Keys);
                 //localNode = ts.masterNode[m[0]];
 
-                currentProgress = maxV;
-
-            ISaveBinary("proba.bin");
+                currentProgress = maxV;            
 
             return 0;
 
