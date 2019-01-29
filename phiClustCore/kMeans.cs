@@ -260,7 +260,7 @@ namespace phiClustCore
             for (int r = 0; r < 1; r++)
             {
                 clustOut = kMeansLevel(k, maxIter,allStruct);
-                cost = CalculateDaviesBouldinIndex(clustOut.clusters);
+                cost = CalculateDaviesBouldinIndex(clustOut.clusters.list);
                 if (remCost > cost)
                 {
                      remCost = cost;
@@ -427,7 +427,8 @@ namespace phiClustCore
             }
 
             clustOut = new ClusterOutput();
-            clustOut.clusters = finalClusters;
+            clustOut.clusters = new clusterRes();
+            clustOut.clusters.list = finalClusters;
            //     clustOut.clusters = clusters;
             currentV = maxV;
             return clustOut;
@@ -467,17 +468,17 @@ namespace phiClustCore
 				{
 					bool test=false;
 					clustOut=kMeansLevel(k,30,structures);
-					for(int n=0;n<clustOut.clusters.Count;n++)
-                        if (clustOut.clusters[n].Count < 10)
+					for(int n=0;n<clustOut.clusters.list.Count;n++)
+                        if (clustOut.clusters.list[n].Count < 10)
 							test=true;
 
 					if(!test)
 					{
-                        cost = CalculateDaviesBouldinIndex(clustOut.clusters);
+                        cost = CalculateDaviesBouldinIndex(clustOut.clusters.list);
 						if(remCost>cost)
 						{
 							remCost=cost;
-							remClust=clustOut.clusters;
+							remClust=clustOut.clusters.list;
 						}	
 					}
 				}

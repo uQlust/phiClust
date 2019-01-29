@@ -27,11 +27,11 @@ namespace Graph
         {
             InitializeComponent();
             this.output = output;
-            this.clusters = output.clusters;
+            this.clusters = output.clusters.list;
             for (int i = 1; i <= clusters.Count; i++)
             {
                 if (clusters[i - 1].Count>1)
-                    listBox1.Items.Add(String.Format("{0,12} {1,7} {2,8}", "Cluster_"+i ,clusters[i - 1].Count,output.clusterConsisten[i-1].ToString("0.00")));
+                    listBox1.Items.Add(String.Format("{0,12} {1,7} {2,8}", "Cluster_"+i ,clusters[i - 1].Count,output.clusters.consistency[i-1].ToString("0.00")));
                 else
                     listBox1.Items.Add(String.Format("{0,12} {1,7} ","Cluster_"+ i, clusters[i - 1].Count));
             }

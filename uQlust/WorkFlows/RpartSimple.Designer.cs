@@ -105,7 +105,7 @@
             // 
             // relevantC
             // 
-            this.relevantC.Location = new System.Drawing.Point(207, 101);
+            this.relevantC.Location = new System.Drawing.Point(210, 101);
             this.relevantC.Maximum = new decimal(new int[] {
             100000000,
             0,
@@ -122,7 +122,7 @@
             // 
             // percentData
             // 
-            this.percentData.Location = new System.Drawing.Point(207, 136);
+            this.percentData.Location = new System.Drawing.Point(210, 136);
             this.percentData.Name = "percentData";
             this.percentData.Size = new System.Drawing.Size(120, 20);
             this.percentData.TabIndex = 63;
@@ -316,7 +316,7 @@
         public System.Windows.Forms.OpenFileDialog openFileDialog1;
         public System.Windows.Forms.Label label8;
         public System.Windows.Forms.Label label9;
-        private System.Windows.Forms.CheckBox checkBox1;
+        public System.Windows.Forms.CheckBox checkBox1;
         public System.Windows.Forms.NumericUpDown refPoints;
         public  System.Windows.Forms.Label label10;
         private System.Windows.Forms.CheckBox selectReference;

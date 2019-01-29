@@ -13,7 +13,7 @@ using phiClustCore.Interface;
 namespace phiClustCore
 {
     [Serializable]
-    class HashCluster:IProgressBar
+    public class HashCluster:IProgressBar
     {
         public Dictionary<string, List<byte>> stateAlign;
         public Options opt;
@@ -506,7 +506,11 @@ namespace phiClustCore
 
             return entropy;
         }
-        protected virtual double [] CalcEntropy(Dictionary<byte,int> []locColumns)
+        public double [] CalcEntropy()
+        {
+            return CalcEntropy(columns);
+        }
+        public virtual double [] CalcEntropy(Dictionary<byte,int> []locColumns)
         {
             if (locColumns == null)
                 return null;
@@ -632,7 +636,8 @@ namespace phiClustCore
             int stop = (int)array[2];
             int maxPosition = (int)array[3];
             List<string> keyQueryLocal = (List<string>)array[4];
-            List<string> caseKeyLocal = (List<string>)array[5];            
+            List<string> caseKeyLocal = (List<string>)array[5];
+            List<string> remBest = null;
             Dictionary<string, List<string>> finalList = (Dictionary<string, List<string>>)array[6];
             List<string> caseKey = (List<string>)array[7];
             List<string> keyQuery = (List<string>)array[8];
@@ -641,6 +646,7 @@ namespace phiClustCore
                 int position = 0;
                 int positionLeft = 0;
                 int positionRight = maxPosition;
+                remBest = null;
 
                 do
                 {
@@ -660,16 +666,26 @@ namespace phiClustCore
                         positionLeft = positionRight;
                     else
                         if (outList.Count > 1)
-                            positionLeft = position;
-                        else
-                            positionRight = position;
+                    {
+                        positionLeft = position;
+                        remBest = new List<string>(outList);
+                    }
+                    else
+                        positionRight = position;
 
                 }
                 while (positionRight - positionLeft > 1);
                 lock (finalList)
                 {
-                    if (!finalList.ContainsKey(keyQuery[i]))
-                        finalList.Add(keyQuery[i], outList);
+                    if (!finalList.ContainsKey(keyQuery[i]))                        
+                            if(remBest!=null)
+                                finalList.Add(keyQuery[i], remBest);
+                            else
+                                finalList.Add(keyQuery[i], outList);
+
+
+
+
                 }
                 outList = new List<string>();
 
@@ -685,22 +701,15 @@ namespace phiClustCore
                 return null;
             DebugClass.WriteMessage("Select");
             bool[] columnAvoid = new bool[columns.Length];
-          
-            int[] indexes = new int[columnAvoid.Length];
 
-            for (int j = 0; j < indexes.Length; j++)
-                indexes[j] = j;
-
-            double[] entropy = CalcEntropy(columns);
-
-            Array.Sort(entropy, indexes);
+            int[] indexes = GetIndexOrder(columns);
 
             List<string> caseKeyLocal = new List<string>(caseKeys.Count);
             StringBuilder keyB = new StringBuilder();
             foreach(var item in caseKeys)
             {                
                 keyB.Clear();
-                for (int i = indexes.Length-1; i >= 0; i--)
+                for (int i = 0; i<indexes.Length; i++)
                     keyB.Append(item[indexes[i]]);
 
                 caseKeyLocal.Add( keyB.ToString());
@@ -711,7 +720,7 @@ namespace phiClustCore
             foreach (var item in keyQuery)
             {
                 keyB.Clear();
-                for (int i = indexes.Length-1; i >= 0; i--)
+                for (int i = 0;i< indexes.Length; i++)
                     keyB.Append(item[indexes[i]]);
 
                 keyQueryLocal.Add(keyB.ToString());
@@ -721,7 +730,7 @@ namespace phiClustCore
 
             Dictionary<string, List<int>> hashClusters = new Dictionary<string, List<int>>();
 
-            threadNumbers = 3;
+            threadNumbers = 1;
             resetEvents = new ManualResetEvent[threadNumbers];
             for (int n = 0; n < threadNumbers; n++)
             {
@@ -863,6 +872,21 @@ namespace phiClustCore
             return hashClusters;
 
         }
+        int [] GetIndexOrder(Dictionary<byte,int> []tab)
+        {
+            int[] indexes = new int[tab.Length];
+
+            for (int j = 0; j < indexes.Length; j++)
+                indexes[j] = j;
+
+            double[] entropy = CalcEntropy(columns);
+
+            Array.Sort(entropy, indexes);
+            Array.Reverse(entropy);
+            Array.Reverse(indexes);
+
+            return indexes;
+        }
         private Dictionary<string, List<int>> SelectColumnsByEntropy(Dictionary<string, List<int>> dic, int k, double prec)
         {
             if (columns == null)
@@ -873,19 +897,10 @@ namespace phiClustCore
                 columnAvoid[i] = false;
 
 
-           // if (dic.Keys.Count < k)
-             //   k = dic.Keys.Count -1;
+            // if (dic.Keys.Count < k)
+            //   k = dic.Keys.Count -1;
 
-            int[] indexes = new int[columnAvoid.Length];
-
-            for (int j = 0; j < indexes.Length; j++)
-                indexes[j] = j;
-
-            double[] entropy = CalcEntropy(columns);
-
-            Array.Sort(entropy, indexes);
-            Array.Reverse(entropy);
-            Array.Reverse(indexes);
+            int[] indexes = GetIndexOrder(columns);
 
             Dictionary<string, List<int>> hashClusters = new Dictionary<string, List<int>>();
 
@@ -1936,7 +1951,7 @@ namespace phiClustCore
         {
             List<List<string>> clusters = new List<List<string>>(dic.Count);
             validIndexes.Clear();
-            if (input.fcolumns)
+            if (input.hashCluster)
             {
                 switch (input.selectionMethod)
                 {
@@ -2429,10 +2444,12 @@ namespace phiClustCore
 
                 if (output.clusters != null)
                 {
-                    output.clusters.Clear();
-                    foreach(var item in backOutput)
-                        item.clusters.Clear();
+                    output.clusters.list.Clear();
+                    foreach (var item in backOutput)
+                        item.clusters.list.Clear();
                 }
+                else
+                    output.clusters = new clusterRes();
 
                 input.relClusters = i;
                 Dictionary<int, double> aux = new Dictionary<int, double>();
@@ -2440,9 +2457,8 @@ namespace phiClustCore
                 for (int j = 30; j < 90; j += 5) //percentage 
                 {
                     dicC = remDic;
-                    input.perData = j;
-
-                    output.clusters = PrepareClusters(dicC, structNames);
+                    input.perData = j;                    
+                    output.clusters.list = PrepareClusters(dicC, structNames);
                     double backDisp = 0;
                     List<double> backList = new List<double>();
                     foreach (var item in backOutput)
@@ -2454,15 +2470,15 @@ namespace phiClustCore
                         foreach (var bitem in backGround.Key)
                             backDic.Add(backGround.Value[bitem.Value[0]], bitem.Key);
                         dicC = backGround.Key;
+                        item.clusters = new clusterRes();
+                        item.clusters.list = PrepareClusters(backGround.Key, backGround.Value);
 
-                        item.clusters = PrepareClusters(backGround.Key, backGround.Value);
-
-                        backList.Add(Math.Log(CalcDisp(item.clusters, backDic)));
+                        backList.Add(Math.Log(CalcDisp(item.clusters.list, backDic)));
                         backDisp += backList[backList.Count-1];
                     }
                     backDisp /= backOutput.Length;
                     double disp = 0;
-                    disp = Math.Log(CalcDisp(output.clusters, structToKey));
+                    disp = Math.Log(CalcDisp(output.clusters.list, structToKey));
                     double sdk = 0;
 
                     foreach(var item in backList)
@@ -2490,7 +2506,7 @@ namespace phiClustCore
 
             input.relClusters = remRelClusters;
             input.perData = remPerData;
-            output.clusters = PrepareClusters(dicC, structNames);
+            output.clusters.list = PrepareClusters(dicC, structNames);
 
             input = remInput;
             return output;
@@ -2612,10 +2628,10 @@ namespace phiClustCore
 
             PrepareClustering(_structNames);
             //output = PrepareClustersJuryLike(dicC, structNames);
+            output.clusters = new clusterRes();
+            output.clusters.list = PrepareClusters(dicC, structNames);
 
-            output.clusters = PrepareClusters(dicC, structNames);
-
-            output.clusterConsisten = CalcClustersConsistency(output.clusters);
+            output.clusters.consistency = CalcClustersConsistency(output.clusters.list);
             if (validIndexes.Count > 0)
                 output.auxInt = validIndexes;
             else

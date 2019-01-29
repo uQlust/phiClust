@@ -62,7 +62,7 @@ namespace Graph
                     if (active == null || !(active is VisOrder))
                     {
                         VisOrder visOrder;
-                        visOrder = new VisOrder(output.clusters, item, null);
+                        visOrder = new VisOrder(output.clusters.list, item, null);
                         visOrder.closeForm = Closing;
                         active = visOrder;
                         visOrder.Show();
@@ -123,7 +123,10 @@ namespace Graph
                         if (output.juryLike != null)
                             showRes = new FormText(output.juryLike, item);
                         else
+                        {
                             showRes = new FormText(output.hNNRes, item);
+                            showRes.Text = "Prediction";
+                        }
                         showRes.closeForm = Closing;
                         active = showRes;
                         showRes.Show();

@@ -142,7 +142,7 @@ namespace WorkFlows
             opt.hash.perData = 90;
 
             opt.hash.combine = radioButton1.Checked;
-            opt.hash.fcolumns = !radioButton1.Checked;
+            opt.hash.hashCluster = !radioButton1.Checked;
 
             opt.hierarchical.uHTree = radioHTree.Checked;
             opt.hierarchical.distance = distanceControl1.distDef;

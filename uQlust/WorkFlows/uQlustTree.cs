@@ -152,7 +152,7 @@ namespace WorkFlows
             }
             if (Hash.Checked)
             {
-                opt.hash.fcolumns = true;
+                opt.hash.hashCluster = true;
                 opt.hash.selectionMethod = COL_SELECTION.ENTROPY;
             }
             results.Show();

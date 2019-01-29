@@ -219,7 +219,11 @@ namespace phiClustTerminal
                     ISerialize test = GeneralFunctionality.LoadBinary(binaryFile);
                     ClusterOutput res = null;
                     res = test.outCl;
-                    res.hNNRes = test.ITest(testFile);
+                    if (test is HNN)
+                    {
+                        res.hNNRes = test.ITest(testFile);                        
+                    }
+                    res.clusterType = test.ToString();
                     clOut.Add("test", res);
                     
                 }

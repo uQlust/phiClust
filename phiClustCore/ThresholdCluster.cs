@@ -119,7 +119,8 @@ namespace phiClustCore
 
                 currentV += items.Count;
 			}
-            output.clusters = clusters;
+            output.clusters = new clusterRes();
+            output.clusters.list = clusters;
             currentV = maxV;
 			return output;			
 		}

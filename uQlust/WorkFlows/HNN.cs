@@ -59,13 +59,23 @@ namespace WorkFlows
         {
             opt.dataDir.Clear();
             opt.clusterAlgorithm.Clear();
-                
-            if(alg==OMICS_CHOOSE.HNN)
+            
+            opt.hash.hashCluster = true;
+            opt.hash.selectionMethod = COL_SELECTION.ENTROPY;
+
+            if (alg==OMICS_CHOOSE.HNN)
                 opt.clusterAlgorithm.Add(ClusterAlgorithm.HNN);
             else
                 opt.clusterAlgorithm.Add(ClusterAlgorithm.GuidedHashCluster);
+            if (radioButton1.Checked)
+            {                
+                opt.hash.hashCluster = false;
+                opt.hash.combine = true;
+            }
+
             opt.profileFiles.Clear();
             opt.hnn.testFile = textBox2.Text;
+            opt.hnn.labelsFile = textBox3.Text;
             if (textBox3.Text.Length > 0)
                 opt.hnn.labelsFile = textBox3.Text;
             
@@ -107,6 +117,13 @@ namespace WorkFlows
             //this.Close();
         }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            DialogResult res = openFileDialog1.ShowDialog();
 
+            if (res == DialogResult.OK)
+                textBox3.Text = ((OpenFileDialog)(openFileDialog1)).FileName;
+
+        }
     }
 }

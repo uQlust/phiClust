@@ -9,13 +9,14 @@ using phiClustCore.Interface;
 namespace phiClustCore
 {
     [Serializable]
-    class HNN:ISerialize
+    public class HNN:ISerialize
     {
         Dictionary<string, string> classLabels;
         Dictionary<string, string> caseBase = new Dictionary<string,string>();
         Dictionary<string, string> labelToBaseKey = new Dictionary<string, string>();
         public List<string> validateList = new List<string>();
         public List<string> testList = new List<string>();
+        public List<string> clusterLabels = null;
         HashCluster hk=null;
         ClusterOutput outP=null;
         public ClusterOutput outCl { get { return outP; } set { outP = value; } }
@@ -29,6 +30,10 @@ namespace phiClustCore
             set = new Settings();
             set.Load();
             PrepareCaseBaseLabels(outp);
+        }
+        public override string ToString()
+        {
+            return "HNN";
         }
         public void ISaveBinary(string fileName)
         {
@@ -58,14 +63,17 @@ namespace phiClustCore
         void PrepareCaseBaseLabels(ClusterOutput outp)
         {
             classLabels = null;
-            if(opt.labelsFile.Length>0)
+            if (opt.labelsFile.Length > 0)
+            {
                 classLabels = ReadClassLabels(opt.labelsFile);
-
+               
+            }
+            clusterLabels = new List<string>();
             if (classLabels == null || classLabels.Count == 0)
             {
                 int num = 1;
                 this.classLabels = new Dictionary<string, string>();
-                foreach (var cluster in outp.clusters)
+                foreach (var cluster in outp.clusters.list)
                 {
                     string label = "cluster_" + num++;
                     foreach(var item in cluster)                    
@@ -102,6 +110,7 @@ namespace phiClustCore
 
                     classLab.Sort((x, y) => classDic[x].CompareTo(classDic[y]));
                     caseBase.Add(item.Key, classLab[0]);
+                    clusterLabels.Add(classLab[0]);
 
                 }
                 else
@@ -159,19 +168,20 @@ namespace phiClustCore
             Dictionary<string, string> aux = new Dictionary<string, string>();
             Dictionary<string, string> res = new Dictionary<string, string>();
             Dictionary<string,List<int>> kk=hk.PrepareKeys(testList, true, false);
-            
-            if(hk.validIndexes.Count>0)
+            List<string> keyList = new List<string>(kk.Keys);
+            List<int> validIndexes = null;
+            if (hk.validIndexes.Count > 0)
             {
-                List<string> keyList = new List<string>(kk.Keys);
-                for(int j=0;j<keyList.Count;j++)
+                validIndexes = hk.validIndexes;
+                for (int j = 0; j < keyList.Count; j++)
                 {
                     StringBuilder newOrder = new StringBuilder();
-                    for (int i = 0; i < hk.validIndexes.Count; i++)
-                        newOrder.Append(keyList[j][hk.validIndexes[i]]);
-                    
+                    for (int i = 0; i < validIndexes.Count; i++)
+                        newOrder.Append(keyList[j][validIndexes[i]]);
+
                     string newKey = newOrder.ToString();
                     if (kk.ContainsKey(newKey))
-                        kk[newKey].Add(j);
+                        kk[newKey].AddRange(kk[keyList[j]]);
                     else
                     {
                         List<int> indx = new List<int>();
@@ -205,10 +215,14 @@ namespace phiClustCore
                     string final = "";
                     if (keys[item].Count > 0)
                     {
-                        foreach (var it in keys[item])
-                            for (int i = 0; i < keys[item].Count - 1; i++)
-                                final += caseBase[keys[item][i]] + ":";
-                        final += caseBase[keys[item][keys[item].Count - 1]];
+                        Dictionary<string, int> c = new Dictionary<string, int>();
+                        for (int i = 0; i < keys[item].Count; i++)
+                            if (!c.ContainsKey(caseBase[keys[item][i]]))
+                                c.Add(caseBase[keys[item][i]], 1);
+                        List<string> xx = new List<string>(c.Keys);
+                        for (int i = 0; i < xx.Count - 1; i++)
+                                final += xx[i] + ":";
+                        final += xx[xx.Count - 1];
                     }
                     if (final.Length == 0)
                         res.Add(aux[item], "NOT CLASSIFIED");

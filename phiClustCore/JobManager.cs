@@ -323,8 +323,7 @@ namespace phiClustCore
         {
             DateTime cpuPart1 = DateTime.Now;
             HashCluster hCluster = null;
-            opt.hash.fcolumns = true;
-            opt.hash.selectionMethod = COL_SELECTION.ENTROPY;
+
             if (alignmentFile != null)
                 hCluster = new HashCluster(null, alignmentFile, opt);
             else
@@ -344,16 +343,17 @@ namespace phiClustCore
 
             ClusterOutput output = new ClusterOutput();
             output.clusters = aux.clusters;
-            output.clusterConsisten = aux.clusterConsisten;
+            output.clusters.consistency = aux.clusters.consistency;
             knn.outCl = output;
+            
+            if (opt.hnn.labelsFile != null && opt.hnn.labelsFile.Length > 0)
+                output.clusters.labels = knn.clusterLabels;
             if (opt.binaryFile.Length > 0)
                 knn.ISaveBinary(opt.binaryFile);
-
             Dictionary<string, string> resT = knn.ITest(opt.hnn.testFile);            
             //double res = knn.HNNValidate(knn.validateList);
 
             output.hNNRes = resT;
-            
 
             UpdateOutput(name, dirName, alignmentFile, output, "NONE", cpuPart1, cpuPart2, knn);
 
@@ -417,16 +417,16 @@ namespace phiClustCore
             fileName += "_transpose";
             List<string> listLeft = OmicsProfile.GetOrderedProfiles(fileName);
 
-            List<string> refUpper= HashClusterDendrog.ClustersReferences(outputUpper.clusters, hashUpper.al);
-            List<string> refLeft = HashClusterDendrog.ClustersReferences(outputLeft.clusters, hashLeft.al);
+            List<string> refUpper= HashClusterDendrog.ClustersReferences(outputUpper.clusters.list, hashUpper.al);
+            List<string> refLeft = HashClusterDendrog.ClustersReferences(outputLeft.clusters.list, hashLeft.al);
 
 
             hashUpper.CuttAlignment(listLeft, refLeft);
             hashLeft.CuttAlignment(listUpper, refUpper);
 
 
-            Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> refStructUpper = HashClusterDendrog.StructuresToDenrogram(outputUpper.clusters, hashUpper.al);
-            Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> refStructLeft = HashClusterDendrog.StructuresToDenrogram(outputLeft.clusters, hashLeft.al);
+            Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> refStructUpper = HashClusterDendrog.StructuresToDenrogram(outputUpper.clusters.list, hashUpper.al);
+            Dictionary<string, KeyValuePair<List<string>, Dictionary<byte, int>[]>> refStructLeft = HashClusterDendrog.StructuresToDenrogram(outputLeft.clusters.list, hashLeft.al);
 
             output = new ClusterOutput();
 

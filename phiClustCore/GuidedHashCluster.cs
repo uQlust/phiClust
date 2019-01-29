@@ -62,7 +62,7 @@ namespace phiClustCore
 
             file.Close();
         }
-        protected override double[] CalcEntropy(Dictionary<byte, int>[] locColumns)
+        public override double[] CalcEntropy(Dictionary<byte, int>[] locColumns)
         {
             double[] entropy = base.CalcEntropy(locColumns);
             Dictionary<string, List<string>> classLabels = new Dictionary<string,List<string>>();

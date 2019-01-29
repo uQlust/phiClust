@@ -33,7 +33,7 @@ namespace phiClustCore
         }
         public void SaveClusters(string fileName)
         {
-            SaveClusters(output.clusters, fileName);
+            SaveClusters(output.clusters.list, fileName);
         }       
         public void SaveClusters(List<List<string>> clust,string fileName)
         {

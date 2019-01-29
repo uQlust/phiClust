@@ -14,6 +14,19 @@ namespace phiClustCore
     public interface ICluster
     {
         ClusterOutput RunCluster();
+    } 
+    [Serializable]
+    public class clusterRes
+    {
+        public clusterRes()
+        {
+            list = new List<List<string>>();
+        }
+        public List<List<string>> list=null;
+        public List<string> labels=null;
+        public List<double> consistency=null;
+
+        
     }
     [Serializable]
     public class ClusterOutput
@@ -25,8 +38,8 @@ namespace phiClustCore
         public List<int> auxInt;
         public HClusterNode hNode;
         public List<HClusterNode> nodes;
-        public List<List<string>> clusters;
-        public List<double> clusterConsisten;
+        public clusterRes clusters=null;
+        
         public List<Color> profilesColor = null;
         public string clusterType;
         public string measure;
@@ -50,7 +63,7 @@ namespace phiClustCore
             }
             if(clusters!=null)
             {
-                Save(clusters,clusterConsisten,stream,false,auxInt);
+                Save(clusters.list,clusters.consistency,stream,false,clusters.labels,auxInt);
             }
             if (hNode != null)
             {
@@ -59,7 +72,7 @@ namespace phiClustCore
             }
             if(hNNRes!=null)
             {
-                SaveHnn(hNNRes,fileName+"_HNN");
+                SaveHnn(hNNRes,fileName+"_prediction");
             }
             stream.Close();
         }
@@ -83,7 +96,7 @@ namespace phiClustCore
             else
                 throw new Exception("Graphics can be saved only for heatmap!");
         }
-        static public void Save(List<List<string>> list,List<double> clCons,StreamWriter stream,bool reference,List<int> selectedFeatures=null)
+        static public void Save(List<List<string>> list,List<double> clCons,StreamWriter stream,bool reference,List<string> labels=null,List<int> selectedFeatures=null)
         {
             if (selectedFeatures != null)
             {
@@ -95,6 +108,8 @@ namespace phiClustCore
             for(int i=0;i<list.Count;i++)
             {
                 string line = "===========CLUSTER " + (i+1) + " === Size " + list[i].Count;
+                if (labels != null)
+                    line += " ====label:"+labels[i];
                 if (reference)
                     line += "====Reference model:" + list[i][0];
                 if (clCons != null && clCons.Count == list.Count)
@@ -280,7 +295,7 @@ namespace phiClustCore
             ClusterOutput aux = new ClusterOutput() ;
             string line;
             StreamReader r = new StreamReader(fileName);
-            aux.clusters = new List<List<string>>();
+            aux.clusters = new clusterRes();
             aux.dirName = dirName;
             while (!r.EndOfStream)
             {
@@ -307,7 +322,7 @@ namespace phiClustCore
                             auxList.Add(loc[loc.Length - 1]+".pdb");
                     }
 
-                    aux.clusters.Add(auxList);
+                    aux.clusters.list.Add(auxList);
                 }
 
             }
@@ -319,7 +334,7 @@ namespace phiClustCore
             string[] tmp = null; ;
             string line;
             StreamReader r = new StreamReader(fileName);
-            aux.clusters = new List<List<string>>();
+            aux.clusters = new clusterRes();
             List<KeyValuePair<string,double>> auxList = new List<KeyValuePair<string,double>>();
             line = r.ReadLine();
             while (!r.EndOfStream)
@@ -347,7 +362,7 @@ namespace phiClustCore
             ClusterOutput aux = new ClusterOutput();
             string line;
             StreamReader r = new StreamReader(fileName);
-            aux.clusters = new List<List<string>>();
+            aux.clusters = new clusterRes();
             List<KeyValuePair<int, int>> clustSize = new List<KeyValuePair<int, int>>();
             aux.dirName = dirName;
             List<string> auxList = null;
@@ -359,7 +374,7 @@ namespace phiClustCore
                 {
                     if (auxList != null)
                     {
-                        aux.clusters.Add(auxList);
+                        aux.clusters.list.Add(auxList);
                         clustSize.Add(new KeyValuePair<int,int>(clSize,index));
                         index++;
                     }
@@ -389,18 +404,18 @@ namespace phiClustCore
             }
             if (auxList.Count > 0)
             {
-                aux.clusters.Add(auxList);
+                aux.clusters.list.Add(auxList);
                 clustSize.Add(new KeyValuePair<int, int>(clSize, index));
             }
 
             clustSize.Sort(delegate(KeyValuePair<int, int> first, KeyValuePair<int, int> second) { return second.Key.CompareTo(first.Key); });
 
             ClusterOutput final = new ClusterOutput();
-            final.clusters = new List<List<string>>();
+            final.clusters = new clusterRes();
             final.name = aux.name;
             final.dirName = aux.dirName;
             foreach (var item in clustSize)
-                final.clusters.Add(aux.clusters[item.Value]);
+                final.clusters.list.Add(aux.clusters.list[item.Value]);
 
             return final;
         }
@@ -410,7 +425,7 @@ namespace phiClustCore
         {
             List<List<string>> aux=new List<List<string>>();
             if (clusters != null)
-                return clusters;
+                return clusters.list;
 
             if (juryLike != null)
             {

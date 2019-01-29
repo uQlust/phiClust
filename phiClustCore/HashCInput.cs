@@ -32,7 +32,7 @@ namespace phiClustCore
         [Description("Profile name for regularization")]
         public string profileNameReg="profiles/SS-SA.profiles";
         [Description("Find clusters by automatic columns selection")]
-        public bool fcolumns = false;
+        public bool hashCluster = false;
         [Description("Columns selection method")]
         public COL_SELECTION selectionMethod=COL_SELECTION.ENTROPY;
         [Description("Number of relevant clusters")]
